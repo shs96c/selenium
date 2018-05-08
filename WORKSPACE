@@ -5,35 +5,35 @@ http_archive(
     sha256 = "ba5e2e10cdc4027702f96e9bdc536c6595decafa94847d08ae28c6cb48225124",
 )
 
-load(
-  "@io_bazel_rules_closure//closure:defs.bzl",
-  "closure_repositories")
-closure_repositories()
+#load(
+#  "@io_bazel_rules_closure//closure:defs.bzl",
+#  "closure_repositories")
+#closure_repositories()
 
-http_archive(
-    name = "io_bazel_rules_docker",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.1.0.tar.gz"],
-    strip_prefix = "rules_docker-0.1.0",
-    sha256 = "f43bc041d91afc799155543a98962e8dac07146575305b4693552a29367932b7",
-)
+#http_archive(
+#    name = "io_bazel_rules_docker",
+#    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.1.0.tar.gz"],
+#    strip_prefix = "rules_docker-0.1.0",
+#    sha256 = "f43bc041d91afc799155543a98962e8dac07146575305b4693552a29367932b7",
+#)
 
-load(
-  "@io_bazel_rules_docker//docker:docker.bzl",
-  "docker_repositories", "docker_pull", "docker_build"
-)
-docker_repositories()
+#load(
+#  "@io_bazel_rules_docker//docker:docker.bzl",
+#  "docker_repositories", "docker_pull", "docker_build"
+#)
+#docker_repositories()
 
-docker_pull(
-  name = "java_base",
-  registry = "gcr.io",
-  repository = "distroless/java",
-)
+#docker_pull(
+#  name = "java_base",
+#  registry = "gcr.io",
+#  repository = "distroless/java",
+#)
 
-docker_pull(
-  name = "cc_base",
-  registry = "gcr.io",
-  repository = "distroless/cc",
-)
+#docker_pull(
+#  name = "cc_base",
+#  registry = "gcr.io",
+#  repository = "distroless/cc",
+#)
 
 #docker_pull(
 #    name = "ubuntu-slim",
