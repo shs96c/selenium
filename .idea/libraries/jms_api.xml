@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="jms-api" type="JMS">
+    <properties version="2.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/third_party/java/jms/javax.jms-api.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/third_party/java/jms/javax.jms-api-2.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
