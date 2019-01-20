@@ -1,0 +1,54 @@
+// Licensed to the Software Freedom Conservancy (SFC) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The SFC licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package org.openqa.selenium.grid.server;
+
+import org.openqa.selenium.events.EventBus;
+import org.openqa.selenium.events.zeromq.ZeroMqEventBus;
+import org.openqa.selenium.grid.config.Config;
+import org.zeromq.ZContext;
+
+import java.util.Objects;
+
+public class EventOptions {
+
+  private final Config config;
+  private volatile EventBus bus;
+
+  public EventOptions(Config config) {
+    this.config = Objects.requireNonNull(config, "Config must be set.");
+  }
+
+  public EventBus getEventBus() {
+    if (bus != null) {
+      return bus;
+    }
+
+    boolean bind = config.getBool("events", "bind").orElse(false);
+    String address = config.get("events", "address")
+        .orElseThrow(() -> new IllegalStateException("Unable to determine port for address bus"));
+
+    synchronized (config) {
+      if (bus == null) {
+        ZContext context = new ZContext();
+        bus = new ZeroMqEventBus(context, address, bind);
+      }
+    }
+
+    return bus;
+  }
+}

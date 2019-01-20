@@ -30,8 +30,10 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.concurrent.Regularly;
+import org.openqa.selenium.events.EventBus;
 import org.openqa.selenium.grid.component.HealthCheck;
 import org.openqa.selenium.grid.data.Session;
+import org.openqa.selenium.grid.data.SessionEndEvent;
 import org.openqa.selenium.grid.node.Node;
 import org.openqa.selenium.grid.node.NodeStatus;
 import org.openqa.selenium.grid.sessionmap.SessionMap;
@@ -67,6 +69,7 @@ public class LocalNode extends Node {
 
   private LocalNode(
       DistributedTracer tracer,
+      EventBus bus,
       URI uri,
       HealthCheck healthCheck,
       int maxSessionCount,
@@ -90,6 +93,9 @@ public class LocalNode extends Node {
         .removalListener((RemovalListener<SessionId, SessionAndHandler>) notification -> {
           // Attempt to stop the session
           notification.getValue().stop();
+
+          // And now let the world know the session is done
+          bus.fire(new SessionEndEvent(notification.getKey()));
         })
         .build();
 
@@ -269,15 +275,17 @@ public class LocalNode extends Node {
   public static Builder builder(
       DistributedTracer tracer,
       HttpClient.Factory httpClientFactory,
+      EventBus bus,
       URI uri,
       SessionMap sessions) {
-    return new Builder(tracer, httpClientFactory, uri, sessions);
+    return new Builder(tracer, httpClientFactory, bus, uri, sessions);
   }
 
   public static class Builder {
 
     private final DistributedTracer tracer;
     private final HttpClient.Factory httpClientFactory;
+    private final EventBus bus;
     private final URI uri;
     private final SessionMap sessions;
     private final ImmutableList.Builder<SessionFactory> factories;
@@ -289,10 +297,12 @@ public class LocalNode extends Node {
     public Builder(
         DistributedTracer tracer,
         HttpClient.Factory httpClientFactory,
+        EventBus bus,
         URI uri,
         SessionMap sessions) {
       this.tracer = Objects.requireNonNull(tracer);
       this.httpClientFactory = Objects.requireNonNull(httpClientFactory);
+      this.bus = bus;
       this.uri = Objects.requireNonNull(uri);
       this.sessions = Objects.requireNonNull(sessions);
       this.factories = ImmutableList.builder();
@@ -329,6 +339,7 @@ public class LocalNode extends Node {
 
       return new LocalNode(
           tracer,
+          bus,
           uri,
           check,
           maxCount,

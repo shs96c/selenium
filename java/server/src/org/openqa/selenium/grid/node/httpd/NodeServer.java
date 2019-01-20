@@ -24,6 +24,7 @@ import com.beust.jcommander.ParameterException;
 
 import org.openqa.selenium.cli.CliCommand;
 import org.openqa.selenium.concurrent.Regularly;
+import org.openqa.selenium.events.EventBus;
 import org.openqa.selenium.grid.config.AnnotatedConfig;
 import org.openqa.selenium.grid.config.CompoundConfig;
 import org.openqa.selenium.grid.config.ConcatenatingConfig;
@@ -38,6 +39,7 @@ import org.openqa.selenium.grid.node.local.NodeFlags;
 import org.openqa.selenium.grid.server.BaseServer;
 import org.openqa.selenium.grid.server.BaseServerFlags;
 import org.openqa.selenium.grid.server.BaseServerOptions;
+import org.openqa.selenium.grid.server.EventOptions;
 import org.openqa.selenium.grid.server.HelpFlags;
 import org.openqa.selenium.grid.server.Server;
 import org.openqa.selenium.grid.server.W3CCommandHandler;
@@ -101,13 +103,17 @@ public class NodeServer implements CliCommand {
           new AnnotatedConfig(serverFlags),
           new AnnotatedConfig(nodeFlags),
           new EnvConfig(),
-          new ConcatenatingConfig("node", '.', System.getProperties()));
+          new ConcatenatingConfig("node", '.', System.getProperties()),
+          new DefaultNodeConfig());
 
       LoggingOptions loggingOptions = new LoggingOptions(config);
       loggingOptions.configureLogging();
       DistributedTracer tracer = loggingOptions.getTracer();
       GlobalDistributedTracer.setInstance(tracer);
       HttpClient.Factory httpClientFactory = HttpClient.Factory.createDefault();
+
+      EventOptions eventOptions = new EventOptions(config);
+      EventBus bus = eventOptions.getEventBus();
 
       SessionMapOptions sessionsOptions = new SessionMapOptions(config);
       URL sessionMapUrl = sessionsOptions.getSessionMapUri().toURL();
@@ -118,6 +124,7 @@ public class NodeServer implements CliCommand {
       LocalNode.Builder builder = LocalNode.builder(
           tracer,
           httpClientFactory,
+          bus,
           serverOptions.getExternalUri(),
           sessions);
       nodeFlags.configure(httpClientFactory, builder);

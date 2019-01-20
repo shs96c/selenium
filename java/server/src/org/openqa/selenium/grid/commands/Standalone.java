@@ -24,6 +24,7 @@ import com.beust.jcommander.ParameterException;
 
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.cli.CliCommand;
+import org.openqa.selenium.events.EventBus;
 import org.openqa.selenium.grid.config.AnnotatedConfig;
 import org.openqa.selenium.grid.config.CompoundConfig;
 import org.openqa.selenium.grid.config.ConcatenatingConfig;
@@ -38,6 +39,7 @@ import org.openqa.selenium.grid.router.Router;
 import org.openqa.selenium.grid.server.BaseServer;
 import org.openqa.selenium.grid.server.BaseServerFlags;
 import org.openqa.selenium.grid.server.BaseServerOptions;
+import org.openqa.selenium.grid.server.EventOptions;
 import org.openqa.selenium.grid.server.HelpFlags;
 import org.openqa.selenium.grid.server.Server;
 import org.openqa.selenium.grid.server.W3CCommandHandler;
@@ -96,7 +98,8 @@ public class Standalone implements CliCommand {
           new AnnotatedConfig(help),
           new AnnotatedConfig(baseFlags),
           new EnvConfig(),
-          new ConcatenatingConfig("selenium", '.', System.getProperties()));
+          new ConcatenatingConfig("selenium", '.', System.getProperties()),
+          new StandaloneConfig());
 
       LoggingOptions loggingOptions = new LoggingOptions(config);
       loggingOptions.configureLogging();
@@ -107,6 +110,9 @@ public class Standalone implements CliCommand {
       GlobalDistributedTracer.setInstance(tracer);
 
       HttpClient.Factory httpClientFactory = HttpClient.Factory.createDefault();
+
+      EventOptions eventOptions = new EventOptions(config);
+      EventBus bus = eventOptions.getEventBus();
 
       SessionMap sessions = new LocalSessionMap(tracer);
       Distributor distributor = new LocalDistributor(tracer, httpClientFactory);
@@ -128,7 +134,12 @@ public class Standalone implements CliCommand {
         throw new RuntimeException(e);
       }
 
-      LocalNode.Builder node = LocalNode.builder(tracer, httpClientFactory, localhost, sessions)
+      LocalNode.Builder node = LocalNode.builder(
+          tracer,
+          httpClientFactory,
+          bus,
+          localhost,
+          sessions)
           .maximumConcurrentSessions(Runtime.getRuntime().availableProcessors() * 3);
       nodeFlags.configure(httpClientFactory, node);
 
