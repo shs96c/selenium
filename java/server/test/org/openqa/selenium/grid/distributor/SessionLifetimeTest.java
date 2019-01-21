@@ -17,22 +17,46 @@
 
 package org.openqa.selenium.grid.distributor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.openqa.selenium.json.Json.MAP_TYPE;
+import static org.openqa.selenium.remote.http.HttpMethod.GET;
 
 import org.junit.Test;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.ImmutableCapabilities;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.grid.GridTopology;
 import org.openqa.selenium.grid.data.Session;
 import org.openqa.selenium.grid.node.local.LocalNode;
+import org.openqa.selenium.grid.web.Values;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.remote.http.HttpClient;
+import org.openqa.selenium.remote.http.HttpRequest;
+import org.openqa.selenium.remote.http.HttpResponse;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 public class SessionLifetimeTest {
 
   private final Capabilities stereotype = new ImmutableCapabilities("browserName", "cheese");
+  private final Function<HttpClient, Boolean> isReady = client -> {
+    try {
+      HttpResponse res = client.execute(new HttpRequest(GET, "/status"));
+      Map<String, Object> value = Values.get(res, MAP_TYPE);
+      return (Boolean) value.get("ready");
+    } catch (IOException | RuntimeException e) {
+      return false;
+    }
+  };
+
 
   @Test
   public void shouldBeAbleToCreateASession() {
@@ -57,7 +81,32 @@ public class SessionLifetimeTest {
 
   @Test
   public void closingASessionShouldAllowTheSessionFactoryToBeReused() {
+    GridTopology grid = GridTopology.builder()
+        .addNode(
+            (tracer, factory, bus, uri, sessions) ->
+                LocalNode.builder(tracer, factory, bus, uri, sessions)
+                    .add(stereotype,
+                         caps -> new Session(new SessionId(UUID.randomUUID()), uri, caps))
+                    .build())
+        .buildGrid();
+    Wait<HttpClient> wait = new FluentWait<>(grid.getHttpClient())
+        .withTimeout(Duration.ofSeconds(5));
 
+    wait.until(isReady);
+
+    WebDriver driver = grid.createWebDriver(stereotype);
+
+    // But a second should not, because we've used up all the sessions
+    assertThatExceptionOfType(SessionNotCreatedException.class)
+        .isThrownBy(() -> grid.createWebDriver(stereotype));
+
+    // Quit the driver. This should return the session back to the pool
+    driver.quit();
+
+    // Wait until the session has been released.
+    Boolean result = wait.until(isReady);
+
+    assertThat(result).isTrue();
   }
 
 }

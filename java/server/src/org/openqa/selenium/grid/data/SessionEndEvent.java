@@ -25,7 +25,7 @@ import java.util.Objects;
 
 public class SessionEndEvent extends Event {
 
-  private static final Type SESSION_END_TYPE = new Type("session-end");
+  public static final Type SESSION_END_TYPE = new Type("session-end");
 
   public SessionEndEvent(SessionId id) {
     super(
