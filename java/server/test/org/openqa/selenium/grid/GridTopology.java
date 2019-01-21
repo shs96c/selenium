@@ -20,9 +20,11 @@ package org.openqa.selenium.grid;
 import static org.openqa.selenium.remote.http.HttpMethod.GET;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.ImmutableCapabilities;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.events.EventBus;
 import org.openqa.selenium.events.zeromq.ZeroMqEventBus;
 import org.openqa.selenium.grid.data.Session;
@@ -39,6 +41,9 @@ import org.openqa.selenium.grid.sessionmap.local.LocalSessionMap;
 import org.openqa.selenium.grid.sessionmap.remote.RemoteSessionMap;
 import org.openqa.selenium.grid.web.CommandHandler;
 import org.openqa.selenium.net.PortProber;
+import org.openqa.selenium.remote.CommandExecutor;
+import org.openqa.selenium.remote.HttpCommandExecutor;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.http.HttpRequest;
@@ -96,7 +101,7 @@ public class GridTopology {
     return httpClientFactory.createClient(gridEntryPoint);
   }
 
-  private LocalNode addNode(NodeSupplier node) {
+  public LocalNode addNode(NodeSupplier node) {
     URI localUri;
     URL localUrl;
     URL remoteUrl;
@@ -109,7 +114,7 @@ public class GridTopology {
       throw new RuntimeException(e);
     }
 
-    LocalNode local = node.get(tracer, bus, localUri, sessions);
+    LocalNode local = node.get(tracer, httpClientFactory, bus, localUri, sessions);
     NodeStatus ls = local.getStatus();
     List<Capabilities> allCaps =
         Stream.concat(ls.getAvailable().entrySet().stream(), ls.getUsed().entrySet().stream())
@@ -130,25 +135,32 @@ public class GridTopology {
     return local;
   }
 
-  private static class Builder {
+  public WebDriver createWebDriver(Capabilities caps) {
+    CommandExecutor executor = new HttpCommandExecutor(
+        ImmutableMap.of(),
+        gridEntryPoint,
+        httpClientFactory);
+    return new RemoteWebDriver(executor, caps);
+  }
+
+  public static class Builder {
 
     private final DistributedTracer tracer = DistributedTracer.builder().build();
     private SessionMapSupplier sessions;
     private DistributorSupplier distributor;
-
-    private final List<Node> allNodes = new ArrayList<>();
+    private final List<NodeSupplier> allNodes = new ArrayList<>();
 
     private Builder() {
       this.sessions = LocalSessionMap::new;
       this.distributor = LocalDistributor::new;
     }
 
-    private Builder addNode(LocalNode node) {
+    public Builder addNode(NodeSupplier node) {
       allNodes.add(Objects.requireNonNull(node));
       return this;
     }
 
-    private Builder sessions(SessionMapSupplier sessions) {
+    public Builder sessions(SessionMapSupplier sessions) {
       this.sessions = Objects.requireNonNull(sessions);
       return this;
     }
@@ -169,7 +181,7 @@ public class GridTopology {
 
       LocalSessionMap localSessions = sessions.get(tracer);
       RemoteSessionMap remoteSessions = new RemoteSessionMap(
-          httpClientFactory.createClient(url("http://local-session")));
+          httpClientFactory.createClient(url("http://local-sessions")));
       httpClientFactory.addRoute("local-sessions", localSessions);
       httpClientFactory.addRoute("remote-sessions", remoteSessions);
 
@@ -183,7 +195,7 @@ public class GridTopology {
       Router router = new Router(tracer, remoteSessions, remoteDistributor);
       httpClientFactory.addRoute("router", router);
 
-      return new GridTopology(
+      GridTopology grid = new GridTopology(
           url("http://router"),
           tracer,
           bus,
@@ -191,6 +203,10 @@ public class GridTopology {
           remoteSessions,
           remoteDistributor,
           router);
+
+      allNodes.forEach(grid::addNode);
+
+      return grid;
     }
 
     private URL url(String url) {
@@ -216,7 +232,12 @@ public class GridTopology {
 
   @FunctionalInterface
   public interface NodeSupplier {
-    LocalNode get(DistributedTracer tracer, EventBus bus, URI uri, SessionMap sessions);
+    LocalNode get(
+        DistributedTracer tracer,
+        HttpClient.Factory factory,
+        EventBus bus,
+        URI uri,
+        SessionMap sessions);
   }
 
   public static void main(String[] args) throws IOException {
@@ -228,7 +249,7 @@ public class GridTopology {
 
     System.out.println(response.getContentString());
 
-    grid.addNode((trace, eb, uri, sm) -> LocalNode.builder(trace, eb, uri, sm)
+    grid.addNode((trace, factory, eb, uri, sm) -> LocalNode.builder(trace, factory, eb, uri, sm)
         .add(
             new ImmutableCapabilities("browserName", "cheese"),
             caps -> new Session(new SessionId(UUID.randomUUID()), uri, caps))
@@ -259,7 +280,11 @@ public class GridTopology {
         public HttpClient createClient(URL url) {
           return request -> {
             HttpResponse response = new HttpResponse();
-            handlers.get(url.getHost()).execute(request, response);
+            CommandHandler handler = handlers.get(url.getHost());
+            if (handler == null) {
+              throw new IllegalStateException("Unable to find handler for " + url);
+            }
+            handler.execute(request, response);
             return response;
           };
         }

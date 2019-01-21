@@ -18,6 +18,7 @@ java_library(
         "//java/server/src/org/openqa/selenium/grid/web:web",
     ],
     visibility = [
+        "//java/server/test/org/openqa/selenium/grid/...",
     ],
 )
 
