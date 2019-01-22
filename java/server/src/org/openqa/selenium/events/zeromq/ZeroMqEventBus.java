@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -101,13 +102,28 @@ public class ZeroMqEventBus implements EventBus {
       throw new RuntimeException("Unable to bind socket: " + publisher.errno());
     }
 
-    // The docs say not to do this. We should really have a REQ/REP socket pair we use,
-    // but we're cowboys so this is okay.
-    try {
-      Thread.sleep(250);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    // We should really have a REQ/REP socket pair we use, but we don't want to have to set up a new
+    // socket and bind that to a port. Instead, we'll post some messages to a unique type, and hope
+    // that nothing is listening for it. We only need to do that if we're binding to the port. And,
+    // yes, we are cowboys. Why do you ask?
+    AtomicBoolean ready = new AtomicBoolean(false);
+    Consumer<Event> probe = event -> {
+      ready.set(true);
+    };
+    Type type = new Type(UUID.randomUUID().toString());
+    addListener(type, probe);
+
+    long end = System.currentTimeMillis() + 250;
+    while (bind && !ready.get() && System.currentTimeMillis() < end) {
+      try {
+        Thread.sleep(50);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(e);
+      }
+      fire(new Event(type, null));
     }
+    listeners.remove(type);
   }
 
   @Override
