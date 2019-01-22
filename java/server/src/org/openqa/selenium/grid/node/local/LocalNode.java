@@ -17,6 +17,8 @@
 
 package org.openqa.selenium.grid.node.local;
 
+import static org.openqa.selenium.remote.http.HttpMethod.DELETE;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Ticker;
@@ -209,10 +211,14 @@ public class LocalNode extends Node {
       span.addTag("session.capabilities", session.getCapabilities());
       span.addTag("session.uri", session.getUri());
 
-      try {
-        session.getHandler().execute(req, resp);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
+      if (DELETE == req.getMethod() && req.getUri().equals("/session/" + id)) {
+        currentSessions.invalidate(id);
+      } else {
+        try {
+          session.getHandler().execute(req, resp);
+        } catch (IOException e) {
+          throw new UncheckedIOException(e);
+        }
       }
     }
   }
@@ -233,7 +239,6 @@ public class LocalNode extends Node {
       span.addTag("session.uri", session.getUri());
 
       currentSessions.invalidate(id);
-      session.stop();
     }
   }
 

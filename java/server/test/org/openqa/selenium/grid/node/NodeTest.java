@@ -20,6 +20,7 @@ package org.openqa.selenium.grid.node;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.openqa.selenium.remote.http.HttpMethod.GET;
+import static org.openqa.selenium.remote.http.HttpMethod.DELETE;
 import static org.openqa.selenium.remote.http.HttpMethod.POST;
 
 import com.google.common.collect.ImmutableSet;
@@ -312,7 +313,7 @@ public class NodeTest {
   @Test
   public void eachSessionShouldReportTheNodesUrl() throws URISyntaxException {
     URI sessionUri = new URI("http://cheese:42/peas");
-    Node node = LocalNode.builder(tracer, clientFactory, uri, sessions)
+    Node node = LocalNode.builder(tracer, clientFactory, bus, uri, sessions)
         .add(caps, c -> new Session(new SessionId(UUID.randomUUID()), sessionUri, c))
         .build();
     Optional<Session> session = node.newSession(caps);
@@ -349,7 +350,7 @@ public class NodeTest {
       }
     };
 
-    Node node = LocalNode.builder(tracer, factory, uri, sessions)
+    Node node = LocalNode.builder(tracer, factory, bus, uri, sessions)
         .add(caps, c -> new Session(new SessionId(UUID.randomUUID()), sessionUri, c))
         .build();
 
@@ -361,6 +362,23 @@ public class NodeTest {
 
     assertThat(clientUrl.get().toURI()).isEqualTo(sessionUri);
     assertThat(called.get()).isTrue();
+  }
+
+  @Test
+  public void sessionsStoppedByTheQuitCommandAreStopped() {
+    Session expected = node.newSession(caps)
+        .orElseThrow(() -> new RuntimeException("Session not created"));
+
+    assertThat(sessions.get(expected.getId())).isEqualTo(expected);
+
+    node.executeWebDriverCommand(
+        new HttpRequest(DELETE, "/session/" + expected.getId()),
+        new HttpResponse());
+
+    assertThat(node.getStatus().getUsed().isEmpty()).isTrue();
+
+    assertThatExceptionOfType(NoSuchSessionException.class)
+        .isThrownBy(() -> sessions.get(expected.getId()));
   }
 
   private static class MyClock extends Clock {
