@@ -21,9 +21,9 @@ import com.google.common.collect.ImmutableMap;
 
 import org.openqa.selenium.grid.config.MapConfig;
 
-public class StandaloneConfig extends MapConfig {
+public class DefaultStandaloneConfig extends MapConfig {
 
-  public StandaloneConfig() {
+  public DefaultStandaloneConfig() {
     super(ImmutableMap.of(
         "events", ImmutableMap.of(
             "address", "inproc://selenium",

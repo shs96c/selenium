@@ -179,7 +179,7 @@ public class GridTopology {
 
       RoutingHttpClientFactory httpClientFactory = new RoutingHttpClientFactory();
 
-      LocalSessionMap localSessions = sessions.get(tracer);
+      LocalSessionMap localSessions = sessions.get(tracer, bus);
       RemoteSessionMap remoteSessions = new RemoteSessionMap(
           httpClientFactory.createClient(url("http://local-sessions")));
       httpClientFactory.addRoute("local-sessions", localSessions);
@@ -220,8 +220,7 @@ public class GridTopology {
 
   @FunctionalInterface
   public interface SessionMapSupplier {
-
-    LocalSessionMap get(DistributedTracer tracer);
+    LocalSessionMap get(DistributedTracer tracer, EventBus bus);
   }
 
   @FunctionalInterface

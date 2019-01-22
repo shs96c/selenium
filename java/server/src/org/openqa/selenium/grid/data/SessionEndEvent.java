@@ -30,6 +30,6 @@ public class SessionEndEvent extends Event {
   public SessionEndEvent(SessionId id) {
     super(
         SESSION_END_TYPE,
-        Objects.requireNonNull(id, "When ending a session, a session id is required."));
+        Objects.requireNonNull(id.toString(), "When ending a session, a session id is required."));
   }
 }

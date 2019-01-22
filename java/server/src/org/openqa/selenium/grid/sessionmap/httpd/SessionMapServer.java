@@ -25,6 +25,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 import org.openqa.selenium.cli.CliCommand;
+import org.openqa.selenium.events.EventBus;
 import org.openqa.selenium.grid.config.AnnotatedConfig;
 import org.openqa.selenium.grid.config.CompoundConfig;
 import org.openqa.selenium.grid.config.ConcatenatingConfig;
@@ -33,6 +34,7 @@ import org.openqa.selenium.grid.config.EnvConfig;
 import org.openqa.selenium.grid.server.BaseServer;
 import org.openqa.selenium.grid.server.BaseServerFlags;
 import org.openqa.selenium.grid.server.BaseServerOptions;
+import org.openqa.selenium.grid.server.EventOptions;
 import org.openqa.selenium.grid.server.HelpFlags;
 import org.openqa.selenium.grid.log.LoggingOptions;
 import org.openqa.selenium.grid.server.Server;
@@ -84,14 +86,18 @@ public class SessionMapServer implements CliCommand {
           new AnnotatedConfig(help),
           new AnnotatedConfig(serverFlags),
           new EnvConfig(),
-          new ConcatenatingConfig("sessions", '.', System.getProperties()));
+          new ConcatenatingConfig("sessions", '.', System.getProperties()),
+          new DefaultSessionMapConfig());
 
       LoggingOptions loggingOptions = new LoggingOptions(config);
       loggingOptions.configureLogging();
       DistributedTracer tracer = loggingOptions.getTracer();
       GlobalDistributedTracer.setInstance(tracer);
 
-      SessionMap sessions = new LocalSessionMap(tracer);
+      EventOptions eventOptions = new EventOptions(config);
+      EventBus bus = eventOptions.getEventBus();
+
+      SessionMap sessions = new LocalSessionMap(tracer, bus);
 
       BaseServerOptions serverOptions = new BaseServerOptions(config);
 

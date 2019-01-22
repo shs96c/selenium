@@ -81,9 +81,7 @@ public abstract class SessionMap implements Predicate<HttpRequest>, CommandHandl
   public abstract void remove(SessionId id);
 
   public SessionMap() {
-    Json json = new Json();
-
-    injector = Injector.builder()
+   injector = Injector.builder()
         .register(this)
         .register(new Json())
         .build();

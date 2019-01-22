@@ -83,7 +83,7 @@ public class NodeTest {
 
     uri = new URI("http://localhost:1234");
 
-    sessions = new LocalSessionMap(tracer);
+    sessions = new LocalSessionMap(tracer, bus);
 
     class Handler extends Session implements CommandHandler {
 
@@ -182,7 +182,7 @@ public class NodeTest {
 
 
   @Test
-  public void sessionsThatAreStoppedWillNotBeReturned() {
+  public void sessionsThatAreStoppedWillNotBeReturned() throws InterruptedException {
     Session expected = node.newSession(caps)
         .orElseThrow(() -> new RuntimeException("Session not created"));
 

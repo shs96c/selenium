@@ -62,7 +62,7 @@ public class EndToEndTest {
   @Test
   public void inMemory() throws URISyntaxException {
     EventBus bus = new ZeroMqEventBus(new ZContext(), "inproc://end-to-end", true);
-    SessionMap sessions = new LocalSessionMap(tracer);
+    SessionMap sessions = new LocalSessionMap(tracer, bus);
     clientFactory = HttpClient.Factory.createDefault();
     Distributor distributor = new LocalDistributor(tracer, clientFactory);
     URI nodeUri = new URI("http://localhost:4444");
@@ -96,7 +96,7 @@ public class EndToEndTest {
         "tcp://localhost:" + PortProber.findFreePort(),
         true);
 
-    LocalSessionMap localSessions = new LocalSessionMap(tracer);
+    LocalSessionMap localSessions = new LocalSessionMap(tracer, bus);
     Server<?> sessionServer = createServer();
     sessionServer.addRoute(Routes.matching(localSessions).using(localSessions));
     sessionServer.start();

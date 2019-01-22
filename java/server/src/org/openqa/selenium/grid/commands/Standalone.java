@@ -99,7 +99,7 @@ public class Standalone implements CliCommand {
           new AnnotatedConfig(baseFlags),
           new EnvConfig(),
           new ConcatenatingConfig("selenium", '.', System.getProperties()),
-          new StandaloneConfig());
+          new DefaultStandaloneConfig());
 
       LoggingOptions loggingOptions = new LoggingOptions(config);
       loggingOptions.configureLogging();
@@ -114,7 +114,7 @@ public class Standalone implements CliCommand {
       EventOptions eventOptions = new EventOptions(config);
       EventBus bus = eventOptions.getEventBus();
 
-      SessionMap sessions = new LocalSessionMap(tracer);
+      SessionMap sessions = new LocalSessionMap(tracer, bus);
       Distributor distributor = new LocalDistributor(tracer, httpClientFactory);
       Router router = new Router(tracer, sessions, distributor);
 
