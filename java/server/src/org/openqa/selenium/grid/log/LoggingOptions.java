@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -47,6 +48,35 @@ public class LoggingOptions {
     return DistributedTracer.builder().detect().build();
   }
 
+  public Level getVerboseness() {
+    String level = config.get("logging", "level").orElse("info");
+    Level logLevel;
+
+    switch (level) {
+      case "debug":
+        logLevel = Level.FINE;
+        break;
+
+      case "info":
+        logLevel = Level.INFO;
+        break;
+
+      case "quiet":
+        logLevel = Level.WARNING;
+        break;
+
+      case "silent":
+        logLevel = Level.OFF;
+        break;
+
+      default:
+        throw new IllegalStateException(
+            "Log level must be one of 'off', 'quiet', 'info', or 'debug': " + level);
+    }
+
+    return logLevel;
+  }
+
   public void configureLogging() {
     if (!config.getBool("logging", "enable").orElse(true)) {
       return;
@@ -62,16 +92,19 @@ public class LoggingOptions {
 
     // Now configure the root logger, since everything should flow up to that
     Logger logger = logManager.getLogger("");
+    logger.setLevel(getVerboseness());
 
     if (isUsingPlainLogs()) {
       Handler handler = new FlushingHandler(System.out);
       handler.setFormatter(new TerseFormatter());
+      handler.setLevel(getVerboseness());
       logger.addHandler(handler);
     }
 
     if (isUsingStructuredLogging()) {
       Handler handler = new FlushingHandler(System.out);
       handler.setFormatter(new JsonFormatter());
+      handler.setLevel(getVerboseness());
       logger.addHandler(handler);
     }
   }

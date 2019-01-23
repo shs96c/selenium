@@ -17,7 +17,9 @@
 
 package org.openqa.selenium.grid.server;
 
+import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 
 import org.openqa.selenium.grid.config.ConfigValue;
 
@@ -25,7 +27,7 @@ public class BaseServerFlags {
 
   @Parameter(
       names = {"--host"},
-      description =  "IP or hostname : usually determined automatically.")
+      description =  "IP or hostname: usually determined automatically.")
   @ConfigValue(section = "server", name = "hostname")
   private String host;
 
@@ -49,7 +51,30 @@ public class BaseServerFlags {
   @ConfigValue(section = "logging", name = "plain-logs")
   private boolean plainLogs = true;
 
+  @Parameter(description = "Configure how verbose logging is (silent, debug, info, quiet)",
+      names = "--log-level", validateWith = LogLevelValidator.class)
+  @ConfigValue(section = "logging", name = "level")
+  private String logLevel;
+
   public BaseServerFlags(int defaultPort) {
     this.port = defaultPort;
   }
+
+  public static class LogLevelValidator implements IParameterValidator {
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+      switch (value) {
+        case "debug":
+        case "info":
+        case "quiet":
+        case "silent":
+          return;
+
+        default:
+          throw new ParameterException(
+              "Unrecognised log level. Allowed values are 'debug', 'info', 'off', and 'quiet'");
+      }
+    }
+  }
+
 }
