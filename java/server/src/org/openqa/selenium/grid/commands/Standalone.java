@@ -116,7 +116,7 @@ public class Standalone implements CliCommand {
 
       SessionMap sessions = new LocalSessionMap(tracer, bus);
       Distributor distributor = new LocalDistributor(tracer, httpClientFactory);
-      Router router = new Router(tracer, sessions, distributor);
+      Router router = new Router(tracer, httpClientFactory, sessions, distributor);
 
       String hostName;
       try {

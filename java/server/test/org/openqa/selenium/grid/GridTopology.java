@@ -192,7 +192,7 @@ public class GridTopology {
       httpClientFactory.addRoute("local-distributor", localDistributor);
       httpClientFactory.addRoute("remote-distributor", remoteDistributor);
 
-      Router router = new Router(tracer, remoteSessions, remoteDistributor);
+      Router router = new Router(tracer, httpClientFactory, remoteSessions, remoteDistributor);
       httpClientFactory.addRoute("router", router);
 
       GridTopology grid = new GridTopology(

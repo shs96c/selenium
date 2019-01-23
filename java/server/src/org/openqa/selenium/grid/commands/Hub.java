@@ -102,9 +102,11 @@ public class Hub implements CliCommand {
       EventOptions eventOptions = new EventOptions(config);
       EventBus bus = eventOptions.getEventBus();
 
+      HttpClient.Factory clientFactory = HttpClient.Factory.createDefault();
+
       SessionMap sessions = new LocalSessionMap(tracer, bus);
-      Distributor distributor = new LocalDistributor(tracer, HttpClient.Factory.createDefault());
-      Router router = new Router(tracer, sessions, distributor);
+      Distributor distributor = new LocalDistributor(tracer, clientFactory);
+      Router router = new Router(tracer, clientFactory, sessions, distributor);
 
       Server<?> server = new BaseServer<>(
           new BaseServerOptions(config));

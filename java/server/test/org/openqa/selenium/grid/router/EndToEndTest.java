@@ -57,13 +57,12 @@ public class EndToEndTest {
 
   private final Capabilities driverCaps = new ImmutableCapabilities("browserName", "cheese");
   private final DistributedTracer tracer = DistributedTracer.builder().build();
-  private HttpClient.Factory clientFactory;
+  private HttpClient.Factory clientFactory = HttpClient.Factory.createDefault();
 
   @Test
   public void inMemory() throws URISyntaxException {
     EventBus bus = new ZeroMqEventBus(new ZContext(), "inproc://end-to-end", true);
     SessionMap sessions = new LocalSessionMap(tracer, bus);
-    clientFactory = HttpClient.Factory.createDefault();
     Distributor distributor = new LocalDistributor(tracer, clientFactory);
     URI nodeUri = new URI("http://localhost:4444");
     LocalNode node = LocalNode.builder(tracer, clientFactory, bus, nodeUri, sessions)
@@ -71,7 +70,7 @@ public class EndToEndTest {
         .build();
     distributor.add(node);
 
-    Router router = new Router(tracer, sessions, distributor);
+    Router router = new Router(tracer, clientFactory, sessions, distributor);
 
     Server<?> server = createServer();
     server.addRoute(Routes.matching(router).using(router));
@@ -128,7 +127,7 @@ public class EndToEndTest {
 
     distributor.add(localNode);
 
-    Router router = new Router(tracer, sessions, distributor);
+    Router router = new Router(tracer, clientFactory, sessions, distributor);
     Server<?> routerServer = createServer();
     routerServer.addRoute(Routes.matching(router).using(router));
     routerServer.start();
