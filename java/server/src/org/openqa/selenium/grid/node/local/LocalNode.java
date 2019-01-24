@@ -19,6 +19,7 @@ package org.openqa.selenium.grid.node.local;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -56,10 +57,12 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class LocalNode extends Node {
 
+  public static final Logger LOG = Logger.getLogger(LocalNode.class.getName());
   private final SessionMap sessions;
   private final URI externalUri;
   private final HealthCheck healthCheck;
@@ -70,7 +73,6 @@ public class LocalNode extends Node {
 
   private LocalNode(
       DistributedTracer tracer,
-      EventBus bus,
       SessionMap sessions,
       Clock clock,
       URI uri,
@@ -142,9 +144,11 @@ public class LocalNode extends Node {
   public Optional<Session> newSession(Capabilities capabilities) {
     try (Span span = tracer.createSpan("node.new-session", tracer.getActiveSpan())) {
       span.addTag("capabilities", capabilities);
+      LOG.info("Attempting to create session for " + capabilities);
 
       if (getCurrentSessionCount() >= maxSessionCount) {
         span.addTag("result", "session count exceeded");
+        LOG.info("Maximum session count exceeded (" + maxSessionCount + ")");
         return Optional.empty();
       }
 
@@ -169,18 +173,22 @@ public class LocalNode extends Node {
 
         if (!possibleInstance.isPresent()) {
           span.addTag("result", "No possible session detected");
+          LOG.info("No session factory available");
           return Optional.empty();
         }
 
+        LOG.info("Attempting to create session");
         WebDriverInstance instance = possibleInstance.get();
         Session session = instance.getSession();
         span.addTag("session.id", session.getId());
         span.addTag("session.capabilities", session.getCapabilities());
         span.addTag("session.uri", session.getUri());
+        LOG.info("Created session: " + session);
 
         try {
           sessions.add(session);
         } catch (Exception e) {
+          LOG.info(Throwables.getStackTraceAsString(e));
           // We couldn't register, so this session has become unreachable. Kill it.
           instance.stop();
           return Optional.empty();
@@ -423,7 +431,6 @@ public class LocalNode extends Node {
 
       return new LocalNode(
           tracer,
-          bus,
           sessions,
           clock,
           uri,

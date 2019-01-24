@@ -35,12 +35,14 @@ import org.openqa.selenium.remote.tracing.DistributedTracer;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 /**
  * A simple router that is aware of the selenium-protocol.
  */
 public class Router implements Predicate<HttpRequest>, CommandHandler {
 
+  public static final Logger LOG = Logger.getLogger("Selenium Router");
   private final Injector injector;
   private final Routes routes;
 
@@ -71,10 +73,16 @@ public class Router implements Predicate<HttpRequest>, CommandHandler {
 
   @Override
   public void execute(HttpRequest req, HttpResponse resp) throws IOException {
+    LOG.info("Incoming request: " + req);
     Optional<CommandHandler> handler = routes.match(injector, req);
     if (!handler.isPresent()) {
       throw new HandlerNotFoundException(req);
     }
+    LOG.info(String.format(
+        "(%s) %s forwarding to %s",
+        req.getMethod(),
+        req.getMethod(),
+        handler));
     handler.get().execute(req, resp);
   }
 }

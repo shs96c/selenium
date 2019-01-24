@@ -2,6 +2,8 @@ package org.openqa.selenium.grid.node.local;
 
 import static org.openqa.selenium.remote.http.HttpMethod.DELETE;
 
+import com.google.common.base.Throwables;
+
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.events.EventBus;
 import org.openqa.selenium.grid.data.Session;
@@ -24,10 +26,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 class WebDriverInstance implements
     CommandHandler, Function<Capabilities, Optional<Session>>, Predicate<Capabilities> {
 
+  public static final Logger LOG = Logger.getLogger(WebDriverInstance.class.getName());
   private final DistributedTracer tracer;
   private final EventBus bus;
   private final Clock clock;
@@ -123,6 +127,7 @@ class WebDriverInstance implements
       return;  // Nothing to do, but it's fine to call stop anyway
     }
 
+    LOG.info(Throwables.getStackTraceAsString(new RuntimeException("Here I am")));
     // * Kill browser. — Sync
     try {
       handler.execute(new HttpRequest(DELETE, "/session/" + getSessionId()), new HttpResponse());

@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * Represents a running instance of a WebDriver session. It is identified by a {@link SessionId}.
@@ -57,6 +58,15 @@ public class Session {
 
   public Capabilities getCapabilities() {
     return capabilities;
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", Session.class.getSimpleName() + "[", "]")
+        .add("id=" + id)
+        .add("uri=" + uri)
+        .add("capabilities=" + capabilities)
+        .toString();
   }
 
   private Map<String, Object> toJson() {

@@ -104,6 +104,7 @@ public class LocalDistributor extends Distributor {
       writeLock.unlock();
     }
 
+    LOG.info("Selected: " + selected);
     return selected
         .orElseThrow(
             () -> new SessionNotCreatedException("Unable to find provider for session: " + allCaps))
