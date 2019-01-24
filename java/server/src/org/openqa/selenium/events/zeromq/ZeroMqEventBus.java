@@ -38,10 +38,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class ZeroMqEventBus implements EventBus {
 
   private static final Json JSON = new Json();
+  private static final Logger LOG = Logger.getLogger(ZeroMqEventBus.class.getName());
 
   private final ZMQ.Socket publisher;
   private final Map<Type, List<Consumer<Event>>> listeners = new ConcurrentHashMap<>();
@@ -93,8 +95,10 @@ public class ZeroMqEventBus implements EventBus {
 
     boolean connected;
     if (bind) {
+      LOG.info("Binding: " + connection);
       connected = publisher.bind(connection);
     } else {
+      LOG.info("Connecting: " + connection);
       connected = publisher.connect(connection);
     }
 
@@ -124,6 +128,7 @@ public class ZeroMqEventBus implements EventBus {
       fire(new Event(type, null));
     }
     listeners.remove(type);
+    LOG.info("Message bus ready to go");
   }
 
   @Override

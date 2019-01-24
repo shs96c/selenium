@@ -36,8 +36,11 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class OkHttpClient implements HttpClient {
+
+  private static final Logger LOG = Logger.getLogger(HttpClient.class.getName());
 
   private final okhttp3.OkHttpClient client;
   private final URL baseUrl;
@@ -100,7 +103,10 @@ public class OkHttpClient implements HttpClient {
         builder.delete();
     }
 
-    Response response = client.newCall(builder.build()).execute();
+    Request req = builder.build();
+    Response response = client.newCall(req).execute();
+
+    LOG.info(String.format("%s -> %s", req, response));
 
     HttpResponse toReturn = new HttpResponse();
     toReturn.setContent(response.body().bytes());
