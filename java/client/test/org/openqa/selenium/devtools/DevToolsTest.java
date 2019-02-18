@@ -37,7 +37,9 @@ public class DevToolsTest {
   @Before
   public void setUp() {
     driver = new ChromeDriver();
-    wait = new FluentWait<Object>(this).withTimeout(Duration.ofSeconds(5));
+    wait = new FluentWait<Object>(this)
+        .ignoring(NullPointerException.class)
+        .withTimeout(Duration.ofSeconds(5));
   }
 
   @After
@@ -58,10 +60,10 @@ public class DevToolsTest {
     tools = new DevTools(driver);
 
     AtomicReference<LogEntry> entry = new AtomicReference<>();
-    tools.log("console", item -> entry.set(item));
+    tools.log("console", entry::set);
 
     driver.executeScript("console.log('Hello, World!');");
 
-    wait.until(obj -> entry.get() != null && "Hello, World!".equals(entry.get().getMessage()));
+    wait.until(obj -> "Hello, World!".equals(entry.get().getMessage()));
   }
 }
