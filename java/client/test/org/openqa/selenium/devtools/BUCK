@@ -1,0 +1,9 @@
+java_test(
+    name = "devtools",
+    srcs = glob(["*.java"]),
+    deps = [
+        "//java/client/src/org/openqa/selenium/chrome:chrome",
+        "//java/client/src/org/openqa/selenium/support:support",
+        "//third_party/java/junit:junit",
+    ],
+)
