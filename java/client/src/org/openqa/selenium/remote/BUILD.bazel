@@ -17,8 +17,7 @@ java_library(
     ],
     visibility = [
         "//java/client/src/org/openqa/selenium/json:__pkg__",
-        "//java/client/src/org/openqa/selenium/remote/protocol:__pkg__",
-        "//java/client/src/org/openqa/selenium/remote/protocol/w3c:__pkg__",
+        "//java/client/src/org/openqa/selenium/remote/protocol:__subpackages__",
     ],
     deps = [
         "//java/client/src/org/openqa/selenium:core",
@@ -161,6 +160,9 @@ java_library(
         "//java/client/src/org/openqa/selenium/remote/session",
         artifact("com.google.guava:guava"),
     ],
+    visibility = [
+        "//java/client/src/org/openqa/selenium/remote/protocol/common:__pkg__",
+    ]
 )
 
 copy_file(

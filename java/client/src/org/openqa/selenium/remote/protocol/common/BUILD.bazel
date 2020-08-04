@@ -1,0 +1,17 @@
+java_library(
+    name = "common",
+    srcs = glob(["*.java"]),
+    deps = [
+        "//java/client/src/org/openqa/selenium:core",
+        "//java/client/src/org/openqa/selenium/json",
+        "//java/client/src/org/openqa/selenium/remote:api",
+        "//java/client/src/org/openqa/selenium/remote:remote-lib",
+        "//java/client/src/org/openqa/selenium/remote/http",
+        "//java/client/src/org/openqa/selenium/remote/protocol",
+    ],
+    visibility = [
+        "//java/client/src/org/openqa/selenium/remote:__pkg__",
+        "//java/client/src/org/openqa/selenium/remote/protocol:__subpackages__",
+        "//java/client/test/org/openqa/selenium/remote/protocol:__subpackages__",
+    ],
+)
