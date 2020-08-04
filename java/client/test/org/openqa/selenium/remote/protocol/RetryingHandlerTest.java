@@ -3,26 +3,18 @@ package org.openqa.selenium.remote.protocol;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.ImmutableCapabilities;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.Response;
 import org.openqa.selenium.remote.http.Contents;
-import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.http.HttpHandler;
 import org.openqa.selenium.remote.http.HttpRequest;
 import org.openqa.selenium.remote.http.HttpResponse;
-import org.openqa.selenium.remote.protocol.common.CommonProtocol;
 import org.openqa.selenium.remote.protocol.w3c.W3CCommand;
-import org.openqa.selenium.remote.protocol.w3c.W3CProtocol;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
@@ -145,17 +137,6 @@ public class RetryingHandlerTest {
     Response res = executor.execute(new Command(null, "find element"));
 
     assertThat(res.getState()).isEqualTo("no such element");
-  }
-
-  @Test
-  public void letsTryThis() throws Exception {
-    HttpClient client = HttpClient.Factory.createDefault().createClient(new URL("http://localhost:4444"));
-    WebDriver driver = new RemoteWebDriver(
-      new RetryingHandler(client, new CommonProtocol().getCommands(), new W3CProtocol().getCommands()),
-      new ImmutableCapabilities("browserName", "firefox"));
-
-    driver.get("http://www.google.com");
-    driver.findElement(By.name("q"));
   }
 
   private static class CannedResponses implements HttpHandler {

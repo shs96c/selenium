@@ -43,7 +43,7 @@ public class Values {
       // Alright then. We might be dealing with the object we expected, or we might have an
       // error. We shall assume that a non-200 http status code indicates that something is
       // wrong.
-      if (response.getStatus() != 200) {
+      if (!response.isSuccessful()) {
         throw ERRORS.decode(JSON.toType(string(response), MAP_TYPE));
       }
 
