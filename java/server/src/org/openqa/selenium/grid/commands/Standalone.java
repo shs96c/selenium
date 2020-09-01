@@ -40,8 +40,12 @@ import org.openqa.selenium.grid.server.NetworkOptions;
 import org.openqa.selenium.grid.server.Server;
 import org.openqa.selenium.grid.sessionmap.SessionMap;
 import org.openqa.selenium.grid.sessionmap.local.LocalSessionMap;
+import org.openqa.selenium.grid.web.ClassPathResource;
 import org.openqa.selenium.grid.web.CombinedHandler;
+import org.openqa.selenium.grid.web.NoHandler;
+import org.openqa.selenium.grid.web.ResourceHandler;
 import org.openqa.selenium.grid.web.RoutableHttpClientFactory;
+import org.openqa.selenium.json.Json;
 import org.openqa.selenium.net.NetworkUtils;
 import org.openqa.selenium.netty.server.NettyServer;
 import org.openqa.selenium.remote.http.Contents;
@@ -152,7 +156,19 @@ public class Standalone extends TemplateGridCommand {
 
     BaseServerOptions serverOptions = new BaseServerOptions(config);
     GraphqlHandler graphqlHandler = new GraphqlHandler(distributor, serverOptions.getExternalUri());
+
+    Routable ui;
+    URL uiRoot = getClass().getResource("/javascript/grid-ui/build");
+    if (uiRoot != null) {
+      ResourceHandler uiHandler = new ResourceHandler(new ClassPathResource(uiRoot, "javascript/grid-ui/build"));
+      ui = Route.matching(req -> req.getUri().startsWith("/")).to(() -> uiHandler);
+    } else {
+      Json json = new Json();
+      ui = Route.matching(req -> false).to(() -> new NoHandler(json));
+    }
+
     HttpHandler httpHandler = combine(
+      ui,
       router,
       Route.prefix("/wd/hub").to(combine(router)),
       Route.post("/graphql").to(() -> graphqlHandler),
