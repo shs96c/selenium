@@ -1,0 +1,42 @@
+load( "@bazelruby_rules_ruby//ruby:defs.bzl", "ruby_gem", "ruby_library")
+
+ruby_gem(
+  name = "selenium-webdriver",
+  gem_name = "selenium-webdriver",
+  gem_version = "4.0.0.alpha6",
+  gem_summary = "Example gem to demonstrate Bazel Gem packaging",
+  gem_description = """WebDriver is a tool for writing automated tests of websites.
+It aims to mimic the behaviour of a real user,
+and as such interacts with the HTML of the application.""",
+  gem_homepage = "https://github.com/SeleniumHQ/selenium",
+  gem_authors = [
+      "Alex Rodionov",
+      "Titus Fortner",
+      "Thomas Walpole",
+  ],
+  gem_author_emails = [
+      "p0deje@gmail.com",
+      "titusfortner@gmail.com",
+      "twalpole@gmail.com",
+  ],
+  gem_runtime_dependencies = {
+      "colored2": "~> 3.1.2",
+      "hashie": "",
+  },
+#  gem_development_dependencies = {
+#      "rspec": "",
+#      "rspec-its": "",
+#      "rubocop": "",
+#  },
+  srcs = [],
+  deps = [
+      "//rb/lib:selenium",
+  ],
+#      s.license = 'Apache-2.0'
+#      s.homepage = ''
+#      s.metadata = {
+#        'changelog_uri' => 'https://github.com/SeleniumHQ/selenium/blob/trunk/rb/CHANGES',
+#        'source_code_uri' => 'https://github.com/SeleniumHQ/selenium/tree/trunk/rb'
+#      }
+
+)

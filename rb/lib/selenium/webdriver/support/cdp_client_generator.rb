@@ -25,23 +25,27 @@ module Selenium
     module Support
       class CDPClientGenerator
         # Input JSON files are generated from PDL tasks.
-        BROWSER_PROTOCOL_PATH = File.expand_path('cdp/browser_protocol.json', __dir__)
-        JS_PROTOCOL_PATH = File.expand_path('cdp/js_protocol.json', __dir__)
+        # BROWSER_PROTOCOL_PATH = File.expand_path('cdp/browser_protocol.json', __dir__)
+        # JS_PROTOCOL_PATH = File.expand_path('cdp/js_protocol.json', __dir__)
         TEMPLATE_PATH = File.expand_path('cdp/domain.rb.erb', __dir__)
 
         RESERVED_KEYWORDS = %w[end].freeze
 
         def initialize
-          @browser_protocol = JSON.parse(File.read(BROWSER_PROTOCOL_PATH), symbolize_names: true)
-          @js_protocol = JSON.parse(File.read(JS_PROTOCOL_PATH), symbolize_names: true)
+          # @browser_protocol = JSON.parse(File.read(BROWSER_PROTOCOL_PATH), symbolize_names: true)
+          # @js_protocol = JSON.parse(File.read(JS_PROTOCOL_PATH), symbolize_names: true)
           @template = ERB.new(File.read(TEMPLATE_PATH))
         end
 
-        def call(output_dir:, version:, **)
+        def call(output_dir:, version:, browser_protocol:, js_protocol:, **)
           @output_dir = output_dir
           @version = version
-          @browser_protocol[:domains].each(&method(:process_domain))
-          @js_protocol[:domains].each(&method(:process_domain))
+
+          browser_protocol = JSON.parse(File.read(browser_protocol), symbolize_names: true )
+          browser_protocol[:domains].each(&method(:process_domain))
+
+          js_protocol = JSON.parse(File.read(js_protocol), symbolize_names: true )
+          js_protocol[:domains].each(&method(:process_domain))
         end
 
         def process_domain(domain)
@@ -79,3 +83,6 @@ module Selenium
     end
   end
 end
+
+generator = Selenium::WebDriver::Support::CDPClientGenerator.new
+generator.call(output_dir: ARGV[1], version: ARGV[0], browser_protocol: ARGV[2], js_protocol: ARGV[3])

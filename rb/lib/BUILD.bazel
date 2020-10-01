@@ -1,0 +1,94 @@
+load("@bazelruby_rules_ruby//ruby:defs.bzl", "ruby_binary", "ruby_gem", "ruby_library")
+load("//common:defs.bzl", "copy_file")
+
+CDP_VERSIONS = ["v84", "v85", "v86"]
+
+ruby_library(
+    name = "selenium",
+    srcs = glob(["**/*.rb"]),
+#    includes = ["rb/lib"],
+    deps = [
+#      "@bundle//:activesupport",
+#      "@bundle//:awesome_print",
+#      "@bundle//:rubocop",
+    ],
+    visibility = [
+        "//rb:__pkg__",
+    ]
+)
+
+ruby_gem(
+  name = "selenium-webdriver",
+  gem_name = "selenium-webdriver",
+  gem_version = "4.0.0.alpha6",
+  gem_summary = "Example gem to demonstrate Bazel Gem packaging",
+  gem_description = """WebDriver is a tool for writing automated tests of websites.
+It aims to mimic the behaviour of a real user,
+and as such interacts with the HTML of the application.""",
+  gem_homepage = "https://github.com/SeleniumHQ/selenium",
+  gem_authors = [
+      "Alex Rodionov",
+      "Titus Fortner",
+      "Thomas Walpole",
+  ],
+  gem_author_emails = [
+      "p0deje@gmail.com",
+      "titusfortner@gmail.com",
+      "twalpole@gmail.com",
+  ],
+  gem_runtime_dependencies = {
+      "colored2": "~> 3.1.2",
+      "hashie": "",
+  },
+#  gem_development_dependencies = {
+#      "rspec": "",
+#      "rspec-its": "",
+#      "rubocop": "",
+#  },
+  srcs = [],
+  deps = [
+      ":selenium",
+      ":v84-lib",
+  ],
+#      s.license = 'Apache-2.0'
+#      s.homepage = ''
+#      s.metadata = {
+#        'changelog_uri' => 'https://github.com/SeleniumHQ/selenium/blob/trunk/rb/CHANGES',
+#        'source_code_uri' => 'https://github.com/SeleniumHQ/selenium/tree/trunk/rb'
+#      }
+
+)
+
+ruby_binary(
+    name = "gen-cdp",
+    main = "selenium/webdriver/support/cdp_client_generator.rb",
+    srcs = [
+        "selenium/webdriver/support/cdp_client_generator.rb"
+    ],
+    data = [
+        "selenium/webdriver/support/cdp/domain.rb.erb",
+    ]
+)
+
+[
+genrule(
+    name = "%s-srcs" % v,
+    outs = [v],
+    cmd = "rm -rf $@ && " +
+          "mkdir -p $@/selenium/webdriver/devtools/%s && " % v +
+          "$(location :gen-cdp) %s $@/selenium/webdriver/devtools/%s $(location //common/devtools/chromium/%s:browser_protocol) $(location //common/devtools/chromium/%s:js_protocol)" % (v, v, v, v),
+    tools = [
+        ":gen-cdp",
+    ],
+    srcs = [
+        "//common/devtools/chromium/%s:browser_protocol" % v,
+        "//common/devtools/chromium/%s:js_protocol" % v,
+    ])
+for v in CDP_VERSIONS]
+
+[
+    ruby_library(
+        name = "%s-lib" % v,
+        srcs = [":%s-srcs" % v],
+    )
+for v in CDP_VERSIONS]

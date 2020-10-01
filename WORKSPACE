@@ -131,6 +131,38 @@ pip_repositories()
 pip_install()
 
 http_archive(
+    name = "bazelruby_rules_ruby",
+    sha256 = "3641e5e4c5490d641f268d703ab03003b43494f7f28157f2083b9f40dd33eff8",
+    strip_prefix = "rules_ruby-6c025e38f0f030b75df2e321740eb31df575c391",
+    urls = ["https://github.com/bazelruby/rules_ruby/archive/6c025e38f0f030b75df2e321740eb31df575c391.zip"],
+)
+
+load(
+    "@bazelruby_rules_ruby//ruby:deps.bzl",
+    "rules_ruby_dependencies",
+    "rules_ruby_select_sdk",
+)
+
+rules_ruby_dependencies()
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+bazel_skylib_workspace()
+
+rules_ruby_select_sdk(version = "2.7.1")
+
+load(
+    "@bazelruby_rules_ruby//ruby:defs.bzl",
+    "ruby_bundle",
+)
+
+ruby_bundle(
+    name = "bundle",
+    gemfile = "//rb:Gemfile",
+    gemfile_lock = "//rb:Gemfile.lock",
+)
+
+
+http_archive(
     name = "rules_pkg",
     sha256 = "aeca78988341a2ee1ba097641056d168320ecc51372ef7ff8e64b139516a4937",
     url = "https://github.com/bazelbuild/rules_pkg/releases/download/0.2.6-1/rules_pkg-0.2.6.tar.gz",
