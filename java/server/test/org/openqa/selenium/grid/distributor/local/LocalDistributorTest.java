@@ -17,6 +17,8 @@
 
 package org.openqa.selenium.grid.distributor.local;
 
+import com.google.common.collect.ImmutableSet;
+import jdk.vm.ci.meta.Local;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Capabilities;
@@ -55,6 +57,7 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -340,6 +343,42 @@ public class LocalDistributorTest {
     assertThat(localNode.isDraining()).isTrue();
   }
 
+  @Test
+  public void shouldBeAbleToStartSessionIfFirstCapabilityIsBadButSecondIsGood() {
+    // Ordering matters for the inputs. Maintain insertion order
+    Set<Capabilities> allCaps = ImmutableSet.of(
+      new ImmutableCapabilities("badName", "isBad"),
+      new ImmutableCapabilities("browserName", "isGood"));
+
+    NewSessionQueue queue = new LocalNewSessionQueue(
+      tracer,
+      bus,
+      Duration.ofSeconds(1),
+      Duration.ofSeconds(10),
+      registrationSecret);
+    Distributor distributor = new LocalDistributor(
+      tracer,
+      bus,
+      clientFactory,
+      new LocalSessionMap(tracer, bus),
+      queue,
+      registrationSecret,
+      Duration.ofSeconds(60));
+
+    distributor.newSession(new SessionRequest(
+      new RequestId(UUID.randomUUID()),
+      Instant.now(),
+      Set.of(W3C),
+      allCaps,
+      Map.of()));
+
+    fail("Write me!");
+  }
+
+  @Test
+  public void shouldBeAbleToStartSessionIfFirstCapabilityCausesNodeToBlowUpButSecondIsOkay() {
+    fail("Write me!");
+  }
 
   private class Handler extends Session implements HttpHandler {
 
