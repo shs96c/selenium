@@ -38,6 +38,8 @@ import org.openqa.selenium.grid.data.NodeId;
 import org.openqa.selenium.grid.data.NodeStatus;
 import org.openqa.selenium.grid.data.NodeStatusEvent;
 import org.openqa.selenium.grid.data.RequestId;
+import org.openqa.selenium.grid.data.RetryNewSessionRequestEvent;
+import org.openqa.selenium.grid.data.SessionClosedEvent;
 import org.openqa.selenium.grid.data.SessionRequest;
 import org.openqa.selenium.grid.data.Slot;
 import org.openqa.selenium.grid.data.SlotId;
@@ -82,6 +84,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -158,9 +161,26 @@ public class LocalDistributor extends Distributor {
           return thread;
         }));
 
+    Consumer<Integer> doze = count -> {
+      try {
+        Thread.sleep(count);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(e);
+      }
+    };
+
     NewSessionRunnable newSessionRunnable = new NewSessionRunnable();
     bus.addListener(NodeDrainComplete.listener(this::remove));
     bus.addListener(NewSessionRequestEvent.listener(ignored -> newSessionRunnable.run()));
+    bus.addListener(RetryNewSessionRequestEvent.listener(ignored -> {
+      doze.accept(2000);
+      newSessionRunnable.run();
+    }));
+    bus.addListener(SessionClosedEvent.listener(ignored -> {
+      doze.accept(2000);
+      newSessionRunnable.run();
+    }));
 
     regularly.submit(model::purgeDeadNodes, Duration.ofSeconds(30), Duration.ofSeconds(30));
     regularly.submit(newSessionRunnable, Duration.ofSeconds(5), Duration.ofSeconds(5));
@@ -554,10 +574,14 @@ public class LocalDistributor extends Distributor {
 
     @Override
     public void run() {
+      StringBuilder message = new StringBuilder();
       int initialSize = sessionQueue.getQueueContents().size();
+      message.append("Initial size is ").append(initialSize).append(". ");
       boolean retry = initialSize != 0;
 
+      int count = 0;
       while (retry) {
+        count++;
         // We deliberately run this outside of a lock: if we're unsuccessful
         // starting the session, we just put the request back on the queue.
         // This does mean, however, that under high contention, we might end
@@ -572,13 +596,17 @@ public class LocalDistributor extends Distributor {
                             .collect(Collectors.toSet()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
+        message.append("On count ").append(count).append(" stereotypes were: ").append(stereotypes).append(". ");
 
         Optional<SessionRequest> maybeRequest = sessionQueue.getNextAvailable(stereotypes);
+        message.append("Found ").append(maybeRequest).append(". ");
         maybeRequest.ifPresent(this::handleNewSessionRequest);
 
         int currentSize = sessionQueue.getQueueContents().size();
+        message.append("Current size is: ").append(currentSize).append(". ");
         retry = currentSize != 0 && currentSize != initialSize;
         initialSize = currentSize;
+        LOG.info(message.toString());
       }
     }
 
@@ -600,6 +628,7 @@ public class LocalDistributor extends Distributor {
 
         if (response.isLeft() && response.left() instanceof RetrySessionRequestException) {
           boolean retried = sessionQueue.retryAddToQueue(sessionRequest);
+          bus.fire(new RetryNewSessionRequestEvent(reqId));
 
           attributeMap.put("request.retry_add", EventAttribute.setValue(retried));
           span.addEvent("Retry adding to front of queue. No slot available.", attributeMap);

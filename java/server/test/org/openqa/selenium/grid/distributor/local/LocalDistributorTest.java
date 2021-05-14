@@ -31,6 +31,7 @@ import org.openqa.selenium.grid.data.NodeStatus;
 import org.openqa.selenium.grid.data.NodeStatusEvent;
 import org.openqa.selenium.grid.data.RequestId;
 import org.openqa.selenium.grid.data.Session;
+import org.openqa.selenium.grid.data.SessionClosedEvent;
 import org.openqa.selenium.grid.distributor.Distributor;
 import org.openqa.selenium.grid.distributor.selector.DefaultSlotSelector;
 import org.openqa.selenium.grid.node.Node;
@@ -41,16 +42,23 @@ import org.openqa.selenium.grid.sessionqueue.NewSessionQueue;
 import org.openqa.selenium.grid.data.SessionRequest;
 import org.openqa.selenium.grid.sessionqueue.local.LocalNewSessionQueue;
 import org.openqa.selenium.grid.testing.TestSessionFactory;
+import org.openqa.selenium.grid.web.Values;
 import org.openqa.selenium.internal.Either;
+import org.openqa.selenium.json.Json;
 import org.openqa.selenium.remote.HttpSessionId;
+import org.openqa.selenium.remote.NewSessionPayload;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.remote.http.Contents;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.http.HttpHandler;
 import org.openqa.selenium.remote.http.HttpRequest;
 import org.openqa.selenium.remote.http.HttpResponse;
 import org.openqa.selenium.remote.tracing.DefaultTestTracer;
 import org.openqa.selenium.remote.tracing.Tracer;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,15 +71,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.openqa.selenium.grid.data.Availability.DRAINING;
+import static org.openqa.selenium.json.Json.MAP_TYPE;
 import static org.openqa.selenium.remote.Dialect.W3C;
 import static org.openqa.selenium.remote.http.HttpMethod.GET;
+import static org.openqa.selenium.remote.http.HttpMethod.POST;
 
 public class LocalDistributorTest {
 
@@ -284,7 +298,7 @@ public class LocalDistributorTest {
     List<Future<SessionId>> futures = Executors.newFixedThreadPool(3).invokeAll(callables);
 
     for (Future<SessionId> future : futures) {
-      SessionId id = future.get(2, TimeUnit.SECONDS);
+      SessionId id = future.get(2, SECONDS);
 
       // Now send a random command.
       HttpResponse res = node.execute(new HttpRequest(GET, String.format("/session/%s/url", id)));
@@ -334,7 +348,7 @@ public class LocalDistributorTest {
   public void testDrainNodeFromNode() {
     assertThat(localNode.isDraining()).isFalse();
 
-    NewSessionQueue queue  = new LocalNewSessionQueue(
+    NewSessionQueue queue = new LocalNewSessionQueue(
       tracer,
       bus,
       new DefaultSlotMatcher(),
@@ -354,6 +368,72 @@ public class LocalDistributorTest {
 
     localNode.drain();
     assertThat(localNode.isDraining()).isTrue();
+  }
+
+  @Test
+  public void shouldStartASessionFromTheQueueOnceCapacityIsAvailable() throws IOException, InterruptedException {
+    NewSessionQueue queue = new LocalNewSessionQueue(
+      tracer,
+      bus,
+      new DefaultSlotMatcher(),
+      Duration.ofSeconds(2),
+      Duration.ofSeconds(2),
+      registrationSecret);
+
+    Distributor distributor = new LocalDistributor(
+      tracer,
+      bus,
+      clientFactory,
+      new LocalSessionMap(tracer, bus),
+      queue,
+      new DefaultSlotSelector(),
+      registrationSecret,
+      Duration.ofMinutes(5));
+
+    distributor.add(localNode);
+    Wait<Distributor> wait = new FluentWait<>(distributor).withTimeout(Duration.ofSeconds(10));
+    wait.until(d -> d.getStatus().hasCapacity());
+
+    int slots = distributor.getStatus().getNodes().stream().mapToInt(node -> node.getSlots().size()).sum();
+    assertThat(slots).isGreaterThan(0);
+
+    StringBuilder contents = new StringBuilder();
+    try (NewSessionPayload payload = NewSessionPayload.create(new ImmutableCapabilities("browserName", "cheese"))) {
+      payload.writeTo(contents);
+    }
+
+    HttpResponse res = queue.execute(new HttpRequest(POST, "/session").setContent(Contents.string(contents, UTF_8)));
+    assertThat(res.isSuccessful()).isTrue();
+    Map<String, Object> raw = Values.get(res, MAP_TYPE);
+    String sessionId = (String) raw.get("sessionId");
+    assertThat(sessionId).isNotNull();
+
+    // Fill up the capacity of the grid
+    for (int i = 1; i < slots; i++) {
+      res = queue.execute(new HttpRequest(POST, "/session").setContent(Contents.string(contents, UTF_8)));
+      assertThat(res.isSuccessful()).isTrue();
+      raw = Values.get(res, MAP_TYPE);
+      String ignored = (String) raw.get("sessionId");
+      assertThat(ignored).isNotNull();
+    }
+
+    assertThat(queue.getQueueContents()).isEmpty();
+
+    // Now we enqueue a new session, kill the other, and then expect the queued session to be started
+    AtomicReference<HttpResponse> queuedResponse = new AtomicReference<>();
+    CountDownLatch latch = new CountDownLatch(1);
+    new Thread(() -> {
+      HttpResponse seen = queue.execute(new HttpRequest(POST, "/session").setContent(Contents.string(contents, UTF_8)));
+      queuedResponse.set(seen);
+      latch.countDown();
+    }).start();
+
+    // Wait until that thread is actually started!
+    wait.until(d -> !queue.getQueueContents().isEmpty());
+    Thread.sleep(1000);
+    bus.fire(new SessionClosedEvent(new SessionId(sessionId)));
+
+    assertThat(latch.await(5, SECONDS)).isTrue();
   }
 
   private class Handler extends Session implements HttpHandler {

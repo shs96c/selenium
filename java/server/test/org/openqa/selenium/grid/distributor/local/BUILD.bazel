@@ -10,8 +10,10 @@ java_test_suite(
         "11",
     ],
     deps = [
+        "//java/client/src/org/openqa/selenium/json",
         "//java/client/src/org/openqa/selenium/remote",
         "//java/client/test/org/openqa/selenium/remote/tracing:tracing-support",
+        "//java/client/src/org/openqa/selenium/support",
         "//java/server/src/org/openqa/selenium/events",
         "//java/server/src/org/openqa/selenium/events/local",
         "//java/server/src/org/openqa/selenium/grid/data",
@@ -25,6 +27,7 @@ java_test_suite(
         "//java/server/src/org/openqa/selenium/grid/sessionmap/local",
         "//java/server/src/org/openqa/selenium/grid/sessionqueue",
         "//java/server/src/org/openqa/selenium/grid/sessionqueue/local",
+        "//java/server/src/org/openqa/selenium/grid/web",
         "//java/server/test/org/openqa/selenium/grid/testing",
         artifact("com.google.guava:guava"),
         artifact("io.opentelemetry:opentelemetry-api"),
