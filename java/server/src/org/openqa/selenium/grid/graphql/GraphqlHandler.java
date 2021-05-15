@@ -73,8 +73,12 @@ public class GraphqlHandler implements HttpHandler {
   private final GraphQL graphQl;
 
 
-  public GraphqlHandler(Tracer tracer, Distributor distributor, NewSessionQueue newSessionQueue,
-                        URI publicUri, String version) {
+  public GraphqlHandler(
+    Tracer tracer,
+    Distributor distributor,
+    NewSessionQueue newSessionQueue,
+    URI publicUri,
+    String version) {
     this.distributor = Require.nonNull("Distributor", distributor);
     this.newSessionQueue = Require.nonNull("New session queue", newSessionQueue);
     this.publicUri = Require.nonNull("Uri", publicUri);

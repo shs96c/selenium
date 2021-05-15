@@ -31,6 +31,7 @@ import org.openqa.selenium.grid.data.Session;
 import org.openqa.selenium.grid.distributor.Distributor;
 import org.openqa.selenium.grid.distributor.local.LocalDistributor;
 import org.openqa.selenium.grid.distributor.selector.DefaultSlotSelector;
+import org.openqa.selenium.grid.graphql.GraphqlHandler;
 import org.openqa.selenium.grid.node.local.LocalNode;
 import org.openqa.selenium.grid.security.AddSecretFilter;
 import org.openqa.selenium.grid.security.Secret;
@@ -43,14 +44,20 @@ import org.openqa.selenium.grid.sessionqueue.local.LocalNewSessionQueue;
 import org.openqa.selenium.grid.testing.TestSessionFactory;
 import org.openqa.selenium.grid.web.CombinedHandler;
 import org.openqa.selenium.grid.web.RoutableHttpClientFactory;
+import org.openqa.selenium.grid.web.Values;
 import org.openqa.selenium.net.PortProber;
 import org.openqa.selenium.netty.server.NettyServer;
+import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.remote.http.Contents;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.http.HttpHandler;
 import org.openqa.selenium.remote.http.HttpRequest;
 import org.openqa.selenium.remote.http.HttpResponse;
+import org.openqa.selenium.remote.http.Route;
 import org.openqa.selenium.remote.tracing.DefaultTestTracer;
 import org.openqa.selenium.remote.tracing.Tracer;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -59,19 +66,24 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.openqa.selenium.json.Json.MAP_TYPE;
 import static org.openqa.selenium.remote.http.Contents.asJson;
 import static org.openqa.selenium.remote.http.HttpMethod.DELETE;
 import static org.openqa.selenium.remote.http.HttpMethod.POST;
@@ -134,7 +146,14 @@ public class SessionQueueGridTest {
 
     Router router = new Router(tracer, clientFactory, sessions, queue, distributor);
 
-    server = createServer(router);
+    GraphqlHandler graphql = new GraphqlHandler(
+      tracer,
+      distributor,
+      queue,
+      nodeUri,
+      "4");
+
+    server = createServer(Route.combine(router, Route.post("/graphql").to(() -> graphql)));
     server.start();
   }
 
@@ -219,6 +238,65 @@ public class SessionQueueGridTest {
       fixedThreadPoolService.shutdownNow();
       scheduler.shutdownNow();
     }
+  }
+
+  @Test
+  public void shouldBeAbleToStartSessionAfterExhaustingQueue() throws InterruptedException {
+    Wait<?> wait = new FluentWait<>("").withTimeout(Duration.ofSeconds(5));
+
+    HttpClient client = clientFactory.createClient(server.getUrl());
+    // Count the total capacity of the grid
+    HttpResponse res = client.execute(
+      new HttpRequest(POST, "/graphql")
+      .setContent(Contents.string("{\"query\": \"{grid { totalSlots maxSession } }\"}", UTF_8)));
+    Map<?,?> out = Contents.fromJson(res, MAP_TYPE);
+    out = (Map<?, ?>) out.get("data");
+    out = (Map<?, ?>) out.get("grid");
+    int max = Math.min(((Number) out.get("totalSlots")).intValue(), ((Number) out.get("maxSession")).intValue());
+
+    assertThat(max).isGreaterThan(0);
+
+    ImmutableMap<String, String> caps = ImmutableMap.of("browserName", "cheese");
+    HttpResponse session = createSession(caps);
+    Map<?, ?> raw = Values.get(session, MAP_TYPE);
+    SessionId id = new SessionId((String) raw.get("sessionId"));
+
+    // Now soak up the available capacity in the grid
+    for (int i = 1; i < max; i++) {
+      createSession(caps);
+    }
+
+    // We want to schedule a new session, ensure it's on the queue, and
+    // then kill an existing one. If everything goes according to plan
+    // the new session will be scheduled, and we're done. Sadly, waiting
+    // for the new session to schedule is synchronous, so create it in a
+    // background thread.
+    AtomicReference<SessionId> queuedSessionId = new AtomicReference<>();
+    CountDownLatch latch = new CountDownLatch(1);
+    new Thread(() -> {
+      HttpResponse queuedResponse = createSession(caps);
+      Map<?, ?> value = Values.get(queuedResponse, MAP_TYPE);
+      queuedSessionId.set(new SessionId((String) value.get("sessionId")));
+      latch.countDown();
+    }).start();
+
+    wait.until(ignored -> {
+      HttpResponse queryRes = client.execute(
+        new HttpRequest(POST, "/graphql")
+          .setContent(Contents.string("{\"query\": \"{grid { sessionQueueSize } }\"}", UTF_8)));
+      Map<?,?> query = Contents.fromJson(queryRes, MAP_TYPE);
+      query = (Map<?, ?>) query.get("data");
+      query = (Map<?, ?>) query.get("grid");
+      Number size = (Number) query.get("sessionQueueSize");
+      return size.intValue() > 0;
+    });
+
+    // We know something is in the queue now. Kill the session
+    client.execute(new HttpRequest(DELETE, "/session/" + id));
+
+    // And now just wait
+    assertThat(latch.await(5, SECONDS)).isTrue();
+    assertThat(queuedSessionId.get()).isNotNull();
   }
 
   @After
