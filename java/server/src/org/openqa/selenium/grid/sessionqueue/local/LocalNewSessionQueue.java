@@ -323,6 +323,8 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
     Require.nonNull("New session request", reqId);
     Require.nonNull("Result", result);
 
+    LOG.info(reqId + " Asked to complete.");
+
     Lock readLock = lock.readLock();
     readLock.lock();
     Data data;
@@ -333,12 +335,14 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
     }
 
     if (data == null) {
+      LOG.info(reqId + " Unable to find data");
       return;
     }
 
     Lock writeLock = lock.writeLock();
     writeLock.lock();
     try {
+      LOG.info(reqId + " Removing from queue");
       requests.remove(reqId);
       queue.removeIf(req -> reqId.equals(req.getRequestId()));
     } finally {
@@ -348,6 +352,7 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
     if (result.isLeft()) {
       bus.fire(new NewSessionRejectedEvent(new NewSessionErrorResponse(reqId, result.left().getMessage())));
     }
+    LOG.info(reqId + " Setting result: " + result);
     data.setResult(result);
   }
 
@@ -406,9 +411,9 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
 
   private class Data {
     public final Instant endTime;
+    public final CountDownLatch latch = new CountDownLatch(1);
     public Either<SessionNotCreatedException, CreateSessionResponse> result;
     private boolean complete;
-    private CountDownLatch latch = new CountDownLatch(1);
 
     public Data(Instant enqueued) {
       this.endTime = enqueued.plus(requestTimeout);
@@ -417,8 +422,10 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
 
     public synchronized void setResult(Either<SessionNotCreatedException, CreateSessionResponse> result) {
       if (complete) {
+        LOG.info("Session is already complete");
         return;
       }
+      LOG.info("Setting the session result: " + result);
       this.result = result;
       complete = true;
       latch.countDown();

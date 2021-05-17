@@ -153,7 +153,7 @@ public class LocalDistributor extends Distributor {
     }));
 
     regularly = new Regularly(
-      Executors.newSingleThreadScheduledExecutor(
+      Executors.newScheduledThreadPool(2,
         r -> {
           Thread thread = new Thread(r);
           thread.setName("New Session Queue");
@@ -178,6 +178,9 @@ public class LocalDistributor extends Distributor {
       newSessionRunnable.run();
     }));
     bus.addListener(SessionClosedEvent.listener(ignored -> {
+      // We should only see this event once the session has closed properly
+      // but sometimes it takes a while to clean up and make resources free.
+      // This isn't ideal, but it'll be okay to get us going
       doze.accept(2000);
       newSessionRunnable.run();
     }));
@@ -640,6 +643,7 @@ public class LocalDistributor extends Distributor {
           }
         }
 
+        LOG.info(reqId + "Calling complete");
         sessionQueue.complete(reqId, response);
       }
     }
