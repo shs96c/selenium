@@ -418,7 +418,7 @@ public class LocalDistributor extends Distributor {
         // in this next block of code.
         SlotId selectedSlot = reserveSlot(request.getRequestId(), caps);
         if (selectedSlot == null) {
-          LOG.info(String.format("Unable to find slot for request %s. May retry: %s ", request.getRequestId(), caps));
+//          LOG.info(String.format("Unable to find slot for request %s. May retry: %s ", request.getRequestId(), caps));
           retry = true;
           continue;
         }
@@ -606,12 +606,14 @@ public class LocalDistributor extends Distributor {
         message.append("Current size is: ").append(currentSize).append(". ");
         retry = currentSize != 0 && currentSize != initialSize;
         initialSize = currentSize;
-        LOG.info(message.toString());
+//        LOG.info(message.toString());
       }
     }
 
     private void handleNewSessionRequest(SessionRequest sessionRequest) {
       RequestId reqId = sessionRequest.getRequestId();
+
+      LOG.info(sessionRequest.getRequestId() + " Starting new session");
 
       try (Span span = tracer.getCurrentContext().createSpan("distributor.poll_queue")) {
         Map<String, EventAttributeValue> attributeMap = new HashMap<>();

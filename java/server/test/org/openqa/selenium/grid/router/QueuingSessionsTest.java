@@ -14,6 +14,7 @@ import org.openqa.selenium.testing.drivers.Browser;
 import java.io.StringReader;
 import java.time.Duration;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -67,8 +68,10 @@ public class QueuingSessionsTest {
         .addAlternative(browser.getCapabilities())
         .address(deployment.getServer().getUrl())
         .build());
+      latch.countDown();
     }).start();
 
+    // Wait until there is something in the queue
     new FluentWait<>("").withTimeout(Duration.ofSeconds(5)).until(ignored -> {
       HttpResponse queryRes = client.execute(
         new HttpRequest(POST, "/graphql")
@@ -77,12 +80,11 @@ public class QueuingSessionsTest {
       query = (Map<?, ?>) query.get("data");
       query = (Map<?, ?>) query.get("grid");
       Number size = (Number) query.get("sessionQueueSize");
-      return size.intValue() > 0;
+      return size.intValue() == 0;
     });
     driver.quit();
 
     assertThat(latch.await(20, SECONDS)).isTrue();
     other.get().quit();
   }
-
 }

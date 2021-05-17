@@ -48,6 +48,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
@@ -80,6 +81,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
   description = "New session queue")
 public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
 
+  private static final Logger LOG = Logger.getLogger(LocalNewSessionQueue.class.getName());
   private final EventBus bus;
   private final SlotMatcher slotMatcher;
   private final Duration requestTimeout;
@@ -174,29 +176,36 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
     Require.nonNull("New session request", request);
     Require.nonNull("Request id", request.getRequestId());
 
+    LOG.info(request.getRequestId() + " Entering");
     Data data = injectIntoQueue(request);
 
     if (isTimedOut(Instant.now(), data)) {
+      LOG.info(request.getRequestId() + " Request timed out");
       failDueToTimeout(request.getRequestId());
     }
 
     Either<SessionNotCreatedException, CreateSessionResponse> result;
     try {
       if (data.latch.await(requestTimeout.toMillis(), MILLISECONDS)) {
+        LOG.info(request.getRequestId() + " Have result");
         result = data.result;
       } else {
+        LOG.info(request.getRequestId() + " Timed out");
         result = Either.left(new SessionNotCreatedException("New session request timed out"));
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+      LOG.info(request.getRequestId() + " Interrupted");
       result = Either.left(new SessionNotCreatedException("Interrupted when creating the session", e));
     } catch (RuntimeException e) {
+      LOG.info(request.getRequestId() + " Something went wrong");
       result = Either.left(new SessionNotCreatedException("An error occurred creating the session", e));
     }
 
     Lock writeLock = this.lock.writeLock();
     writeLock.lock();
     try {
+      LOG.info(request.getRequestId() + " Removing request");
       requests.remove(request.getRequestId());
       queue.remove(request);
     } finally {
@@ -211,6 +220,7 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
         .setContent(Contents.asJson(Collections.singletonMap("value", result.left())));
     }
 
+    LOG.info(request.getRequestId() + " Returning result");
     return res;
   }
 
