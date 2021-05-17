@@ -17,10 +17,6 @@
 
 package org.openqa.selenium.grid.sessionqueue;
 
-import static org.openqa.selenium.remote.tracing.HttpTracing.newSpanAsChildOf;
-import static org.openqa.selenium.remote.tracing.Tags.HTTP_REQUEST;
-import static org.openqa.selenium.remote.tracing.Tags.HTTP_RESPONSE;
-
 import org.openqa.selenium.grid.data.SessionRequest;
 import org.openqa.selenium.internal.Require;
 import org.openqa.selenium.remote.http.Contents;
@@ -30,8 +26,15 @@ import org.openqa.selenium.remote.http.HttpResponse;
 import org.openqa.selenium.remote.tracing.Span;
 import org.openqa.selenium.remote.tracing.Tracer;
 
+import java.util.logging.Logger;
+
+import static org.openqa.selenium.remote.tracing.HttpTracing.newSpanAsChildOf;
+import static org.openqa.selenium.remote.tracing.Tags.HTTP_REQUEST;
+import static org.openqa.selenium.remote.tracing.Tags.HTTP_RESPONSE;
+
 class AddToSessionQueue implements HttpHandler {
 
+  private static final Logger LOG = Logger.getLogger(AddToSessionQueue.class.getName());
   private final Tracer tracer;
   private final NewSessionQueue newSessionQueue;
 
@@ -46,6 +49,7 @@ class AddToSessionQueue implements HttpHandler {
       HTTP_REQUEST.accept(span, req);
 
       HttpResponse response = newSessionQueue.addToQueue(Contents.fromJson(req, SessionRequest.class));
+      LOG.info("Response! " + Contents.string(response));
 
       HTTP_RESPONSE.accept(span, response);
 
