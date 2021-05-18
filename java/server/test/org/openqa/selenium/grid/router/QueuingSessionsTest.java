@@ -14,13 +14,13 @@ import org.openqa.selenium.testing.drivers.Browser;
 import java.io.StringReader;
 import java.time.Duration;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.openqa.selenium.json.Json.MAP_TYPE;
 import static org.openqa.selenium.remote.http.HttpMethod.POST;
 
@@ -63,11 +63,13 @@ public class QueuingSessionsTest {
 
     CountDownLatch latch = new CountDownLatch(1);
     AtomicReference<WebDriver> other = new AtomicReference<>();
+    AtomicReference<Long> times = new AtomicReference<>(System.currentTimeMillis());
     new Thread(() -> {
       other.set(RemoteWebDriver.builder()
         .addAlternative(browser.getCapabilities())
         .address(deployment.getServer().getUrl())
         .build());
+      times.getAndUpdate(start -> System.currentTimeMillis() - start);
       latch.countDown();
     }).start();
 
@@ -82,9 +84,11 @@ public class QueuingSessionsTest {
       Number size = (Number) query.get("sessionQueueSize");
       return size.intValue() == 0;
     });
+    times.set(System.currentTimeMillis());
     driver.quit();
 
     assertThat(latch.await(20, SECONDS)).isTrue();
     other.get().quit();
+    fail("Oh no! " + times.get());
   }
 }
