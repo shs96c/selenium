@@ -111,6 +111,7 @@ public class GraphqlHandlerTest {
     sessionRequest = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(OSS, W3C),
       Set.of(caps),
       Map.of());
@@ -180,6 +181,7 @@ public class GraphqlHandlerTest {
     SessionRequest request = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(caps),
       Map.of());
@@ -201,6 +203,7 @@ public class GraphqlHandlerTest {
     SessionRequest request = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(caps),
       Map.of());

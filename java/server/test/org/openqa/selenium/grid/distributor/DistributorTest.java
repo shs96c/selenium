@@ -1091,6 +1091,7 @@ public class DistributorTest {
     SessionRequest sessionRequest = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       // Insertion order is assumed to be preserved
         ImmutableSet.of(
@@ -1116,6 +1117,7 @@ public class DistributorTest {
     SessionRequest sessionRequest = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       // Insertion order is assumed to be preserved
         ImmutableSet.of(
@@ -1136,6 +1138,7 @@ public class DistributorTest {
     return new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(allCaps),
       Map.of());

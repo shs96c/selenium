@@ -28,10 +28,12 @@ import org.openqa.selenium.remote.http.HttpRequest;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -46,6 +48,7 @@ import static org.openqa.selenium.json.Json.MAP_TYPE;
 
 public class SessionRequest {
 
+  private static final Type HTTP_HEADERS = new TypeToken<Map<String, List<String>>>() {}.getType();
   private static final Type SET_OF_CAPABILITIES = new TypeToken<Set<Capabilities>>() {}.getType();
   private static final Type SET_OF_DIALECTS = new TypeToken<Set<Dialect>>() {}.getType();
   private final RequestId requestId;
@@ -53,6 +56,7 @@ public class SessionRequest {
   private final Set<Capabilities> desiredCapabilities;
   private final Set<Dialect> downstreamDialects;
   private final Map<String, Object> metadata;
+  private final Map<String, List<String>> httpHeaders;
 
   public SessionRequest(RequestId requestId, HttpRequest request, Instant enqueued) {
     this.requestId = Require.nonNull("Request ID", requestId);
@@ -61,19 +65,29 @@ public class SessionRequest {
 
     try (NewSessionPayload payload = NewSessionPayload.create(Contents.reader(request))) {
       desiredCapabilities = payload.stream().collect(Collectors.toSet());
-      downstreamDialects = payload.getDownstreamDialects();
-      metadata = payload.getMetadata();
+      downstreamDialects = Collections.unmodifiableSet(payload.getDownstreamDialects());
+      metadata = Collections.unmodifiableMap(new HashMap<>(payload.getMetadata()));
     }
+
+    Map<String, List<String>> headers = new HashMap<>();
+    request.getHeaderNames().forEach(name -> {
+      request.getHeaders(name).forEach(value -> {
+        headers.computeIfAbsent(name, n -> new ArrayList<>()).add(value);
+      });
+    });
+    this.httpHeaders = Collections.unmodifiableMap(headers);
   }
 
   public SessionRequest(
     RequestId requestId,
     Instant enqueued,
+    Map<String, List<String>> httpHeaders,
     Set<Dialect> downstreamDialects,
     Set<Capabilities> desiredCapabilities,
     Map<String, Object> metadata) {
     this.requestId = Require.nonNull("Request ID", requestId);
     this.enqueued = Require.nonNull("Enqueud time", enqueued);
+    this.httpHeaders = unmodifiableMap(new HashMap<>(Require.nonNull("HTTP headers", httpHeaders)));
     this.downstreamDialects = unmodifiableSet(
       new HashSet<>(Require.nonNull("Downstream dialects", downstreamDialects)));
     this.desiredCapabilities = unmodifiableSet(
@@ -108,6 +122,7 @@ public class SessionRequest {
       .add("desiredCapabilities=" + desiredCapabilities)
       .add("downstreamDialects=" + downstreamDialects)
       .add("metadata=" + metadata)
+      .add("headers=" + httpHeaders)
       .toString();
   }
 
@@ -121,12 +136,13 @@ public class SessionRequest {
     return this.requestId.equals(that.requestId) &&
       this.desiredCapabilities.equals(that.desiredCapabilities) &&
       this.downstreamDialects.equals(that.downstreamDialects) &&
-      this.metadata.equals(that.metadata);
+      this.metadata.equals(that.metadata) &&
+      this.httpHeaders.equals(that.httpHeaders);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(requestId, enqueued, desiredCapabilities, downstreamDialects, metadata);
+    return Objects.hash(requestId, enqueued, desiredCapabilities, downstreamDialects, metadata, httpHeaders);
   }
 
   private Map<String, Object> toJson() {
@@ -136,6 +152,7 @@ public class SessionRequest {
     toReturn.put("dialects", downstreamDialects);
     toReturn.put("capabilities", desiredCapabilities);
     toReturn.put("metadata", metadata);
+    toReturn.put("headers", httpHeaders);
     return unmodifiableMap(toReturn);
   }
 
@@ -145,6 +162,7 @@ public class SessionRequest {
     Set<Capabilities> capabilities = null;
     Set<Dialect> dialects = null;
     Map<String, Object> metadata = emptyMap();
+    Map<String, List<String>> headers = emptyMap();
 
     input.beginObject();
     while (input.hasNext()) {
@@ -159,6 +177,10 @@ public class SessionRequest {
 
         case "enqueued":
           enqueued = input.read(Instant.class);
+          break;
+
+        case "headers":
+          headers = input.read(HTTP_HEADERS);
           break;
 
         case "metadata":
@@ -176,6 +198,6 @@ public class SessionRequest {
     }
     input.endObject();
 
-    return new SessionRequest(id, enqueued, dialects, capabilities, metadata);
+    return new SessionRequest(id, enqueued, headers, dialects, capabilities, metadata);
   }
 }

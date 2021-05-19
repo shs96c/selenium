@@ -123,6 +123,7 @@ public class LocalNewSessionQueueTest {
     this.sessionRequest = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(CAPS),
       Map.of());
@@ -381,6 +382,7 @@ public class LocalNewSessionQueueTest {
       SessionRequest sessionRequest = new SessionRequest(
         new RequestId(UUID.randomUUID()),
         Instant.now(),
+        Map.of(),
         Set.of(W3C),
         Set.of(CAPS),
         Map.of());
@@ -414,6 +416,7 @@ public class LocalNewSessionQueueTest {
     final SessionRequest request = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       LONG_AGO,
+      Map.of(),
       Set.of(W3C),
       Set.of(CAPS),
       Map.of());
@@ -444,6 +447,7 @@ public class LocalNewSessionQueueTest {
     SessionRequest sessionRequest = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       LONG_AGO,
+      Map.of(),
       Set.of(W3C),
       Set.of(CAPS),
       Map.of());
@@ -463,6 +467,7 @@ public class LocalNewSessionQueueTest {
       SessionRequest sessionRequest = new SessionRequest(
         new RequestId(UUID.randomUUID()),
         Instant.now(),
+        Map.of(),
         Set.of(W3C),
         Set.of(CAPS),
         Map.of());
@@ -497,6 +502,7 @@ public class LocalNewSessionQueueTest {
     SessionRequest expected = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(new ImmutableCapabilities("browserName", "cheese", "se:kind", "smoked")),
       Map.of());
@@ -505,6 +511,7 @@ public class LocalNewSessionQueueTest {
     localQueue.injectIntoQueue(new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(new ImmutableCapabilities("browserName", "peas", "se:kind", "mushy")),
       Map.of()));
@@ -523,6 +530,7 @@ public class LocalNewSessionQueueTest {
     localQueue.injectIntoQueue(new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(new ImmutableCapabilities("browserName", "peas", "se:kind", "mushy")),
       Map.of()));
@@ -530,6 +538,7 @@ public class LocalNewSessionQueueTest {
     SessionRequest expected = new SessionRequest(
       new RequestId(UUID.randomUUID()),
       Instant.now(),
+      Map.of(),
       Set.of(W3C),
       Set.of(new ImmutableCapabilities("browserName", "cheese", "se:kind", "smoked")),
       Map.of());

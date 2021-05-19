@@ -261,6 +261,7 @@ public class LocalDistributorTest {
         new SessionRequest(
             new RequestId(UUID.randomUUID()),
             Instant.now(),
+            Map.of(),
             Set.of(W3C),
             Set.of(new ImmutableCapabilities("browserName", "cheese")),
             Map.of());
