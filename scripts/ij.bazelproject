@@ -26,3 +26,5 @@ additional_languages:
   # scala
   typescript
 
+# The .bazelrc makes sure we Do The Right Thing when compiling
+java_language_level: 11
