@@ -11,6 +11,7 @@ import org.openqa.selenium.grid.data.NewSessionRejectedEvent;
 import org.openqa.selenium.grid.data.NewSessionRequestEvent;
 import org.openqa.selenium.grid.data.RequestId;
 import org.openqa.selenium.grid.data.SessionRequest;
+import org.openqa.selenium.grid.data.SessionRequestTags;
 import org.openqa.selenium.grid.data.SlotMatcher;
 import org.openqa.selenium.grid.distributor.config.DistributorOptions;
 import org.openqa.selenium.grid.jmx.JMXHelper;
@@ -24,10 +25,13 @@ import org.openqa.selenium.grid.sessionqueue.NewSessionQueue;
 import org.openqa.selenium.grid.sessionqueue.config.SessionRequestOptions;
 import org.openqa.selenium.internal.Either;
 import org.openqa.selenium.internal.Require;
+import org.openqa.selenium.remote.RemoteTags;
 import org.openqa.selenium.remote.http.Contents;
 import org.openqa.selenium.remote.http.HttpResponse;
 import org.openqa.selenium.remote.tracing.AttributeKey;
+import org.openqa.selenium.remote.tracing.HttpTracing;
 import org.openqa.selenium.remote.tracing.Span;
+import org.openqa.selenium.remote.tracing.Tags;
 import org.openqa.selenium.remote.tracing.Tracer;
 
 import java.io.Closeable;
@@ -54,6 +58,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.openqa.selenium.grid.data.SessionRequestTags.SESSION_REQUEST;
 
 /**
  * An in-memory implementation of the list of new session requests.
@@ -176,44 +181,51 @@ public class LocalNewSessionQueue extends NewSessionQueue implements Closeable {
     Require.nonNull("New session request", request);
     Require.nonNull("Request id", request.getRequestId());
 
-    Data data = injectIntoQueue(request);
+    try (Span span = tracer.getCurrentContext().createSpan("sessionqueue.add_to_queue")) {
+      SESSION_REQUEST.accept(span, request);
 
-    if (isTimedOut(Instant.now(), data)) {
-      failDueToTimeout(request.getRequestId());
-    }
+      Data data = injectIntoQueue(request);
 
-    Either<SessionNotCreatedException, CreateSessionResponse> result;
-    try {
-      if (data.latch.await(requestTimeout.toMillis(), MILLISECONDS)) {
-        result = data.result;
-      } else {
-        result = Either.left(new SessionNotCreatedException("New session request timed out"));
+      if (isTimedOut(Instant.now(), data)) {
+        failDueToTimeout(request.getRequestId());
       }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      result = Either.left(new SessionNotCreatedException("Interrupted when creating the session", e));
-    } catch (RuntimeException e) {
-      result = Either.left(new SessionNotCreatedException("An error occurred creating the session", e));
-    }
 
-    Lock writeLock = this.lock.writeLock();
-    writeLock.lock();
-    try {
-      requests.remove(request.getRequestId());
-      queue.remove(request);
-    } finally {
-      writeLock.unlock();
-    }
+      Either<SessionNotCreatedException, CreateSessionResponse> result;
+      try {
+        if (data.latch.await(requestTimeout.toMillis(), MILLISECONDS)) {
+          result = data.result;
+        } else {
+          result = Either.left(new SessionNotCreatedException("New session request timed out"));
+        }
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        result =
+            Either.left(new SessionNotCreatedException("Interrupted when creating the session", e));
+      } catch (RuntimeException e) {
+        result =
+            Either.left(
+                new SessionNotCreatedException("An error occurred creating the session", e));
+      }
 
-    HttpResponse res = new HttpResponse();
-    if (result.isRight()) {
-      res.setContent(Contents.bytes(result.right().getDownstreamEncodedResponse()));
-    } else {
-      res.setStatus(HTTP_INTERNAL_ERROR)
-        .setContent(Contents.asJson(Collections.singletonMap("value", result.left())));
-    }
+      Lock writeLock = this.lock.writeLock();
+      writeLock.lock();
+      try {
+        requests.remove(request.getRequestId());
+        queue.remove(request);
+      } finally {
+        writeLock.unlock();
+      }
 
-    return res;
+      HttpResponse res = new HttpResponse();
+      if (result.isRight()) {
+        res.setContent(Contents.bytes(result.right().getDownstreamEncodedResponse()));
+      } else {
+        res.setStatus(HTTP_INTERNAL_ERROR)
+            .setContent(Contents.asJson(Collections.singletonMap("value", result.left())));
+      }
+
+      return res;
+    }
   }
 
   @VisibleForTesting
