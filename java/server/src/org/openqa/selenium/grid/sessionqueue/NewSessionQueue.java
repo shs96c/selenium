@@ -33,7 +33,6 @@ import org.openqa.selenium.remote.http.Route;
 import org.openqa.selenium.remote.tracing.Tracer;
 import org.openqa.selenium.status.HasReadyState;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public abstract class NewSessionQueue implements HasReadyState, Routable {
 
     routes = combine(
       post("/session")
-        .to(() -> req -> addToQueue(new SessionRequest(new RequestId(UUID.randomUUID()), req, Instant.now()))),
+        .to(() -> new IntroduceToSessionQueue(tracer, this)),
       post("/se/grid/newsessionqueue/session")
         .to(() -> new AddToSessionQueue(tracer, this))
         .with(requiresSecret),
