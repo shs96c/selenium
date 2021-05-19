@@ -91,7 +91,7 @@ public class RemoteNewSessionQueue extends NewSessionQueue {
   @Override
   public HttpResponse addToQueue(SessionRequest request) {
     HttpRequest upstream = new HttpRequest(POST, "/se/grid/newsessionqueue/session");
-    HttpTracing.inject(tracer, tracer.getCurrentContext(), upstream);
+    TraceSessionRequest.inject(tracer, upstream, request);
     upstream.setContent(Contents.asJson(request));
     return client.with(addSecret).execute(upstream);
   }
@@ -102,7 +102,7 @@ public class RemoteNewSessionQueue extends NewSessionQueue {
 
     HttpRequest upstream =
       new HttpRequest(POST, String.format("/se/grid/newsessionqueue/session/%s/retry", request.getRequestId()));
-    HttpTracing.inject(tracer, tracer.getCurrentContext(), upstream);
+    TraceSessionRequest.inject(tracer, upstream, request);
     upstream.setContent(Contents.asJson(request));
     HttpResponse response = client.with(addSecret).execute(upstream);
     return Values.get(response, Boolean.class);

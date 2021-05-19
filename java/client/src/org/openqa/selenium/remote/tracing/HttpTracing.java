@@ -30,7 +30,7 @@ public class HttpTracing {
     // Utility classes
   }
 
-  private static TraceContext extract(Tracer tracer, HttpRequest request) {
+  public static TraceContext extract(Tracer tracer, HttpRequest request) {
     Require.nonNull("Tracer", tracer);
     Require.nonNull("Request", request);
 

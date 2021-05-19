@@ -99,6 +99,10 @@ public class SessionRequest {
     return requestId;
   }
 
+  public Map<String, List<String>> getHttpHeaders() {
+    return httpHeaders;
+  }
+
   public Set<Capabilities> getDesiredCapabilities() {
     return desiredCapabilities;
   }
