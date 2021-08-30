@@ -18,11 +18,35 @@
 package org.openqa.selenium.remote;
 
 import org.junit.Test;
+import org.openqa.selenium.ImmutableCapabilities;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.ScriptKey;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.http.*;
+
+import java.util.Map;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.openqa.selenium.json.Json.JSON_UTF_8;
 
 public class RemoteScriptPinningTest {
 
+  private final SessionId id = new SessionId(UUID.randomUUID());
+
   @Test
   public void ifRemoteEndSupportsScriptPinningDoesNotFallBackToExecuteScript() {
+    Routable route = Route.combine(
+      Route.post("/session/{sessionId}/se/pin").to(() -> null),
+      Route.post("/session/{sessionId}/se/pin/12345").to(() -> null));
+
+    WebDriver driver = createDriver(route);
+
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    ScriptKey key = js.pin("return 'cheese!'");
+    Object value = js.executeScript(key);
+
+    assertThat(value).isEqualTo("cheese!");
   }
 
   @Test
@@ -35,6 +59,26 @@ public class RemoteScriptPinningTest {
 
   @Test
   public void onceAPinningStrategyHasBeenSelectedItShouldBeUsed() {
+  }
+
+  private WebDriver createDriver(Routable route) {
+    Filter addJson = next -> req -> next.execute(req).setHeader("Content-Type", JSON_UTF_8);
+
+    Route createSession = Route.post("/session")
+      .to(() -> req ->
+        new HttpResponse()
+          .setContent(Contents.asJson(
+            Map.of("value", Map.of(
+              "sessionId", id, "capabilities",
+              new ImmutableCapabilities("browserName", "cheese"))))));
+
+    Routable handler = Route.combine(createSession, route).with(addJson);
+
+    return RemoteWebDriver.builder()
+      .oneOf(new ImmutableCapabilities())
+      .address("http://localhost:3456")
+      .connectingWith(cc -> handler)
+      .build();
   }
 
 }
