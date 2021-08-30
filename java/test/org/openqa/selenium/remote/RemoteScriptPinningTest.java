@@ -65,6 +65,11 @@ public class RemoteScriptPinningTest {
   public void onceAPinningStrategyHasBeenSelectedItShouldBeUsed() {
   }
 
+  @Test
+  public void pinningTheSameScriptTwiceReturnsTheSameKey() {
+
+  }
+
   private WebDriver createDriver(Routable route) {
     Filter addJson = next -> req -> next.execute(req).setHeader("Content-Type", JSON_UTF_8);
 
