@@ -22,7 +22,11 @@ import org.openqa.selenium.ImmutableCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.ScriptKey;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.http.*;
+import org.openqa.selenium.remote.http.Contents;
+import org.openqa.selenium.remote.http.Filter;
+import org.openqa.selenium.remote.http.HttpResponse;
+import org.openqa.selenium.remote.http.Routable;
+import org.openqa.selenium.remote.http.Route;
 
 import java.util.Map;
 import java.util.UUID;
