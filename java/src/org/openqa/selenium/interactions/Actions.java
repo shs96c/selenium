@@ -67,14 +67,14 @@ public class Actions {
   public Actions(WebDriver driver) {
     this.driver = Require.nonNull("Driver", driver);
 
-    if (driver instanceof HasInputDevices) {
-      HasInputDevices deviceOwner = (HasInputDevices) driver;
-      this.jsonKeyboard = deviceOwner.getKeyboard();
-      this.jsonMouse = deviceOwner.getMouse();
-    } else {
+//    if (driver instanceof HasInputDevices) {
+//      HasInputDevices deviceOwner = (HasInputDevices) driver;
+//      this.jsonKeyboard = deviceOwner.getKeyboard();
+//      this.jsonMouse = deviceOwner.getMouse();
+//    } else {
       this.jsonKeyboard = null;
       this.jsonMouse = null;
-    }
+//    }
   }
 
   /**
