@@ -72,6 +72,8 @@ def selenium_java_deps():
             "org.apache.commons:commons-exec:1.3",
             "org.assertj:assertj-core:3.22.0",
             "org.asynchttpclient:async-http-client:2.12.3",
+            "org.bouncycastle:bcprov-jdk15on:1.70",
+            "org.bouncycastle:bcpkix-jdk15on:1.70",
             "org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5",
             "org.hamcrest:hamcrest:2.2",
             "org.hsqldb:hsqldb:2.6.1",
