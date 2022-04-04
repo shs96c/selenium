@@ -89,6 +89,12 @@ def selenium_test(name, test_class, size = "medium", browsers = BROWSERS.keys(),
             **stripped_args
         )
 
+        if browser == default_browser:
+            native.alias(
+                name = "%s-%s" % (name, browser),
+                actual = test,
+            )
+
         if "selenium-remote" in tags:
             native.java_test(
                 name = "%s-remote" % test,
