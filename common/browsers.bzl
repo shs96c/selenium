@@ -8,6 +8,7 @@ chrome_data = select({
     "@selenium//common:use_pinned_linux_chrome": [
         "@linux_chromedriver//:chromedriver",
         "@linux_chrome//:chrome-linux",
+        "@linux_chrome//:chrome-linux-files",
     ],
     "@selenium//common:use_pinned_macos_chrome": [
         "@mac_chromedriver//:chromedriver",
@@ -29,7 +30,8 @@ edge_data = select({
 firefox_data = select({
     "@selenium//common:use_pinned_linux_firefox": [
         "@linux_geckodriver//:geckodriver",
-        "@linux_firefox//:firefox",
+        "@linux_firefox//:firefox-exe",
+        "@linux_firefox//:firefox-files",
     ],
     "@selenium//common:use_pinned_macos_firefox": [
         "@mac_geckodriver//:geckodriver",

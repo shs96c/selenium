@@ -3,7 +3,7 @@ load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:packaging.bzl", "py_package", "py_wheel")
 load("@dev_requirements//:requirements.bzl", "requirement")
-load("//common:defs.bzl", "copy_file")
+load("//common:defs.bzl", "copy_file", "gendir")
 load("//py:defs.bzl", "py_test_suite")
 load("//py/private:browsers.bzl", "BROWSERS")
 
@@ -213,13 +213,13 @@ py_binary(
     deps = [requirement("inflection")],
 )
 
-[genrule(
+[gendir(
     name = "create-cdp-srcs-" + n,
     srcs = [
         "//common/devtools/chromium/" + n + ":browser_protocol",
         "//common/devtools/chromium/" + n + ":js_protocol",
     ],
-    outs = ["selenium/webdriver/common/devtools/" + n],
+    out = "selenium/webdriver/common/devtools/" + n,
     cmd = "python3 $(location :generate) $(location //common/devtools/chromium/" + n + ":browser_protocol) $(location //common/devtools/chromium/" + n + ":js_protocol) $@",
     tools = [
         ":generate",
