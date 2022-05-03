@@ -58,3 +58,15 @@ build:baas --define=EXECUTOR=remote
 build:baas --incompatible_enable_cc_toolchain_resolution
 build:baas --bes_lifecycle_events
 
+build:buildbuddy --config=baas
+build:buildbuddy --jobs=100
+
+build:buildbuddy --bes_results_url=https://app.buildbuddy.io/invocation/
+build:buildbuddy --bes_backend=grpcs://remote.buildbuddy.io
+
+build:buildbuddy --remote_cache=grpcs://remote.buildbuddy.io
+
+build:buildbuddy --remote_executor=grpcs://remote.buildbuddy.io
+build:buildbuddy --host_platform=@buildbuddy_toolchain//:platform_linux
+build:buildbuddy --crosstool_top=@buildbuddy_toolchain//:ubuntu1604_cc_toolchain_suite
+build:buildbuddy --extra_toolchains=@buildbuddy_toolchain//:ubuntu1604_cc_toolchain
