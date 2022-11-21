@@ -11,11 +11,12 @@ cc_library(
         "include/*.h",
         "util/*.h",
     ]),
-    copts = [
-    ],
     includes = [
-        "include/",
-        "lib/",
+        "./include/",
+        "./lib/",
+    ],
+    copts = [
+        "-Wno-int-conversion",
     ],
     deps = [
         "@apr//:apr",

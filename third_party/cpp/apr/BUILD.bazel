@@ -4,6 +4,7 @@ copy_file(
     name = "apr-header",
     src = select({
         "@platforms//os:macos": "apr.h.macos",
+        "@platforms//os:linux": "apr.h.macos",
     }),
     out = "apr.h",
 )

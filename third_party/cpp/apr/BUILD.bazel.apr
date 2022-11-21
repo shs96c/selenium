@@ -37,7 +37,7 @@ cc_library(
     ] + select({
         "@platforms//os:linux": ["./include/arch/unix/"],
         "@platforms//os:macos": ["./include/arch/unix/"],
-        "@platforms//os:windows": ["./include/arch/win32"],
+        "@platforms//os:windows": ["./include/arch/win32/"],
     }),
     copts = [
         "-Wno-int-conversion",
