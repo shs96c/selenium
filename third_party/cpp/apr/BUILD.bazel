@@ -1,0 +1,33 @@
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+
+copy_file(
+    name = "apr-header",
+    src = select({
+        "@platforms//os:macos": "apr.h.macos",
+    }),
+    out = "apr.h",
+)
+
+copy_file(
+    name = "apr-private-header",
+    src = select({
+        "@platforms//os:linux": "apr_private.h.unix",
+        "@platforms//os:macos": "apr_private.h.unix",
+        "@platforms//os:windows": "apr_private.h.win32",
+    }),
+    out = "apr_private.h",
+)
+
+cc_library(
+    name = "apr-generated",
+    hdrs = [
+        "apr_escape_test_char.h",
+        ":apr-header",
+        ":apr-private-header",
+    ],
+    includes = ["."],
+    visibility = [
+        "@apr//:__subpackages__",
+        "@iconv//:__subpackages__",
+    ],
+)

@@ -245,22 +245,46 @@ load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
 aspect_bazel_lib_dependencies()
 
 # A cross-compiling cc toolchain
+#http_archive(
+#    name = "bazel-zig-cc",
+#    sha256 = "73afa7e1af49e3dbfa1bae9362438cdc51cb177c359a6041a7a403011179d0b5",
+#    strip_prefix = "bazel-zig-cc-v0.9.2",
+#    urls = ["https://git.sr.ht/~motiejus/bazel-zig-cc/archive/v0.9.2.tar.gz"],
+#)
+#
+#load("@bazel-zig-cc//toolchain:defs.bzl", zig_toolchains = "toolchains")
+
+#zig_toolchains()
+#
+#register_toolchains(
+#    "@zig_sdk//toolchain:aarch64-macos-none",
+#    "@zig_sdk//toolchain:x86_64-linux-musl",
+#    "@zig_sdk//toolchain:x86_64-macos-none",
+#    "@zig_sdk//toolchain:x86_64-windows-gnu",
+#)
+
+# Libraries needed to compile Selenium Manager
 http_archive(
-    name = "bazel-zig-cc",
-    sha256 = "73afa7e1af49e3dbfa1bae9362438cdc51cb177c359a6041a7a403011179d0b5",
-    strip_prefix = "bazel-zig-cc-v0.9.2",
-    urls = ["https://git.sr.ht/~motiejus/bazel-zig-cc/archive/v0.9.2.tar.gz"],
+    name = "apr",
+    build_file = "//third_party/cpp/apr:BUILD.bazel.apr",
+    strip_prefix = "apr-1.7.0",
+    url = "https://github.com/apache/apr/archive/refs/tags/1.7.0.zip",
 )
 
-load("@bazel-zig-cc//toolchain:defs.bzl", zig_toolchains = "toolchains")
+#local_repository(
+#    name = "apr",
+#    path = "apr-1.7.0",
+#)
 
-zig_toolchains()
+#http_archive(
+#    name = "iconv",
+#    strip_prefix = "apr-iconv-1.2.2",
+#    url = "https://github.com/apache/apr-iconv/archive/refs/tags/1.2.2.zip",
+#)
 
-register_toolchains(
-    "@zig_sdk//toolchain:aarch64-macos-none",
-    "@zig_sdk//toolchain:x86_64-linux-musl",
-    "@zig_sdk//toolchain:x86_64-macos-none",
-    "@zig_sdk//toolchain:x86_64-windows-gnu",
+local_repository(
+    name = "iconv",
+    path = "apr-iconv-1.2.2",
 )
 
 http_archive(

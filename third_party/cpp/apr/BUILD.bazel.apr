@@ -1,0 +1,49 @@
+# Note, we include the private headers here so that they
+# do not propagate to things that depend on `apr`
+COMMON_SRCS = glob([
+  "encoding/*.c",
+  "passwd/*.c",
+  "strings/*.c",
+  "tables/*.c",
+  "include/private/*.h",
+])
+
+UNIX_SRCS = glob([
+    "*/unix/*.c"
+])
+
+WINDOWS_SRCS = glob([
+    "*/win32/*.c",
+])
+
+cc_library(
+    name = "apr",
+    srcs = COMMON_SRCS + select({
+        "@platforms//os:linux": UNIX_SRCS,
+        "@platforms//os:macos": UNIX_SRCS,
+        "@platforms//os:windows": WINDOWS_SRCS,
+    }),
+    hdrs = glob([
+        "include/*.h",
+        "include/arch/*.h",
+    ]) + select({
+        "@platforms//os:linux": glob(["include/arch/unix/*.h"]) + ["random/unix/sha2.h"],
+        "@platforms//os:macos": glob(["include/arch/unix/*.h"]) + ["random/unix/sha2.h"],
+        "@platforms//os:windows": glob(["include/arch/win32/*.h"]),
+    }),
+    includes = [
+        "./include/",
+        "./include/private/",
+    ] + select({
+        "@platforms//os:linux": ["./include/arch/unix/"],
+        "@platforms//os:macos": ["./include/arch/unix/"],
+        "@platforms//os:windows": ["./include/arch/win32"],
+    }),
+    copts = [
+        "-Wno-int-conversion",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@selenium//third_party/cpp/apr:apr-generated",
+    ],
+)

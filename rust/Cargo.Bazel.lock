@@ -1,5 +1,5 @@
 {
-  "checksum": "5e052aa0631affe215a19b0ce171ee5e624a06167893433a57cd3abf4fdd946c",
+  "checksum": "9bb2057adbf712bbeed2184c1df1348304b3d08817bcba975c7a08c30ebd55f6",
   "crates": {
     "adler 1.0.2": {
       "name": "adler",
@@ -4152,78 +4152,6 @@
       },
       "license": "MIT OR Apache-2.0"
     },
-    "lock_api 0.4.9": {
-      "name": "lock_api",
-      "version": "0.4.9",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/lock_api/0.4.9/download",
-          "sha256": "435011366fe56583b16cf956f9df0095b405b82d76425bc8981c0e22e60ec4df"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "lock_api",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        },
-        {
-          "BuildScript": {
-            "crate_name": "build_script_build",
-            "crate_root": "build.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "lock_api",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "lock_api 0.4.9",
-              "target": "build_script_build"
-            },
-            {
-              "id": "scopeguard 1.1.0",
-              "target": "scopeguard"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2018",
-        "version": "0.4.9"
-      },
-      "build_script_attrs": {
-        "data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "autocfg 1.1.0",
-              "target": "autocfg"
-            }
-          ],
-          "selects": {}
-        }
-      },
-      "license": "MIT OR Apache-2.0"
-    },
     "log 0.4.17": {
       "name": "log",
       "version": "0.4.17",
@@ -5037,141 +4965,6 @@
         ],
         "edition": "2021",
         "version": "6.4.1"
-      },
-      "license": "MIT OR Apache-2.0"
-    },
-    "parking_lot 0.12.1": {
-      "name": "parking_lot",
-      "version": "0.12.1",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/parking_lot/0.12.1/download",
-          "sha256": "3742b2c103b9f06bc9fff0a37ff4912935851bee6d36f3c02bcc755bcfec228f"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "parking_lot",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "parking_lot",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "crate_features": [
-          "default"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "lock_api 0.4.9",
-              "target": "lock_api"
-            },
-            {
-              "id": "parking_lot_core 0.9.4",
-              "target": "parking_lot_core"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2018",
-        "version": "0.12.1"
-      },
-      "license": "MIT OR Apache-2.0"
-    },
-    "parking_lot_core 0.9.4": {
-      "name": "parking_lot_core",
-      "version": "0.9.4",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/parking_lot_core/0.9.4/download",
-          "sha256": "4dc9e0dc2adc1c69d09143aff38d3d30c5c3f0df0dad82e6d25547af174ebec0"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "parking_lot_core",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        },
-        {
-          "BuildScript": {
-            "crate_name": "build_script_build",
-            "crate_root": "build.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "parking_lot_core",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "cfg-if 1.0.0",
-              "target": "cfg_if"
-            },
-            {
-              "id": "parking_lot_core 0.9.4",
-              "target": "build_script_build"
-            },
-            {
-              "id": "smallvec 1.10.0",
-              "target": "smallvec"
-            }
-          ],
-          "selects": {
-            "cfg(target_os = \"redox\")": [
-              {
-                "id": "redox_syscall 0.2.16",
-                "target": "syscall"
-              }
-            ],
-            "cfg(unix)": [
-              {
-                "id": "libc 0.2.137",
-                "target": "libc"
-              }
-            ],
-            "cfg(windows)": [
-              {
-                "id": "windows-sys 0.42.0",
-                "target": "windows_sys"
-              }
-            ]
-          }
-        },
-        "edition": "2018",
-        "version": "0.9.4"
-      },
-      "build_script_attrs": {
-        "data_glob": [
-          "**"
-        ]
       },
       "license": "MIT OR Apache-2.0"
     },
@@ -6613,39 +6406,6 @@
       },
       "license": "MIT"
     },
-    "scopeguard 1.1.0": {
-      "name": "scopeguard",
-      "version": "1.1.0",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/scopeguard/1.1.0/download",
-          "sha256": "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "scopeguard",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "scopeguard",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "edition": "2015",
-        "version": "1.1.0"
-      },
-      "license": "MIT/Apache-2.0"
-    },
     "security-framework 2.7.0": {
       "name": "security-framework",
       "version": "2.7.0",
@@ -7315,48 +7075,6 @@
       },
       "license": "MIT OR Apache-2.0"
     },
-    "signal-hook-registry 1.4.0": {
-      "name": "signal-hook-registry",
-      "version": "1.4.0",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/signal-hook-registry/1.4.0/download",
-          "sha256": "e51e73328dc4ac0c7ccbda3a494dfa03df1de2f46018127f60c693f2648455b0"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "signal_hook_registry",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "signal_hook_registry",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "libc 0.2.137",
-              "target": "libc"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2015",
-        "version": "1.4.0"
-      },
-      "license": "Apache-2.0/MIT"
-    },
     "slab 0.4.7": {
       "name": "slab",
       "version": "0.4.7",
@@ -7428,39 +7146,6 @@
         }
       },
       "license": "MIT"
-    },
-    "smallvec 1.10.0": {
-      "name": "smallvec",
-      "version": "1.10.0",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/smallvec/1.10.0/download",
-          "sha256": "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "smallvec",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "smallvec",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "edition": "2018",
-        "version": "1.10.0"
-      },
-      "license": "MIT OR Apache-2.0"
     },
     "socket2 0.4.7": {
       "name": "socket2",
@@ -8253,9 +7938,6 @@
         "crate_features": [
           "bytes",
           "default",
-          "fs",
-          "full",
-          "io-std",
           "io-util",
           "libc",
           "macros",
@@ -8263,12 +7945,8 @@
           "mio",
           "net",
           "num_cpus",
-          "parking_lot",
-          "process",
           "rt",
           "rt-multi-thread",
-          "signal",
-          "signal-hook-registry",
           "socket2",
           "sync",
           "time",
@@ -8294,10 +7972,6 @@
               "target": "num_cpus"
             },
             {
-              "id": "parking_lot 0.12.1",
-              "target": "parking_lot"
-            },
-            {
               "id": "pin-project-lite 0.2.9",
               "target": "pin_project_lite"
             },
@@ -8317,10 +7991,6 @@
               {
                 "id": "libc 0.2.137",
                 "target": "libc"
-              },
-              {
-                "id": "signal-hook-registry 1.4.0",
-                "target": "signal_hook_registry"
               }
             ],
             "cfg(windows)": [
@@ -9675,10 +9345,8 @@
           "namedpipeapi",
           "objbase",
           "processenv",
-          "processthreadsapi",
           "shlobj",
           "std",
-          "threadpoollegacyapiset",
           "timezoneapi",
           "winbase",
           "wincon",
@@ -10030,9 +9698,7 @@
           "Win32_Storage_FileSystem",
           "Win32_System",
           "Win32_System_IO",
-          "Win32_System_LibraryLoader",
           "Win32_System_Pipes",
-          "Win32_System_SystemServices",
           "Win32_System_WindowsProgramming",
           "default"
         ],

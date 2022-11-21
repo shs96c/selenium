@@ -29,13 +29,13 @@ copy_file(
 )
 
 copy_file(
-    name = "manager-windows",
-    src = "//rust:s",
-    out = "windows/selenium-manager.exe",
-)
-
-copy_file(
     name = "manager-macos",
     src = "//rust:selenium-manager-macos-x86_64",
     out = "macos/selenium-manager",
+)
+
+copy_file(
+    name = "manager-windows",
+    src = "//rust:selenium-manager-windows-x86_64",
+    out = "windows/selenium-manager.exe",
 )

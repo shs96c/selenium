@@ -1,0 +1,23 @@
+cc_library(
+    name = "util",
+    srcs = glob([
+        "ccs/*.c",
+        "ces/*.c",
+        "lib/*.c",
+        "util/*.c",
+    ]),
+    hdrs = glob([
+        "lib/*.h",
+        "include/*.h",
+        "util/*.h",
+    ]),
+    copts = [
+        "-Iexternal/iconv/include/",
+    ],
+    #    includes = [
+    #        "include/",
+    #    ],
+    deps = [
+        "@selenium//third_party/cpp/apr:apr-generated",
+    ],
+)

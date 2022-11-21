@@ -6,7 +6,9 @@ rust_binary(
     name = "selenium-manager",
     srcs = glob(["src/**/*.rs"]),
     edition = "2021",
-    deps = all_crate_deps(normal = True),
+    deps = [
+        "@apr//:apr",
+    ] + all_crate_deps(normal = True),
 )
 
 platform_transition_filegroup(

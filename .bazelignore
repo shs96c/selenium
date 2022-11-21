@@ -3,3 +3,4 @@ java/client/build
 java/server/build
 node_modules
 java/build/production
+/apr-*
