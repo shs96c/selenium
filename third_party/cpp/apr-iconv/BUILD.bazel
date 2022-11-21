@@ -1,0 +1,10 @@
+cc_library(
+    name = "apr-iconv-generated",
+    hdrs = [
+        "apr_iconv_private.h",
+    ],
+    includes = ["."],
+    visibility = [
+        "@iconv//:__subpackages__",
+    ],
+)

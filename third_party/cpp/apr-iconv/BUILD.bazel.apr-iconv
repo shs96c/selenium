@@ -1,5 +1,5 @@
 cc_library(
-    name = "util",
+    name = "iconv",
     srcs = glob([
         "ccs/*.c",
         "ces/*.c",
@@ -12,12 +12,16 @@ cc_library(
         "util/*.h",
     ]),
     copts = [
-        "-Iexternal/iconv/include/",
     ],
-    #    includes = [
-    #        "include/",
-    #    ],
+    includes = [
+        "include/",
+        "lib/",
+    ],
     deps = [
-        "@selenium//third_party/cpp/apr:apr-generated",
+        "@apr//:apr",
+        "@selenium//third_party/cpp/apr-iconv:apr-iconv-generated",
+    ],
+    visibility = [
+        "@selenium//rust:__pkg__",
     ],
 )

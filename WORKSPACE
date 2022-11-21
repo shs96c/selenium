@@ -271,22 +271,14 @@ http_archive(
     url = "https://github.com/apache/apr/archive/refs/tags/1.7.0.zip",
 )
 
-#local_repository(
-#    name = "apr",
-#    path = "apr-1.7.0",
-#)
-
-#http_archive(
-#    name = "iconv",
-#    strip_prefix = "apr-iconv-1.2.2",
-#    url = "https://github.com/apache/apr-iconv/archive/refs/tags/1.2.2.zip",
-#)
-
-local_repository(
+http_archive(
     name = "iconv",
-    path = "apr-iconv-1.2.2",
+    build_file = "//third_party/cpp/apr-iconv:BUILD.bazel.apr-iconv",
+    strip_prefix = "apr-iconv-1.2.2",
+    url = "https://github.com/apache/apr-iconv/archive/refs/tags/1.2.2.zip",
 )
 
+# Javascript/Node support
 http_archive(
     name = "build_bazel_rules_nodejs",
     sha256 = "5aae76dced38f784b58d9776e4ab12278bc156a9ed2b1d9fcd3e39921dc88fda",

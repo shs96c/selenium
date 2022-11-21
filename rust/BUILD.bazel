@@ -8,6 +8,7 @@ rust_binary(
     edition = "2021",
     deps = [
         "@apr//:apr",
+        "@iconv//:iconv",
     ] + all_crate_deps(normal = True),
 )
 
