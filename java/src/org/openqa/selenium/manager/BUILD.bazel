@@ -9,9 +9,10 @@ java_export(
     maven_coordinates = "org.seleniumhq.selenium:selenium-manager:%s" % SE_VERSION,
     pom_template = "//java/src/org/openqa/selenium:template-pom",
     resources = [
-        ":manager-linux",
-        ":manager-macos",
-        ":manager-windows",
+        ":manager-linux-x86_64",
+        ":manager-macos-arm64",
+        ":manager-macos-x86_64",
+        ":manager-windows-x86_64",
     ],
     visibility = [
         "//visibility:public",
@@ -23,19 +24,25 @@ java_export(
 )
 
 copy_file(
-    name = "manager-linux",
+    name = "manager-linux-x86_64",
     src = "//rust:selenium-manager-linux-x86_64",
-    out = "linux/selenium-manager",
+    out = "linux/x86_64/selenium-manager",
 )
 
 copy_file(
-    name = "manager-windows",
+    name = "manager-windows-x86_64",
     src = "//common/manager:windows/selenium-manager.exe",
-    out = "windows/selenium-manager.exe",
+    out = "windows/x86_64/selenium-manager.exe",
 )
 
 copy_file(
-    name = "manager-macos",
-    src = "//common/manager:macos/selenium-manager",
-    out = "macos/selenium-manager",
+    name = "manager-macos-arm64",
+    src = "//rust:selenium-manager-macos-arm64",
+    out = "macos/arm64/selenium-manager",
+)
+
+copy_file(
+    name = "manager-macos-x86_64",
+    src = "//rust:selenium-manager-macos-x86_64",
+    out = "macos/x86_64/selenium-manager",
 )

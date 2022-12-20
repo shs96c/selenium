@@ -1,0 +1,2 @@
+Included so that we can find the root of the sysroot
+from within a bazel command

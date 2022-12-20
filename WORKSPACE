@@ -285,9 +285,18 @@ http_archive(
     url = "https://git.sr.ht/~motiejus/bazel-zig-cc/archive/v1.0.0-rc3.tar.gz",
 )
 
-load("@bazel-zig-cc//toolchain:defs.bzl", zig_toolchains = "toolchains")
+load("@bazel-zig-cc//toolchain:defs.bzl", "URL_FORMAT_RELEASE", zig_toolchains = "toolchains")
 
-zig_toolchains()
+zig_toolchains(
+    host_platform_sha256 = {
+        "linux-x86_64": "631ec7bcb649cd6795abe40df044d2473b59b44e10be689c15632a0458ddea55",
+        "macos-aarch64": "02f7a7839b6a1e127eeae22ea72c87603fb7298c58bc35822a951479d53c7557",
+        "macos-x86_64": "3a22cb6c4749884156a94ea9b60f3a28cf4e098a69f08c18fbca81c733ebfeda",
+        "windows-x86_64": "a66e2ff555c6e48781de1bcb0662ef28ee4b88af3af2a577f7b1950e430897ee",
+    },
+    url_formats = [URL_FORMAT_RELEASE],
+    version = "0.10.0",
+)
 
 register_toolchains(
     "@zig_sdk//toolchain:aarch64-macos-none",

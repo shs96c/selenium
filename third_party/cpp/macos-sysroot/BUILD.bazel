@@ -1,0 +1,12 @@
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["marker"])
+
+filegroup(
+    name = "macos-sysroot",
+    srcs = glob(
+        ["**/*"],
+        exclude = ["marker/**"],
+    ),
+)
+

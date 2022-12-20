@@ -7,7 +7,27 @@ rust_binary(
     # instead of an underscore
     name = "selenium-manager",
     srcs = ["src/main.rs"],
+    data = [
+        "//third_party/cpp/macos-sysroot",
+        "//third_party/cpp/macos-sysroot:marker",
+    ],
     edition = "2021",
+    rustc_flags = [
+        "-C",
+        "opt-level=z",
+        "-C",
+        "lto=yes",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "panic=abort",  # Abort on panic
+        #        "-C",
+        #        "strip=symbols",  # Strip symbols from binary*
+        "-C",
+        "link-arg=-L$(location //third_party/cpp/macos-sysroot:marker)/..",
+        "-C",
+        "link-arg=-F$(location //third_party/cpp/macos-sysroot:marker)/..",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":selenium_manager",
