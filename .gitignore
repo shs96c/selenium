@@ -126,3 +126,6 @@ bazel-testlogs
 /.vscode/
 /.scannerwork/
 /.bazelrc.local
+
+third_party/cpp/macos-sysroot/Security.framework/
+third_party/cpp/macos-sysroot/libiconv.*
