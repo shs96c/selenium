@@ -1,5 +1,5 @@
 {
-  "checksum": "ccd9c454e6cc0d2f3a6c50706ca48c6f2707d204af2f49f8ec436d9d4406e732",
+  "checksum": "5a9ca2ab21b4acfdf51c5c54b0011ee59016d593e875acc9df8d00fbe733fcd3",
   "crates": {
     "adler 1.0.2": {
       "name": "adler",
@@ -618,129 +618,6 @@
       },
       "license": "MIT"
     },
-    "bzip2 0.4.3": {
-      "name": "bzip2",
-      "version": "0.4.3",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/bzip2/0.4.3/download",
-          "sha256": "6afcd980b5f3a45017c57e57a2fcccbb351cc43a356ce117ef760ef8052b89b0"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "bzip2",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "bzip2",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "bzip2-sys 0.1.11+1.0.8",
-              "target": "bzip2_sys"
-            },
-            {
-              "id": "libc 0.2.138",
-              "target": "libc"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2015",
-        "version": "0.4.3"
-      },
-      "license": "MIT/Apache-2.0"
-    },
-    "bzip2-sys 0.1.11+1.0.8": {
-      "name": "bzip2-sys",
-      "version": "0.1.11+1.0.8",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/bzip2-sys/0.1.11+1.0.8/download",
-          "sha256": "736a955f3fa7875102d57c82b8cac37ec45224a07fd32d58f9f7a186b6cd4cdc"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "bzip2_sys",
-            "crate_root": "lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        },
-        {
-          "BuildScript": {
-            "crate_name": "build_script_build",
-            "crate_root": "build.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "bzip2_sys",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "bzip2-sys 0.1.11+1.0.8",
-              "target": "build_script_build"
-            },
-            {
-              "id": "libc 0.2.138",
-              "target": "libc"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2015",
-        "version": "0.1.11+1.0.8"
-      },
-      "build_script_attrs": {
-        "data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "cc 1.0.78",
-              "target": "cc"
-            },
-            {
-              "id": "pkg-config 0.3.26",
-              "target": "pkg_config"
-            }
-          ],
-          "selects": {}
-        },
-        "links": "bzip2"
-      },
-      "license": "MIT/Apache-2.0"
-    },
     "cc 1.0.78": {
       "name": "cc",
       "version": "1.0.78",
@@ -781,19 +658,6 @@
         "compile_data_glob": [
           "**"
         ],
-        "crate_features": [
-          "jobserver",
-          "parallel"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "jobserver 0.1.25",
-              "target": "jobserver"
-            }
-          ],
-          "selects": {}
-        },
         "edition": "2018",
         "version": "1.0.78"
       },
@@ -4114,50 +3978,6 @@
       },
       "license": "MIT OR Apache-2.0"
     },
-    "jobserver 0.1.25": {
-      "name": "jobserver",
-      "version": "0.1.25",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/jobserver/0.1.25/download",
-          "sha256": "068b1ee6743e4d11fb9c6a1e6064b3693a1b600e7f5f5988047d98b3dc9fb90b"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "jobserver",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "jobserver",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [],
-          "selects": {
-            "cfg(unix)": [
-              {
-                "id": "libc 0.2.138",
-                "target": "libc"
-              }
-            ]
-          }
-        },
-        "edition": "2018",
-        "version": "0.1.25"
-      },
-      "license": "MIT/Apache-2.0"
-    },
     "js-sys 0.3.60": {
       "name": "js-sys",
       "version": "0.3.60",
@@ -4953,39 +4773,6 @@
         ],
         "edition": "2018",
         "version": "0.1.0"
-      },
-      "license": "MIT OR Apache-2.0"
-    },
-    "pkg-config 0.3.26": {
-      "name": "pkg-config",
-      "version": "0.3.26",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/pkg-config/0.3.26/download",
-          "sha256": "6ac9a59f73473f1b8d852421e59e64809f025994837ef743615c6d0c5b305160"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "pkg_config",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "pkg_config",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "edition": "2015",
-        "version": "0.3.26"
       },
       "license": "MIT OR Apache-2.0"
     },
@@ -10414,16 +10201,13 @@
         "crate_features": [
           "aes",
           "aes-crypto",
-          "bzip2",
           "constant_time_eq",
-          "default",
           "deflate",
           "flate2",
           "hmac",
           "pbkdf2",
           "sha1",
-          "time",
-          "zstd"
+          "time"
         ],
         "deps": {
           "common": [
@@ -10434,10 +10218,6 @@
             {
               "id": "byteorder 1.4.3",
               "target": "byteorder"
-            },
-            {
-              "id": "bzip2 0.4.3",
-              "target": "bzip2"
             },
             {
               "id": "constant_time_eq 0.1.5",
@@ -10466,10 +10246,6 @@
             {
               "id": "time 0.3.17",
               "target": "time"
-            },
-            {
-              "id": "zstd 0.11.2+zstd.1.5.2",
-              "target": "zstd"
             }
           ],
           "selects": {
@@ -10485,205 +10261,6 @@
         "version": "0.6.3"
       },
       "license": "MIT"
-    },
-    "zstd 0.11.2+zstd.1.5.2": {
-      "name": "zstd",
-      "version": "0.11.2+zstd.1.5.2",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/zstd/0.11.2+zstd.1.5.2/download",
-          "sha256": "20cc960326ece64f010d2d2107537f26dc589a6573a316bd5b1dba685fa5fde4"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "zstd",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "zstd",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "crate_features": [
-          "arrays",
-          "default",
-          "legacy",
-          "zdict_builder"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "zstd-safe 5.0.2+zstd.1.5.2",
-              "target": "zstd_safe"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2018",
-        "version": "0.11.2+zstd.1.5.2"
-      },
-      "license": "MIT"
-    },
-    "zstd-safe 5.0.2+zstd.1.5.2": {
-      "name": "zstd-safe",
-      "version": "5.0.2+zstd.1.5.2",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/zstd-safe/5.0.2+zstd.1.5.2/download",
-          "sha256": "1d2a5585e04f9eea4b2a3d1eca508c4dee9592a89ef6f450c11719da0726f4db"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "zstd_safe",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        },
-        {
-          "BuildScript": {
-            "crate_name": "build_script_build",
-            "crate_root": "build.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "zstd_safe",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "crate_features": [
-          "arrays",
-          "legacy",
-          "std",
-          "zdict_builder"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "libc 0.2.138",
-              "target": "libc"
-            },
-            {
-              "id": "zstd-safe 5.0.2+zstd.1.5.2",
-              "target": "build_script_build"
-            },
-            {
-              "id": "zstd-sys 2.0.4+zstd.1.5.2",
-              "target": "zstd_sys"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2018",
-        "version": "5.0.2+zstd.1.5.2"
-      },
-      "build_script_attrs": {
-        "data_glob": [
-          "**"
-        ]
-      },
-      "license": "MIT/Apache-2.0"
-    },
-    "zstd-sys 2.0.4+zstd.1.5.2": {
-      "name": "zstd-sys",
-      "version": "2.0.4+zstd.1.5.2",
-      "repository": {
-        "Http": {
-          "url": "https://crates.io/api/v1/crates/zstd-sys/2.0.4+zstd.1.5.2/download",
-          "sha256": "4fa202f2ef00074143e219d15b62ffc317d17cc33909feac471c044087cad7b0"
-        }
-      },
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "zstd_sys",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        },
-        {
-          "BuildScript": {
-            "crate_name": "build_script_build",
-            "crate_root": "build.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "zstd_sys",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "crate_features": [
-          "legacy",
-          "std",
-          "zdict_builder"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "libc 0.2.138",
-              "target": "libc"
-            },
-            {
-              "id": "zstd-sys 2.0.4+zstd.1.5.2",
-              "target": "build_script_build"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2018",
-        "version": "2.0.4+zstd.1.5.2"
-      },
-      "build_script_attrs": {
-        "data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "cc 1.0.78",
-              "target": "cc"
-            }
-          ],
-          "selects": {}
-        },
-        "links": "zstd"
-      },
-      "license": "MIT/Apache-2.0"
     }
   },
   "binary_crates": [

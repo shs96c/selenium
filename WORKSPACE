@@ -164,11 +164,74 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_rust/releases/download/0.15.0/rules_rust-v0.15.0.tar.gz"],
 )
 
-load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
+load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains", "rust_repository_set")
+
+rust_version = "1.66.0"
+
+rust_edition = "2021"
 
 rules_rust_dependencies()
 
-rust_register_toolchains()
+load("@rules_rust//crate_universe:repositories.bzl", "crate_universe_dependencies")
+
+crate_universe_dependencies(bootstrap = True)
+
+rust_register_toolchains(
+    edition = rust_edition,
+    extra_target_triples = [],
+    version = rust_version,
+)
+
+# Allow cross-compilation. The name of the repository_set is the platform
+# we're running on. The `extra_target_triples` are the platforms we want
+# to enable cross-compilation for.
+rust_repository_set(
+    name = "macos_x86_64",
+    edition = rust_edition,
+    exec_triple = "x86_64-apple-darwin",
+    extra_target_triples = [
+        "aarch64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+        "x86_64-pc-windows-gnu",
+    ],
+    version = rust_version,
+)
+
+rust_repository_set(
+    name = "macos_arm64",
+    edition = rust_edition,
+    exec_triple = "aarch64-apple-darwin",
+    extra_target_triples = [
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+        "x86_64-pc-windows-gnu",
+    ],
+    version = rust_version,
+)
+
+rust_repository_set(
+    name = "linux_x86_64",
+    edition = rust_edition,
+    exec_triple = "x86_64-unknown-linux-gnu",
+    extra_target_triples = [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "x86_64-pc-windows-gnu",
+    ],
+    version = rust_version,
+)
+
+rust_repository_set(
+    name = "windows_x86_64",
+    edition = rust_edition,
+    exec_triple = "x86_64-pc-windows-gnu",
+    extra_target_triples = [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+    ],
+    version = rust_version,
+)
 
 load("@rules_rust//crate_universe:defs.bzl", "crates_repository")
 
@@ -182,6 +245,58 @@ crates_repository(
 load("@crates//:defs.bzl", "crate_repositories")
 
 crate_repositories()
+
+# Required for cross-compilation of the Rust binaries
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "platforms",
+    sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+        "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+    ],
+)
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "be236556c7b9c7b91cb370e837fdcec62b6e8893408cd4465ae883c9d7c67024",
+    strip_prefix = "bazel-lib-1.18.0",
+    url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.18.0.tar.gz",
+)
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
+
+aspect_bazel_lib_dependencies()
+
+# A cross-compiling cc toolchain
+http_archive(
+    name = "bazel-zig-cc",
+    patch_args = [
+        "-p1",
+    ],
+    patches = [
+        "//third_party/bazel:0001-Avoid-calling-sed-during-a-build.patch",
+    ],
+    sha256 = "a309e20189d285a2185d69121b5dbe0db4a5b32e635a5add17d0d380c142585b",
+    strip_prefix = "bazel-zig-cc-v1.0.0-rc3",
+    url = "https://git.sr.ht/~motiejus/bazel-zig-cc/archive/v1.0.0-rc3.tar.gz",
+)
+
+load("@bazel-zig-cc//toolchain:defs.bzl", zig_toolchains = "toolchains")
+
+zig_toolchains()
+
+register_toolchains(
+    "@zig_sdk//toolchain:aarch64-macos-none",
+    "@zig_sdk//toolchain:x86_64-linux-gnu.2.30",
+    "@zig_sdk//toolchain:x86_64-macos-none",
+    "@zig_sdk//toolchain:x86_64-windows-gnu",
+)
+
+# End of cross-compilation section
 
 http_archive(
     name = "build_bazel_rules_nodejs",

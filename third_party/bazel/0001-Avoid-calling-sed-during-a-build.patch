@@ -1,0 +1,28 @@
+diff --git a/toolchain/defs.bzl b/toolchain/defs.bzl
+index 672bc33..0eabc3f 100644
+--- a/toolchain/defs.bzl
++++ b/toolchain/defs.bzl
+@@ -164,14 +164,14 @@ exec "{zig}" "{zig_tool}" "$@" $maybe_o2
+ # if/after https://go-review.googlesource.com/c/go/+/436884 is merged.
+ # Shell hackery taken from
+ # https://web.archive.org/web/20100129154217/http://www.seanius.net/blog/2009/03/saving-and-restoring-positional-params
+-_ZIG_TOOL_COMMON_UNIX = """
+-quote(){ echo "$1" | sed -e "s,','\\\\'',g"; }
+-for arg in "$@"; do saved="${saved:+$saved }'$(quote "$arg")'"; done
+-maybe_o2=
+-while [ "$#" -gt 6 ]; do shift; done
+-[ "$*" = "-Wl,--no-gc-sections -x c - -o /dev/null" ] && maybe_o2="-O2"
+-eval set -- "$saved"
+-"""
++_ZIG_TOOL_COMMON_UNIX = ""
++#quote(){ echo "$1" | sed -e "s,','\\\\'',g"; }
++#for arg in "$@"; do saved="${saved:+$saved }'$(quote "$arg")'"; done
++#maybe_o2=
++#while [ "$#" -gt 6 ]; do shift; done
++#[ "$*" = "-Wl,--no-gc-sections -x c - -o /dev/null" ] && maybe_o2="-O2"
++#eval set -- "$saved"
++#"""
+ 
+ def _zig_tool_wrapper(zig_tool, zig, is_windows, cache_prefix):
+     kwargs = dict(
+

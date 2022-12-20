@@ -24,7 +24,7 @@ java_export(
 
 copy_file(
     name = "manager-linux",
-    src = "//common/manager:linux/selenium-manager",
+    src = "//rust:selenium-manager-linux-x86_64",
     out = "linux/selenium-manager",
 )
 
