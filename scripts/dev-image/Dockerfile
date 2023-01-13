@@ -1,6 +1,6 @@
 # Used to create a development image for working on Selenium
 
-FROM ubuntu:focal@sha256:3626dff0d616e8ee7065a9ac8c7117e904a4178725385910eeecd7f1872fc12d
+FROM ubuntu:focal
 
 RUN apt-get update -qqy && apt-get install -y wget curl gnupg2
 
@@ -33,8 +33,10 @@ RUN curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/baz
     ln -sf /usr/bin/bazelisk /usr/bin/bazel
 
 RUN useradd -ms /bin/bash dev
+RUN chmod 777 /
 USER dev
 WORKDIR /home/dev
 RUN git clone --depth 1 https://github.com/SeleniumHQ/selenium.git /home/dev/selenium
 RUN echo "build --//common:pin_browsers" >>/home/dev/selenium/.bazelrc.local
 RUN echo "build --//common:headless" >>/home/dev/selenium/.bazelrc.local
+USER root

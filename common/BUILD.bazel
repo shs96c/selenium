@@ -109,3 +109,32 @@ config_setting(
         "firefox",
     ]
 ]
+
+toolchain(
+    name = "cc-toolchain",
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        "@bazel_tools//tools/cpp:gcc",
+    ],
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = "//common/remote-build/cc:cc-compiler-k8",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+platform(
+    name = "remote-platform",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        "@bazel_tools//tools/cpp:gcc",
+    ],
+    exec_properties = {
+        "container-image": "docker://docker.io/shs96c/selenium-remote-build@sha256:26be23bbbf7ac93484c56829f63e677699948697c93ab31885319f43a7b58535",
+        "OSFamily": "Linux",
+    },
+    parents = ["@local_config_platform//:host"],
+)
