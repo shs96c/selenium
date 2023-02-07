@@ -13,6 +13,6 @@ cd "$temp"
 
 touch WORKSPACE BUILD.bazel
 bazel build @local_config_cc//...
-rm -rf /code/common/toolchains/cc
-mkdir /code/common/toolchains/cc
-cp -Lr $(bazel info output_base)/external/local_config_cc/* /code/common/toolchains/cc
+rm -rf /code/common/remote-build/cc
+mkdir /code/common/remote-build/cc
+cp -Lr $(bazel info output_base)/external/local_config_cc/* /code/common/remote-build/cc
