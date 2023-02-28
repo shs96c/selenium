@@ -1,0 +1,11 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "internal",
+    srcs = [
+        "drivers.go",
+        "geckodriver.go",
+    ],
+    importpath = "github.com/SeleniumHQ/selenium/golang/internal",
+    visibility = ["//golang:__subpackages__"],
+)

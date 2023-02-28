@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "cmd",
+    srcs = [
+        "download.go",
+        "usage.go",
+        "version.go",
+    ],
+    importpath = "github.com/SeleniumHQ/selenium/golang/cmd",
+    visibility = ["//visibility:public"],
+    deps = ["//golang/internal/auth"],
+)

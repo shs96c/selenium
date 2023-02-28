@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "auth",
+    srcs = ["auth.go"],
+    importpath = "github.com/SeleniumHQ/selenium/golang/internal/auth",
+    visibility = ["//golang:__subpackages__"],
+    deps = ["@com_github_bgentry_go_netrc//netrc:go_default_library"],
+)

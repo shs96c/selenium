@@ -1,3 +1,4 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
 load("//common:browsers.bzl", "chrome_data", "firefox_data")
 load("//java:browsers.bzl", "chrome_jvm_flags", "firefox_jvm_flags")
 load("//java:defs.bzl", "artifact")
@@ -58,4 +59,17 @@ platform(
         "@platforms//os:osx",
         "@platforms//cpu:x86_64",
     ],
+)
+
+# gazelle:prefix github.com/SeleniumHQ/selenium
+gazelle(name = "gazelle")
+
+gazelle(
+    name = "gazelle-update-repos",
+    args = [
+        "-from_file=golang/go.mod",
+        "-to_macro=golang/deps.bzl%selenium_go_dependencies",
+        "-prune",
+    ],
+    command = "update-repos",
 )

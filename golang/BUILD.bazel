@@ -1,0 +1,36 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "golang_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/SeleniumHQ/selenium/golang",
+    visibility = ["//visibility:private"],
+    deps = ["//golang/cmd"],
+)
+
+go_binary(
+    name = "selenium-manager",
+    embed = [":golang_lib"],
+    pure = "on",
+    static = "on",
+    visibility = ["//visibility:public"],
+)
+
+[
+  go_binary(
+    name = "selenium-manager-%s-%s" % (archos["os"], archos["arch"]),
+    embed = [":golang_lib"],
+    goos = archos["os"],
+    goarch = archos["arch"],
+    pure = "on",
+    static = "on",
+    visibility = ["//visibility:public"],
+  )
+
+  for archos in [
+    {"arch": "amd64", "os": "linux"},
+    {"arch": "arm64", "os": "linux"},
+    {"arch": "amd64", "os": "darwin"},
+    {"arch": "arm64", "os": "darwin"},
+    {"arch": "arm64", "os": "windows"},
+]]
