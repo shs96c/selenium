@@ -79,10 +79,13 @@ test --test_timeout=1800
 test:node_debug --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
 
 # The RBE to use
-build:remote --bes_results_url=http://127.0.0.1:8080/invocation/
-build:remote --bes_backend=grpc://127.0.0.1:8080
-build:remote --remote_executor=grpc://127.0.0.1:8080
-build:remote --remote_cache=grpc://127.0.0.1:8080
+build:remote --bes_results_url=https://gypsum.cluster.engflow.com/invocation
+build:remote --bes_backend=grpcs://gypsum.cluster.engflow.com
+build:remote --remote_executor=grpcs://gypsum.cluster.engflow.com
+build:remote --remote_cache=grpcs://gypsum.cluster.engflow.com
+
+# The number of cores available
+build:remote -j 50
 
 # Build Without The Bytes
 build:remote --remote_download_outputs=minimal
