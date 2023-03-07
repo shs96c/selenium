@@ -32,6 +32,8 @@ build --incompatible_strict_action_env
 # Except for the PATH environment variable
 
 build --action_env=PATH
+# On a remote build, we don't have much on the builder image
+build:remote --action_env=PATH=/bin:/usr/bin
 
 # For build stamping
 
