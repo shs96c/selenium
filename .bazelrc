@@ -113,5 +113,3 @@ build:remote --disk_cache=
 
 build:remote --incompatible_enable_cc_toolchain_resolution
 build:remote --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
-
-#build:remote --remote_default_exec_properties=container-image=docker://docker.io/shs96c/selenium-remote-build:latest

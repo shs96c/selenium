@@ -133,7 +133,7 @@ platform(
         "@bazel_tools//tools/cpp:gcc",
     ],
     exec_properties = {
-        "container-image": "docker://docker.io/shs96c/selenium-remote-build:latest",
+        "container-image": "docker://docker.io/shs96c/selenium-remote-build@sha256:5589aa1873174d45ccf3219ea4040ab8565a313235e04807f179abe69905a80a",
         "OSFamily": "Linux",
         "dockerRebuse": "True",
     },
