@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "cache",
+    srcs = ["cache.go"],
+    importpath = "github.com/SeleniumHQ/selenium/golang/internal/cache",
+    visibility = ["//golang:__subpackages__"],
+    deps = [
+        "//golang/internal/platforms",
+        "//golang/pkg/drivers",
+        "@com_github_hashicorp_go_version//:go-version",
+        "@com_github_sirupsen_logrus//:logrus",
+    ],
+)

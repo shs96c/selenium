@@ -1,0 +1,61 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "selenium-manager_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/SeleniumHQ/selenium/golang/cmd/selenium-manager",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//golang/cmd/selenium-manager/app/cmd/download",
+        "//golang/cmd/selenium-manager/app/cmd/version",
+        "//golang/internal",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_spf13_cobra//:cobra",
+    ],
+)
+
+# Useful for debugging and trying things out
+go_binary(
+    name = "selenium-manager",
+    embed = [":selenium-manager_lib"],
+    pure = "on",
+    static = "on",
+    visibility = ["//visibility:public"],
+)
+
+[
+    go_binary(
+        name = "selenium-manager-%s-%s" % (
+            archos["os"],
+            archos["arch"],
+        ),
+        embed = [":selenium-manager_lib"],
+        goarch = archos["arch"],
+        goos = archos["os"],
+        pure = "on",
+        static = "on",
+        visibility = ["//visibility:public"],
+    )
+    for archos in [
+        {
+            "arch": "amd64",
+            "os": "linux",
+        },
+        {
+            "arch": "arm64",
+            "os": "linux",
+        },
+        {
+            "arch": "amd64",
+            "os": "darwin",
+        },
+        {
+            "arch": "arm64",
+            "os": "darwin",
+        },
+        {
+            "arch": "amd64",
+            "os": "windows",
+        },
+    ]
+]

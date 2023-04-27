@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "download",
+    srcs = ["download.go"],
+    importpath = "github.com/SeleniumHQ/selenium/golang/cmd/selenium-manager/app/cmd/download",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//golang/internal/cache",
+        "//golang/internal/download",
+        "//golang/internal/platforms",
+        "//golang/pkg/drivers",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_spf13_cobra//:cobra",
+    ],
+)
