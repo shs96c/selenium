@@ -85,20 +85,19 @@ load("@py_dev_requirements//:requirements.bzl", "install_deps")
 install_deps()
 
 http_archive(
-    name = "rules_proto",
-    sha256 = "9fc210a34f0f9e7cc31598d109b5d069ef44911a82f507d5a88716db171615a8",
-    strip_prefix = "rules_proto-f7a30f6f80006b591fa7c437fe5a951eb10bcbcf",
+    name = "io_bazel_rules_go",
+    sha256 = "6b65cb7917b4d1709f9410ffe00ecf3e160edf674b78c54a894471320862184f",
     urls = [
-        "https://github.com/bazelbuild/rules_proto/archive/f7a30f6f80006b591fa7c437fe5a951eb10bcbcf.tar.gz",
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/f7a30f6f80006b591fa7c437fe5a951eb10bcbcf.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.39.0/rules_go-v0.39.0.zip",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.39.0/rules_go-v0.39.0.zip",
     ],
 )
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
-rules_proto_dependencies()
+go_rules_dependencies()
 
-rules_proto_toolchains()
+go_register_toolchains(version = "1.19.3")
 
 http_archive(
     name = "rules_jvm_external",
@@ -239,83 +238,84 @@ load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
 
-http_archive(
-    name = "io_bazel_rules_docker",
-    sha256 = "b1e80761a8a8243d03ebca8845e9cc1ba6c82ce7c5179ce2b295cd36f7e394bf",
-    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.25.0/rules_docker-v0.25.0.tar.gz"],
-)
-
-load(
-    "@io_bazel_rules_docker//repositories:repositories.bzl",
-    container_repositories = "repositories",
-)
-
-container_repositories()
-
-load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
-
-container_deps()
-
-load(
-    "@io_bazel_rules_docker//container:container.bzl",
-    "container_pull",
-)
-
-# Examine https://console.cloud.google.com/gcr/images/distroless/GLOBAL/java?gcrImageListsize=30 to find
-# the latest version when updating
-container_pull(
-    name = "java_image_base",
-    # This pulls the java 11 version of the java base image
-    digest = "sha256:97c7eae86c65819664fcb7f36e8dee54bbbbc09c2cb6b448cbee06e1b42df81b",
-    registry = "gcr.io",
-    repository = "distroless/java",
-)
-
-container_pull(
-    name = "firefox_standalone",
-    # selenium/standalone-firefox-debug:3.141.59
-    digest = "sha256:ecc9861eafb3c2f999126fa4cc0434e9fbe6658ba1241998457bb088c99dd0d0",
-    registry = "index.docker.io",
-    repository = "selenium/standalone-firefox-debug",
-)
-
-container_pull(
-    name = "chrome_standalone",
-    # selenium/standalone-chrome-debug:3.141.59
-    digest = "sha256:c3a2174ac31b3918ae9d93c43ed8165fc2346b8c9e16d38ebac691fbb242667f",
-    registry = "index.docker.io",
-    repository = "selenium/standalone-chrome-debug",
-)
-
-http_archive(
-    name = "io_bazel_rules_k8s",
-    sha256 = "ce5b9bc0926681e2e7f2147b49096f143e6cbc783e71bc1d4f36ca76b00e6f4a",
-    strip_prefix = "rules_k8s-0.7",
-    urls = ["https://github.com/bazelbuild/rules_k8s/archive/refs/tags/v0.7.tar.gz"],
-)
-
-load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
-
-k8s_repositories()
-
-load(
-    "@io_bazel_rules_go//go:deps.bzl",
-    "go_register_toolchains",
-    "go_rules_dependencies",
-)
-
-go_rules_dependencies()
-
-go_register_toolchains()
-
-k8s_defaults(
-    name = "k8s_dev",
-    cluster = "docker-desktop",
-    image_chroot = "localhost:5000",
-    kind = "deployment",
-    namespace = "selenium",
-)
-
+#http_archive(
+#    name = "io_bazel_rules_docker",
+#    sha256 = "18334871b15016ae4d6d03c19ed80b246f711ada83b59fd8106684ab9bfcc3cb",
+#    strip_prefix = "rules_docker-6db7c12fbe4b49682f5dcbc193e4c467011a9fb6",
+#    url = "https://github.com/bazelbuild/rules_docker/archive/6db7c12fbe4b49682f5dcbc193e4c467011a9fb6.zip",
+#)
+#
+#load(
+#    "@io_bazel_rules_docker//repositories:repositories.bzl",
+#    container_repositories = "repositories",
+#)
+#
+#container_repositories()
+#
+#load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+#
+#container_deps()
+#
+#load(
+#    "@io_bazel_rules_docker//container:container.bzl",
+#    "container_pull",
+#)
+#
+## Examine https://console.cloud.google.com/gcr/images/distroless/GLOBAL/java?gcrImageListsize=30 to find
+## the latest version when updating
+#container_pull(
+#    name = "java_image_base",
+#    # This pulls the java 11 version of the java base image
+#    digest = "sha256:97c7eae86c65819664fcb7f36e8dee54bbbbc09c2cb6b448cbee06e1b42df81b",
+#    registry = "gcr.io",
+#    repository = "distroless/java",
+#)
+#
+#container_pull(
+#    name = "firefox_standalone",
+#    # selenium/standalone-firefox-debug:3.141.59
+#    digest = "sha256:ecc9861eafb3c2f999126fa4cc0434e9fbe6658ba1241998457bb088c99dd0d0",
+#    registry = "index.docker.io",
+#    repository = "selenium/standalone-firefox-debug",
+#)
+#
+#container_pull(
+#    name = "chrome_standalone",
+#    # selenium/standalone-chrome-debug:3.141.59
+#    digest = "sha256:c3a2174ac31b3918ae9d93c43ed8165fc2346b8c9e16d38ebac691fbb242667f",
+#    registry = "index.docker.io",
+#    repository = "selenium/standalone-chrome-debug",
+#)
+#
+#http_archive(
+#    name = "io_bazel_rules_k8s",
+#    sha256 = "ce5b9bc0926681e2e7f2147b49096f143e6cbc783e71bc1d4f36ca76b00e6f4a",
+#    strip_prefix = "rules_k8s-0.7",
+#    urls = ["https://github.com/bazelbuild/rules_k8s/archive/refs/tags/v0.7.tar.gz"],
+#)
+#
+#load("@io_bazel_rules_k8s//k8s:k8s.bzl", "k8s_defaults", "k8s_repositories")
+#
+#k8s_repositories()
+#
+#load(
+#    "@io_bazel_rules_go//go:deps.bzl",
+#    "go_register_toolchains",
+#    "go_rules_dependencies",
+#)
+#
+#go_rules_dependencies()
+#
+#go_register_toolchains()
+#
+#k8s_defaults(
+#    name = "k8s_dev",
+#    cluster = "docker-desktop",
+#    image_chroot = "localhost:5000",
+#    kind = "deployment",
+#    namespace = "selenium",
+#)
+#
 load("//common:repositories.bzl", "pin_browsers")
 
 pin_browsers()
