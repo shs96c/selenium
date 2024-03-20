@@ -6,7 +6,6 @@ load(
     "java_dist_zip",
     "java_export",
     "java_library",
-    "javadoc",
     "maven_bom",
     "merge_jars",
 )
@@ -209,18 +208,5 @@ java_dist_zip(
     ],
     deps = [
         ":grid",
-    ],
-)
-
-javadoc(
-    name = "all-javadocs",
-    third_party_prefixes = [
-        "@maven//",
-        "//third_party",
-    ] + CDP_DEPS,
-    transitive = True,
-    deps = [
-        ":grid",
-        "//java/src/org/openqa/selenium:client-combined",
     ],
 )

@@ -1,9 +1,6 @@
 try-import .bazelrc.local
 try-import .bazelrc.windows.local
 
-# Disable bzlmod until we're ready to use it
-common --noenable_bzlmod
-
 # Ensure Windows support is accurate.
 
 startup --windows_enable_symlinks
