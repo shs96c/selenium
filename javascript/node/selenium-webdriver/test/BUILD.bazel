@@ -56,16 +56,30 @@ mocha_test(
     ],
 )
 
-#LARGE_TESTS = glob(
-#    ["**/*_test.js"],
-#    exclude = SMALL_TESTS,
+LARGE_TESTS = glob(
+    ["**/*_test.js"],
+    exclude = SMALL_TESTS,
+)
+
+js_library(
+    name = "large-test-srcs",
+    srcs = LARGE_TESTS,
+)
+
+#mocha_test(
+#    name = "browser-test",
+#    size = "large",
+#    args = [
+#        "--retries",
+#        "1",
+#        "element_finding_test.js",
+#    ],
+#    chdir = package_name(),
+#    data = [
+#        "element_finding_test.js",
+#    ],
 #)
-#
-#js_library(
-#    name = "large-test-srcs",
-#    srcs = LARGE_TESTS,
-#)
-#
+
 #[
 #    [
 #        mocha_test(
