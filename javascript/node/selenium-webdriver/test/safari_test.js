@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const safari = require('../safari')
-const test = require('../lib/test')
+const test = require('./lib/test')
 
 test.suite(
   function (_env) {

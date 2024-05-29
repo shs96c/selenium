@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { By } = require('..')
-const test = require('../lib/test')
+const test = require('./lib/test')
 
 test.suite(function (env) {
   describe('WebElement', function () {

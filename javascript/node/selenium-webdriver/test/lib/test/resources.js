@@ -19,7 +19,6 @@
 
 const fs = require('node:fs')
 const path = require('node:path')
-const { projectRoot } = require('./build')
 
 // PUBLIC API
 
@@ -30,7 +29,9 @@ const { projectRoot } = require('./build')
  * @throws {Error} If the file does not exist.
  */
 exports.locate = function (filePath) {
-  const fullPath = path.normalize(path.join(projectRoot(), filePath))
+  const runfilesDir = process.env.JS_BINARY__RUNFILES
+  const fullPath = path.normalize(path.join(runfilesDir, '_main', filePath))
+
   if (!fs.existsSync(fullPath)) {
     throw Error('File does not exist: ' + filePath)
   }

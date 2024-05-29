@@ -21,8 +21,8 @@ const assert = require('node:assert')
 const fs = require('node:fs')
 const edge = require('../../edge')
 const symbols = require('../../lib/symbols')
-const test = require('../../lib/test')
-const { locate } = require('../../lib/test/resources')
+const test = require('../lib/test')
+const { locate } = require('../lib/test/resources')
 
 const WEBEXTENSION_CRX = locate('common/extensions/webextensions-selenium-example.crx')
 

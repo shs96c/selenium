@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../')
-const { Pages, suite, ignore } = require('../../lib/test')
+const { Pages, suite, ignore } = require('../lib/test')
 const Network = require('../../bidi/network')
 const until = require('../../lib/until')
 

@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser, By, WebElement, error } = require('..')
-const { Pages, ignore, suite } = require('../lib/test')
+const { Pages, ignore, suite } = require('./lib/test')
 
 suite(function (env) {
   var driver

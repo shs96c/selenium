@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser, By } = require('../../')
-const { Pages, suite } = require('../../lib/test')
+const { Pages, suite } = require('../lib/test')
 const Network = require('../../bidi/network')
 const { AddInterceptParameters } = require('../../bidi/addInterceptParameters')
 const { InterceptPhase } = require('../../bidi/interceptPhase')

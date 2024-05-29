@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../index')
-const { Pages, suite } = require('../../lib/test')
+const { Pages, suite } = require('../lib/test')
 let startIndex = 0
 let endIndex = 5
 let pngMagicNumber = 'iVBOR'

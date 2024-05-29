@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../')
-const { Pages, suite } = require('../../lib/test')
+const { Pages, suite } = require('../lib/test')
 const BrowsingContext = require('../../bidi/browsingContext')
 const ScriptManager = require('../../bidi/scriptManager')
 const { ChannelValue, LocalValue, ReferenceValue, RemoteReferenceType } = require('../../bidi/protocolValue')

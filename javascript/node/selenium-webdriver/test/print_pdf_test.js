@@ -17,8 +17,8 @@
 
 'use strict'
 
-const test = require('../lib/test')
-const { Pages } = require('../lib/test')
+const test = require('./lib/test')
+const { Pages } = require('./lib/test')
 const { Browser } = require('../')
 const assert = require('node:assert')
 

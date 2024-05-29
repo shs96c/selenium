@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Select, By } = require('..')
-const { Pages, suite } = require('../lib/test')
+const { Pages, suite } = require('./lib/test')
 const { escapeQuotes } = require('../lib/select')
 
 let singleSelectValues1 = {

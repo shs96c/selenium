@@ -19,7 +19,7 @@
 
 const Capabilities = require('../../lib/capabilities').Capabilities
 const Symbols = require('../../lib/symbols')
-const test = require('../../lib/test')
+const test = require('./test')
 const chrome = require('../../chrome')
 const { Browser, By, until } = require('../../')
 const remote = require('../../remote')

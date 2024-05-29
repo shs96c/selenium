@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 
-const test = require('../lib/test')
+const test = require('./lib/test')
 const Pages = test.Pages
 
 test.suite(

@@ -20,7 +20,7 @@
 const assert = require('node:assert')
 const firefox = require('../../firefox')
 const { Browser } = require('../../')
-const { Pages, suite } = require('../../lib/test')
+const { Pages, suite } = require('../lib/test')
 const BrowsingContext = require('../../bidi/browsingContext')
 const { Locator } = require('../../bidi/browsingContext')
 const { ScriptManager } = require('../../index')

@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const chrome = require('../../chrome')
-const test = require('../../lib/test')
+const test = require('../lib/test')
 const { getBinaryPaths } = require('../../common/driverFinder')
 
 test.suite(

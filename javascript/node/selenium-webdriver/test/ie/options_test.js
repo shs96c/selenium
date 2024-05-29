@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const ie = require('../../ie')
-const test = require('../../lib/test')
+const test = require('../lib/test')
 const Capabilities = require('../../lib/capabilities').Capabilities
 
 test.suite(

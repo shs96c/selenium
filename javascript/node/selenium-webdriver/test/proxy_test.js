@@ -20,9 +20,9 @@
 const assert = require('node:assert')
 const { URL } = require('node:url')
 const proxy = require('../proxy')
-const test = require('../lib/test')
+const test = require('./lib/test')
 const { Browser } = require('..')
-const { Server } = require('../lib/test/httpserver')
+const { Server } = require('./lib/test/httpserver')
 
 test.suite(function (env) {
   function writeResponse(res, body, encoding, contentType) {

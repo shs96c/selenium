@@ -18,8 +18,8 @@
 'use strict'
 
 const assert = require('node:assert')
-const fileServer = require('../../lib/test/fileserver')
-const { ignore, Pages, suite } = require('../../lib/test')
+const fileServer = require('../lib/test/fileserver')
+const { ignore, Pages, suite } = require('../lib/test')
 const { Key, Origin } = require('../../lib/input')
 const { Browser, By, until } = require('../..')
 const Input = require('../../bidi/input')

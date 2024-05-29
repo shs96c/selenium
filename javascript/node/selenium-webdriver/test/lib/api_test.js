@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { By, Browser } = require('../../index')
-const { Pages, ignore, suite } = require('../../lib/test')
+const { Pages, ignore, suite } = require('./test')
 
 suite(function (env) {
   const browsers = (...args) => env.browsers(...args)

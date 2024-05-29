@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser, By } = require('../../')
-const { Pages, suite, ignore } = require('../../lib/test')
+const { Pages, suite, ignore } = require('../lib/test')
 const BrowsingContext = require('../../bidi/browsingContext')
 const until = require('../../lib/until')
 const { Origin, CaptureScreenshotParameters } = require('../../bidi/captureScreenshotParameters')

@@ -21,7 +21,7 @@ const assert = require('node:assert')
 const error = require('../../lib/error')
 const { Browser } = require('../../index')
 const { Context } = require('../../firefox')
-const { suite } = require('../../lib/test')
+const { suite } = require('../lib/test')
 
 suite(
   function (env) {

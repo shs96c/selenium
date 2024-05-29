@@ -24,7 +24,10 @@ const path = require('node:path')
 const io = require('selenium-webdriver/io')
 const zip = require('selenium-webdriver/io/zip')
 const { InvalidArgumentError } = require('selenium-webdriver/lib/error')
-const { locate } = require('selenium-webdriver/lib/test/resources')
+const { locate } = require('../lib/test/resources')
+
+// /private/var/tmp/_bazel_shs/07bf086e43a2745da2726dbccdbf6ae7/execroot/_main/bazel-out/darwin_arm64-fastbuild/bin/javascript/node/selenium-webdriver/test/io/zip_test.js
+// /private/var/tmp/_bazel_shs/07bf086e43a2745da2726dbccdbf6ae7/execroot/_main/bazel-out/darwin_arm64-fastbuild/bin/common/extensions/webextensions-selenium-example.xpi
 
 const XPI_PATH = locate('common/extensions/webextensions-selenium-example.xpi')
 

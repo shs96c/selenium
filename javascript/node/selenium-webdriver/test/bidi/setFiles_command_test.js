@@ -18,8 +18,8 @@
 'use strict'
 
 const assert = require('node:assert')
-require('../../lib/test/fileserver')
-const { Pages, suite } = require('../../lib/test')
+require('../lib/test/fileserver')
+const { Pages, suite } = require('../lib/test')
 const { Browser, By } = require('../..')
 const Input = require('../../bidi/input')
 const io = require('../../io')

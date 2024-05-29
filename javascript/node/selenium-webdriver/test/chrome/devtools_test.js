@@ -24,9 +24,9 @@ const path = require('node:path')
 const chrome = require('../../chrome')
 const by = require('../../lib/by')
 const error = require('../../lib/error')
-const fileServer = require('../../lib/test/fileserver')
+const fileServer = require('../lib/test/fileserver')
 const io = require('../../io')
-const test = require('../../lib/test')
+const test = require('../lib/test')
 const until = require('../../lib/until')
 
 test.suite(

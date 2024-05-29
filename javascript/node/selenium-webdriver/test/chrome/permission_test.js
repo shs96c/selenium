@@ -19,8 +19,8 @@
 
 const assert = require('node:assert')
 const chrome = require('../../chrome')
-const test = require('../../lib/test')
-const { ignore } = require('../../lib/test')
+const test = require('../lib/test')
+const { ignore } = require('../lib/test')
 const { Browser } = require('../../index')
 
 test.suite(

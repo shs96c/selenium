@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../')
-const { Pages, suite } = require('../../lib/test')
+const { Pages, suite } = require('../lib/test')
 const logInspector = require('../../bidi/logInspector')
 const filterBy = require('../../bidi/filterBy')
 

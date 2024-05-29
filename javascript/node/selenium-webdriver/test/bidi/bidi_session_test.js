@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../')
-const { suite } = require('../../lib/test')
+const { suite } = require('../lib/test')
 
 suite(
   function (env) {

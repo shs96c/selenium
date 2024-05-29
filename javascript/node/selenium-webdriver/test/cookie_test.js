@@ -20,8 +20,8 @@
 const assert = require('node:assert')
 const { URL } = require('node:url')
 
-const { ignore, suite } = require('../lib/test')
-const fileserver = require('../lib/test/fileserver')
+const { ignore, suite } = require('./lib/test')
+const fileserver = require('./lib/test/fileserver')
 const { Browser } = require('..')
 
 suite(function (env) {

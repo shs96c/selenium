@@ -18,11 +18,11 @@
 'use strict'
 
 const assert = require('node:assert')
-require('../../lib/test/fileserver')
-const { suite } = require('../../lib/test')
+require('../lib/test/fileserver')
+const { suite } = require('../lib/test')
 const { Browser } = require('../..')
 const Storage = require('../../bidi/storage')
-const fileserver = require('../../lib/test/fileserver')
+const fileserver = require('../lib/test/fileserver')
 const { CookieFilter } = require('../../bidi/cookieFilter')
 const { BytesValue, SameSite } = require('../../bidi/networkTypes')
 const { BrowsingContextPartitionDescriptor } = require('../../bidi/partitionDescriptor')

@@ -21,7 +21,7 @@ const assert = require('node:assert')
 const fs = require('node:fs')
 const io = require('../io')
 const remote = require('../remote')
-const test = require('../lib/test')
+const test = require('./lib/test')
 const { Browser, By, until } = require('..')
 
 const Pages = test.Pages

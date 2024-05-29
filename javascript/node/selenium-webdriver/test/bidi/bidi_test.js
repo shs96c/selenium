@@ -19,7 +19,7 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../')
-const { Pages, suite } = require('../../lib/test')
+const { Pages, suite } = require('../lib/test')
 const logInspector = require('../../bidi/logInspector')
 const BrowsingContext = require('../../bidi/browsingContext')
 const until = require('../../lib/until')

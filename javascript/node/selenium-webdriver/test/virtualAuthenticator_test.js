@@ -21,9 +21,9 @@ const assert = require('node:assert')
 const virtualAuthenticatorCredential = require('../lib/virtual_authenticator').Credential
 const virtualAuthenticatorOptions = require('../lib/virtual_authenticator').VirtualAuthenticatorOptions
 const Protocol = require('../lib/virtual_authenticator').Protocol
-const { ignore, suite } = require('../lib/test')
+const { ignore, suite } = require('./lib/test')
 const { Browser } = require('../lib/capabilities')
-const fileServer = require('../lib/test/fileserver')
+const fileServer = require('./lib/test/fileserver')
 const invalidArgumentError = require('../lib/error').InvalidArgumentError
 
 const REGISTER_CREDENTIAL = 'registerCredential().then(arguments[arguments.length - 1]);'

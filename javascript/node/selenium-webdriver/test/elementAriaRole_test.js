@@ -18,7 +18,7 @@
 'use strict'
 
 const assert = require('node:assert')
-const test = require('../lib/test')
+const test = require('./lib/test')
 const { By } = require('../index')
 
 test.suite(

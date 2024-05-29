@@ -19,8 +19,8 @@
 
 const assert = require('node:assert')
 const { Browser } = require('../../index')
-const { Pages, suite } = require('../../lib/test')
-const { locate } = require('../../lib/test/resources')
+const { Pages, suite } = require('../lib/test')
+const { locate } = require('../lib/test/resources')
 const { until, By } = require('../../index')
 
 const EXT_XPI = locate('common/extensions/webextensions-selenium-example.xpi')

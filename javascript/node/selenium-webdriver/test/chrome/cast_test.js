@@ -17,7 +17,7 @@
 
 'use strict'
 
-const test = require('../../lib/test')
+const test = require('../lib/test')
 
 test.suite(
   function (env) {

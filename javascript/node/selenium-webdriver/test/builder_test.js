@@ -25,9 +25,9 @@ const error = require('../lib/error')
 const firefox = require('../firefox')
 const ie = require('../ie')
 const safari = require('../safari')
-const test = require('../lib/test')
+const test = require('./lib/test')
 const { Browser } = require('../lib/capabilities')
-const { Pages } = require('../lib/test')
+const { Pages } = require('./lib/test')
 const { Builder, Capabilities } = require('..')
 
 test.suite(function (env) {

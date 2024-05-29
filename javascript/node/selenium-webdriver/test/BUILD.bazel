@@ -10,7 +10,7 @@ load("//javascript:defs.bzl", "mocha_test")
 
 SMALL_TESTS = [
     "io/io_test.js",
-    #    "io/zip_test.js",
+    "io/zip_test.js",
     "lib/by_test.js",
     "lib/credentials_test.js",
     "lib/error_test.js",
@@ -30,7 +30,7 @@ js_library(
     srcs = SMALL_TESTS,
 )
 
-js_library(
+copy_to_bin(
     name = "test-data",
     srcs = glob(
         ["**"],

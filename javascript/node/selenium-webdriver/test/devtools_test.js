@@ -19,9 +19,9 @@
 
 const assert = require('node:assert')
 const { Browser, until } = require('..')
-const fileServer = require('../lib/test/fileserver')
+const fileServer = require('./lib/test/fileserver')
 const { HttpResponse } = require('../devtools/networkinterceptor')
-const { Pages, ignore, suite } = require('../lib/test')
+const { Pages, ignore, suite } = require('./lib/test')
 
 suite(
   function (env) {
