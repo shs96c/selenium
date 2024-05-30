@@ -22,13 +22,14 @@ const { URL } = require('node:url')
 
 const { ignore, suite } = require('./lib/test')
 const fileserver = require('./lib/test/fileserver')
-const { Browser } = require('..')
+const { Browser } = require('selenium-webdriver')
+const driverFactory = require('./driver_factory')
 
 suite(function (env) {
   let driver
 
   before(async function () {
-    driver = await env.builder().build()
+    driver = driverFactory.GetBrowserForTests()
   })
 
   after(function () {

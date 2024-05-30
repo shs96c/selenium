@@ -19,13 +19,14 @@
 
 const assert = require('node:assert')
 const test = require('./lib/test')
-const { Browser, By, error, until } = require('..')
+const { Browser, By, error, until } = require('selenium-webdriver')
+const driverFactory = require('./driver_factory')
 const Pages = test.Pages
 
 test.suite(function (env) {
   var driver
   before(async function () {
-    driver = await env.builder().build()
+    driver = driverFactory.GetBrowserForTests()
   })
   after(function () {
     return driver.quit()

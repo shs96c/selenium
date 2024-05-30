@@ -19,10 +19,11 @@
 
 const assert = require('node:assert')
 const fs = require('node:fs')
-const io = require('../io')
-const remote = require('../remote')
+const io = require('selenium-webdriver/io')
+const remote = require('selenium-webdriver/remote')
 const test = require('./lib/test')
-const { Browser, By, until } = require('..')
+const { Browser, By, until } = require('selenium-webdriver')
+const driverFactory = require('./driver_factory')
 
 const Pages = test.Pages
 
@@ -41,7 +42,7 @@ test.suite(function (env) {
 
   var driver
   before(async function () {
-    driver = await env.builder().build()
+    driver = driverFactory.GetBrowserForTests()
   })
 
   after(function () {

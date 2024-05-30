@@ -19,8 +19,9 @@
 
 const test = require('./lib/test')
 const { Pages } = require('./lib/test')
-const { Browser } = require('../')
+const { Browser } = require('selenium-webdriver')
 const assert = require('node:assert')
+const driverFactory = require('./driver_factory')
 
 let startIndex = 0
 let endIndex = 5
@@ -36,7 +37,7 @@ test.suite(
     })
 
     it('Should Print pdf with 2 pages', async function () {
-      driver = env.builder().build()
+      driver = driverFactory.GetBrowserForTests()
       await driver.get(Pages.printPage)
       base64Code = await driver.printPage({ pageRanges: ['1-2'] })
       base64Code = base64Code.slice(startIndex, endIndex)
@@ -44,7 +45,7 @@ test.suite(
     })
 
     it('Should Print pdf with total pages', async function () {
-      driver = env.builder().build()
+      driver = driverFactory.GetBrowserForTests()
       await driver.get(Pages.printPage)
       base64Code = await driver.printPage()
       base64Code = base64Code.slice(startIndex, endIndex)
@@ -52,7 +53,7 @@ test.suite(
     })
 
     it('Check with all valid params', async function () {
-      driver = env.builder().build()
+      driver = driverFactory.GetBrowserForTests()
       await driver.get(Pages.printPage)
       base64Code = await driver.printPage({
         orientation: 'landscape',
@@ -72,7 +73,7 @@ test.suite(
     })
 
     it('Check with page params', async function () {
-      driver = env.builder().build()
+      driver = driverFactory.GetBrowserForTests()
       await driver.get(Pages.printPage)
       base64Code = await driver.printPage({ width: 30, height: 30 })
       base64Code = base64Code.slice(startIndex, endIndex)
@@ -80,7 +81,7 @@ test.suite(
     })
 
     it('Check with margin params', async function () {
-      driver = env.builder().build()
+      driver = driverFactory.GetBrowserForTests()
       await driver.get(Pages.printPage)
       base64Code = await driver.printPage({
         top: 1,

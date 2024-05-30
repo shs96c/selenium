@@ -18,13 +18,14 @@
 'use strict'
 
 const assert = require('node:assert')
-const virtualAuthenticatorCredential = require('../lib/virtual_authenticator').Credential
-const virtualAuthenticatorOptions = require('../lib/virtual_authenticator').VirtualAuthenticatorOptions
-const Protocol = require('../lib/virtual_authenticator').Protocol
+const virtualAuthenticatorCredential = require('selenium-webdriver/lib/virtual_authenticator').Credential
+const virtualAuthenticatorOptions = require('selenium-webdriver/lib/virtual_authenticator').VirtualAuthenticatorOptions
+const Protocol = require('selenium-webdriver/lib/virtual_authenticator').Protocol
 const { ignore, suite } = require('./lib/test')
-const { Browser } = require('../lib/capabilities')
+const { Browser } = require('selenium-webdriver/lib/capabilities')
 const fileServer = require('./lib/test/fileserver')
-const invalidArgumentError = require('../lib/error').InvalidArgumentError
+const driverFactory = require('./driver_factory')
+const invalidArgumentError = require('selenium-webdriver/lib/error').InvalidArgumentError
 
 const REGISTER_CREDENTIAL = 'registerCredential().then(arguments[arguments.length - 1]);'
 const GET_CREDENTIAL = `getCredential([{
@@ -132,7 +133,7 @@ suite(function (env) {
   let driver
 
   beforeEach(async function () {
-    driver = await env.builder().build()
+    driver = driverFactory.GetBrowserForTests()
     await driver.get(fileServer.Pages.virtualAuthenticator.replace('127.0.0.1', 'localhost'))
     assert.strictEqual(await driver.getTitle(), 'Virtual Authenticator Tests')
   })

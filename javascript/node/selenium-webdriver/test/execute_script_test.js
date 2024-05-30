@@ -18,14 +18,15 @@
 'use strict'
 
 const assert = require('node:assert')
-const { Browser, By, WebElement, error } = require('..')
+const { Browser, By, WebElement, error } = require('selenium-webdriver')
 const { Pages, ignore, suite } = require('./lib/test')
+const driverFactory = require('./driver_factory')
 
 suite(function (env) {
   var driver
 
   before(async function () {
-    driver = await env.builder().build()
+    driver = driverFactory.GetBrowserForTests()
   })
 
   after(function () {

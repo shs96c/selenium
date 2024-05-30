@@ -18,10 +18,11 @@
 'use strict'
 
 const assert = require('node:assert')
-const { Browser, until } = require('..')
+const { Browser, until } = require('selenium-webdriver')
 const fileServer = require('./lib/test/fileserver')
-const { HttpResponse } = require('../devtools/networkinterceptor')
+const { HttpResponse } = require('selenium-webdriver/devtools/networkinterceptor')
 const { Pages, ignore, suite } = require('./lib/test')
+const driverFactory = require('./driver_factory')
 
 suite(
   function (env) {
@@ -30,7 +31,7 @@ suite(
     let driver
 
     before(async function () {
-      driver = await env.builder().build()
+      driver = driverFactory.GetBrowserForTests()
     })
     after(async () => await driver.quit())
 
