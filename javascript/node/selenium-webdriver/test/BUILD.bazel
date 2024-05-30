@@ -85,18 +85,17 @@ mocha_test(
             "@linux_chromedriver//:chromedriver-js",
         ],
     }),
-    env = select({
+    env = {
+        "SELENIUM_BROWSER": "chrome",
+    } | select({
         "@platforms//os:macos": {
             "SELENIUM_BROWSER": "chrome",
             "DRIVER_BINARY": "mac_chromedriver/chromedriver",
             "BROWSER_BINARY": "mac_chrome/Chrome.app/Contents/MacOS/Chrome",
-            "MOCHA_FILE": "$$XML_OUTPUT_FILE",
         },
         "@platforms//os:linux": {
-            "SELENIUM_BROWSER": "chrome",
             "DRIVER_BINARY": "linux_chromedriver/chromedriver",
             "BROWSER_BINARY": "linux_chrome/chrome-linux64/chrome",
-            "MOCHA_FILE": "$$XML_OUTPUT_FILE",
         },
     }),
 )
