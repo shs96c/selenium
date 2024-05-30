@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("//javascript:defs.bzl", "mocha_test")
+load("//javascript:defs.bzl", "BROWSERS", "mocha_test")
 
 SMALL_TESTS = [
     "io/io_test.js",
@@ -45,7 +45,6 @@ mocha_test(
         "//common/src/web:js-lib",
         "//javascript/node/selenium-webdriver:node_modules/@bazel/runfiles",
         "//javascript/node/selenium-webdriver:node_modules/mocha",
-        "//javascript/node/selenium-webdriver:node_modules/mocha-junit-reporter",
         "//javascript/node/selenium-webdriver:node_modules/sinon",
     ],
 )
@@ -60,94 +59,38 @@ js_library(
     srcs = LARGE_TESTS,
 )
 
-mocha_test(
-    name = "browser-test",
-    size = "large",
-    args = [
-        "--retries",
-        "1",
-        "simple_test.js",
-    ],
-    chdir = package_name(),
-    data = [
-        "simple_test.js",
-        ":test-data",
-        "//:node_modules/selenium-webdriver",
-        "//common/src/web:js-lib",
-        "//javascript/node/selenium-webdriver:node_modules/@bazel/runfiles",
-    ] + select({
-        "@platforms//os:macos": [
-            "@mac_chrome//:chrome-js",
-            "@mac_chromedriver//:chromedriver-js",
-        ],
-        "@platforms//os:linux": [
-            "@linux_chrome//:chrome-js",
-            "@linux_chromedriver//:chromedriver-js",
-        ],
-    }),
-    env = {
-        "SELENIUM_BROWSER": "chrome",
-    } | select({
-        "@platforms//os:macos": {
-            "SELENIUM_BROWSER": "chrome",
-            "DRIVER_BINARY": "mac_chromedriver/chromedriver",
-            "BROWSER_BINARY": "mac_chrome/Chrome.app/Contents/MacOS/Chrome",
-        },
-        "@platforms//os:linux": {
-            "DRIVER_BINARY": "linux_chromedriver/chromedriver",
-            "BROWSER_BINARY": "linux_chrome/chrome-linux64/chrome",
-        },
-    }),
-)
-
-#[
-#    [
-#        mocha_test(
-#            name = "%s-%s" % (
-#                test.replace("/", "-").replace("_", "-"),
-#                browser,
-#            ),
-#            size = "large",
-#            args = [
-#                "--retries",
-#                "1",
-#                test,
-#            ],
-#            chdir = package_name(),
-#            data = [
-#                "test-data",
-#                ":large-test-srcs",
-#                ":node_modules/@bazel/runfiles",
-#                ":node_modules/express",
-#                ":node_modules/jszip",
-#                ":node_modules/multer",
-#                ":node_modules/serve-index",
-#                ":node_modules/sinon",
-#                ":node_modules/tmp",
-#                ":node_modules/ws",
-#                "//:node_modules/selenium-webdriver",
-#                "//common/extensions:js-lib",
-#                "//common/src/web:js-lib",
-#                "//javascript/node/selenium-webdriver/lib/atoms:find-elements",
-#                "//javascript/node/selenium-webdriver/lib/atoms:get_attribute",
-#                "//javascript/node/selenium-webdriver/lib/atoms:is_displayed",
-#                "//javascript/node/selenium-webdriver/lib/atoms:mutation-listener",
-#            ],
-#            env = {
-#                "SELENIUM_BROWSER": browser,
-#            },
-#            tags = [
-#                browser,
-#                "browser-test",
-#                "no-sandbox",
-#                "requires-network",
-#                "skip-remote",
-#            ],
-#        ),
-#    ]
-#    for test in LARGE_TESTS
-#    for browser in [
-#        "chrome",
-#        "firefox",
-#    ]
-#]
+[
+    [
+        mocha_test(
+            name = "%s-%s" % (
+                test.replace("/", "-").replace("_", "-"),
+                browser,
+            ),
+            size = "large",
+            args = [
+                "--retries",
+                "1",
+                test,
+            ],
+            chdir = package_name(),
+            data = [
+                ":large-test-srcs",
+                ":test-data",
+                "//:node_modules/selenium-webdriver",
+                "//common/src/web:js-lib",
+                "//javascript/node/selenium-webdriver:node_modules/@bazel/runfiles",
+                "//javascript/node/selenium-webdriver:node_modules/express",
+                "//javascript/node/selenium-webdriver:node_modules/multer",
+                "//javascript/node/selenium-webdriver:node_modules/serve-index",
+            ] + values["data"],
+            env = values["env"],
+            tags = [
+                browser,
+                "browser-test",
+                "requires-network",
+            ],
+        )
+        for (browser, values) in BROWSERS.items()
+    ]
+    for test in LARGE_TESTS
+]

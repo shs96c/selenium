@@ -23,6 +23,7 @@ const { Browser, By, error, withTagName, until } = require('selenium-webdriver')
 const { Pages, ignore, suite, whereIs } = require('./lib/test')
 const { locateWith } = require('selenium-webdriver/lib/by')
 const { RelativeBy } = require('selenium-webdriver')
+const driverFactory = require('./driver_factory')
 
 suite(function (env) {
   const browsers = (...args) => env.browsers(...args)
@@ -30,7 +31,7 @@ suite(function (env) {
   let driver
 
   before(async function () {
-    driver = await env.builder().build()
+    driver = driverFactory.GetBrowserForTests()
   })
 
   after(function () {

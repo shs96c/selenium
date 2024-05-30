@@ -44,7 +44,6 @@ function GetBrowserForTests() {
   builder.disableEnvironmentOverrides()
 
   let driverBinary = process.env.DRIVER_BINARY
-  console.log("Driver binary", driverBinary)
   let resolvedDriver = driverBinary ? resources.locate(driverBinary) : undefined
 
   let binary = process.env.BROWSER_BINARY
@@ -60,8 +59,7 @@ function GetBrowserForTests() {
       if (resolvedDriver) {
         let sb = new chrome.ServiceBuilder(resolvedDriver)
         sb.enableVerboseLogging()
-        sb.setStdio('inherit')
-        console.log("Setting chrome service", tracePrototypeChainOf(sb))
+        // sb.setStdio('inherit')
         builder.setChromeService(sb)
       }
       if (resolvedBinary) {
@@ -69,7 +67,6 @@ function GetBrowserForTests() {
         options.setChromeBinaryPath(resolvedBinary)
         options.setAcceptInsecureCerts(true)
         options.addArguments('disable-infobars', 'disable-breakpad', 'disable-dev-shm-usage', 'no-sandbox')
-        console.log("Setting chrome options", options, tracePrototypeChainOf(options))
         builder.setChromeOptions(options)
       }
       break

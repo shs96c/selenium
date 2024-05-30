@@ -460,8 +460,6 @@ class Builder {
    * @return {!Builder} A self reference.
    */
   setChromeService(service) {
-    console.log("Receiving chrome service", tracePrototypeChainOf(service))
-    console.log("And chrome service builder", tracePrototypeChainOf(chrome.ServiceBuilder.prototype))
     if (service && !(service instanceof chrome.ServiceBuilder)) {
       throw TypeError('not a chrome.ServiceBuilder object')
     }
@@ -598,7 +596,6 @@ class Builder {
     // Create a copy for any changes we may need to make based on the current
     // environment.
     const capabilities = new Capabilities(this.capabilities_)
-    console.log("Capabilities when starting up", this.capabilities_)
 
     let browser
     if (!this.ignoreEnv_ && process.env.SELENIUM_BROWSER) {

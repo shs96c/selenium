@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 
 filegroup(
@@ -9,15 +10,14 @@ filegroup(
     visibility = [
         "//dotnet/test:__subpackages__",
         "//java/test/org/openqa/selenium/environment:__pkg__",
-        "//javascript/node/selenium-webdriver:__subpackages__",
         "//py:__pkg__",
         "//rb/spec:__subpackages__",
     ],
 )
 
-js_library(
+copy_to_bin(
     name = "js-lib",
-    data = [
+    srcs = [
         ":web",
     ],
     visibility = [

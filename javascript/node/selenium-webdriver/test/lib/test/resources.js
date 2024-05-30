@@ -42,6 +42,13 @@ exports.locate = function (filePath) {
     // This is fine. The `runfiles` library does this when it can't find things
   }
 
+  // Is the item in the workspace?
+  try {
+    return runfiles.resolveWorkspaceRelative(filePath)
+  } catch {
+    // Fall through
+  }
+
   // Find the repo mapping file
   let repoMappingFile
   try {
