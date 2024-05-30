@@ -65,6 +65,19 @@ function startSeleniumServer(jar) {
   return seleniumServer.start()
 }
 
+function tracePrototypeChainOf(object) {
+  let proto = object.constructor.prototype;
+  let result = '';
+
+  while (proto) {
+    result += ' -> ' + proto.constructor.name + '.prototype';
+    proto = Object.getPrototypeOf(proto)
+  }
+
+  result += ' -> null';
+  return result;
+}
+
 /**
  * {@linkplain webdriver.WebDriver#setFileDetector WebDriver's setFileDetector}
  * method uses a non-standard command to transfer files from the local client
@@ -447,6 +460,8 @@ class Builder {
    * @return {!Builder} A self reference.
    */
   setChromeService(service) {
+    console.log("Receiving chrome service", tracePrototypeChainOf(service))
+    console.log("And chrome service builder", tracePrototypeChainOf(chrome.ServiceBuilder.prototype))
     if (service && !(service instanceof chrome.ServiceBuilder)) {
       throw TypeError('not a chrome.ServiceBuilder object')
     }
@@ -583,6 +598,7 @@ class Builder {
     // Create a copy for any changes we may need to make based on the current
     // environment.
     const capabilities = new Capabilities(this.capabilities_)
+    console.log("Capabilities when starting up", this.capabilities_)
 
     let browser
     if (!this.ignoreEnv_ && process.env.SELENIUM_BROWSER) {
@@ -629,6 +645,8 @@ class Builder {
     } else if (browser === Browser.EDGE && this.edgeOptions_) {
       capabilities.merge(this.edgeOptions_)
     }
+
+    console.log("merged capabilities", capabilities)
 
     checkOptions(capabilities, 'chromeOptions', chrome.Options, 'setChromeOptions')
     checkOptions(capabilities, 'moz:firefoxOptions', firefox.Options, 'setFirefoxOptions')
@@ -794,3 +812,4 @@ exports.BrowsingContext = BrowsingContext
 exports.BrowsingContextInspector = BrowsingContextInspector
 exports.ScriptManager = ScriptManager
 exports.NetworkInspector = NetworkInspector
+exports.tracePrototypeChainOf = tracePrototypeChainOf

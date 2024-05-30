@@ -18,6 +18,7 @@
 'use strict'
 
 const fs = require('node:fs')
+const path = require('node:path')
 const { runfiles } = require('@bazel/runfiles')
 
 /**
@@ -27,10 +28,45 @@ const { runfiles } = require('@bazel/runfiles')
  * @throws {Error} If the file does not exist.
  */
 exports.locate = function (filePath) {
-  const fullPath = runfiles.resolveWorkspaceRelative(filePath)
+  // Try the easy path first: the filePath is relative to the cwd and exists
+  const resolvedPath = path.resolve(filePath)
 
-  if (!fs.existsSync(fullPath)) {
-    throw Error('File does not exist: ' + filePath)
+  if (fs.existsSync(resolvedPath)) {
+    return resolvedPath
   }
-  return fullPath
+
+  // Can we find this with runfiles normally?
+  try {
+    return runfiles.resolve(filePath)
+  } catch {
+    // This is fine. The `runfiles` library does this when it can't find things
+  }
+
+  // Find the repo mapping file
+  let repoMappingFile
+  try {
+    repoMappingFile = runfiles.resolve('_repo_mapping')
+  } catch {
+    throw new Error('Unable to locate ' + filePath)
+  }
+  const lines = fs.readFileSync(repoMappingFile, {encoding: 'utf8'}).split('\n')
+
+  // Build a map of "repo we declared we need" to "path"
+  const mapping = {}
+  for (const line of lines) {
+    if (line.startsWith(',')) {
+      const parts = line.split(',', 3)
+      mapping[parts[1]] = parts[2]
+    }
+  }
+
+  // Get the first segment of the path
+  const pathSegments = filePath.split('/')
+  if (!pathSegments.length) {
+    throw new Error('Unable to locate ' + filePath)
+  }
+
+  pathSegments[0] = mapping[pathSegments[0]] ? mapping[pathSegments[0]] : '_main'
+
+  return runfiles.resolve(path.join(...pathSegments))
 }

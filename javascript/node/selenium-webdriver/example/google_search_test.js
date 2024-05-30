@@ -34,7 +34,7 @@
  */
 
 const { Browser, By, Key, until } = require('..')
-const { ignore, suite } = require('../testing')
+const { ignore, suite } = require('selenium-webdriver/testing')
 
 suite(function (env) {
   describe('Google Search', function () {

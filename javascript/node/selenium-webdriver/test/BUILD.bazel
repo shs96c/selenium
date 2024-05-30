@@ -60,19 +60,46 @@ js_library(
     srcs = LARGE_TESTS,
 )
 
-#mocha_test(
-#    name = "browser-test",
-#    size = "large",
-#    args = [
-#        "--retries",
-#        "1",
-#        "element_finding_test.js",
-#    ],
-#    chdir = package_name(),
-#    data = [
-#        "element_finding_test.js",
-#    ],
-#)
+mocha_test(
+    name = "browser-test",
+    size = "large",
+    args = [
+        "--retries",
+        "1",
+        "simple_test.js",
+    ],
+    chdir = package_name(),
+    data = [
+        "simple_test.js",
+        ":test-data",
+        "//:node_modules/selenium-webdriver",
+        "//common/src/web:js-lib",
+        "//javascript/node/selenium-webdriver:node_modules/@bazel/runfiles",
+    ] + select({
+        "@platforms//os:macos": [
+            "@mac_chrome//:chrome-js",
+            "@mac_chromedriver//:chromedriver-js",
+        ],
+        "@platforms//os:linux": [
+            "@linux_chrome//:chrome-js",
+            "@linux_chromedriver//:chromedriver-js",
+        ],
+    }),
+    env = select({
+        "@platforms//os:macos": {
+            "SELENIUM_BROWSER": "chrome",
+            "DRIVER_BINARY": "mac_chromedriver/chromedriver",
+            "BROWSER_BINARY": "mac_chrome/Chrome.app/Contents/MacOS/Chrome",
+            "MOCHA_FILE": "$$XML_OUTPUT_FILE",
+        },
+        "@platforms//os:linux": {
+            "SELENIUM_BROWSER": "chrome",
+            "DRIVER_BINARY": "linux_chromedriver/chromedriver",
+            "BROWSER_BINARY": "linux_chrome/chrome-linux64/chrome",
+            "MOCHA_FILE": "$$XML_OUTPUT_FILE",
+        },
+    }),
+)
 
 #[
 #    [

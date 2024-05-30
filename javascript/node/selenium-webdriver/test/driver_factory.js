@@ -19,11 +19,12 @@
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
-const { Browser } = require('../index')
-const { Environment } = require('../testing')
-const chrome = require('../chrome')
-const firefox = require('../firefox')
+const { Browser, tracePrototypeChainOf } = require('selenium-webdriver')
+const { Environment } = require('selenium-webdriver/testing')
+const chrome = require('selenium-webdriver/chrome')
+const firefox = require('selenium-webdriver/firefox')
 const { runfiles } = require('@bazel/runfiles')
+const resources = require('./lib/test/resources')
 
 function GetBrowserForTests() {
   let browser = process.env.SELENIUM_BROWSER
@@ -41,11 +42,13 @@ function GetBrowserForTests() {
   const targetBrowser = { name: browser, capabilities: undefined }
   const builder = new Environment(targetBrowser).builder()
   builder.disableEnvironmentOverrides()
-  let binary = process.env.BROWSER_BINARY
-  let driverBinary = process.env.DRIVER_BINARY
 
-  let resolvedBinary = binary ? runfiles.resolve(driverBinary) : undefined
-  let resolvedDriver = driverBinary ? runfiles.resolve(binary) : undefined
+  let driverBinary = process.env.DRIVER_BINARY
+  console.log("Driver binary", driverBinary)
+  let resolvedDriver = driverBinary ? resources.locate(driverBinary) : undefined
+
+  let binary = process.env.BROWSER_BINARY
+  let resolvedBinary = binary ? resources.locate(binary) : undefined
 
   // Create a temporary directory we can use as a home dir
   // process.env["USER"] = "nobody"
@@ -58,6 +61,7 @@ function GetBrowserForTests() {
         let sb = new chrome.ServiceBuilder(resolvedDriver)
         sb.enableVerboseLogging()
         sb.setStdio('inherit')
+        console.log("Setting chrome service", tracePrototypeChainOf(sb))
         builder.setChromeService(sb)
       }
       if (resolvedBinary) {
@@ -65,6 +69,7 @@ function GetBrowserForTests() {
         options.setChromeBinaryPath(resolvedBinary)
         options.setAcceptInsecureCerts(true)
         options.addArguments('disable-infobars', 'disable-breakpad', 'disable-dev-shm-usage', 'no-sandbox')
+        console.log("Setting chrome options", options, tracePrototypeChainOf(options))
         builder.setChromeOptions(options)
       }
       break
@@ -85,6 +90,7 @@ function GetBrowserForTests() {
         let options = new firefox.Options()
         options.setBinary(resolvedBinary)
         options.enableDebugger()
+        options.enableBidi()
         builder.setFirefoxOptions(options)
       }
       break
