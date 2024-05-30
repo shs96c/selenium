@@ -24,7 +24,6 @@ BROWSERS = {
             "SELENIUM_BROWSER": "chrome",
         } | select({
             "@platforms//os:macos": {
-                "SELENIUM_BROWSER": "chrome",
                 "DRIVER_BINARY": "mac_chromedriver/chromedriver",
                 "BROWSER_BINARY": "mac_chrome/Chrome.app/Contents/MacOS/Chrome",
             },
@@ -34,4 +33,28 @@ BROWSERS = {
             },
         }),
     },
+    #    "firefox": {
+    #        "data": select({
+    #            "@platforms//os:macos": [
+    #                "@mac_firefox//:firefox-js",
+    #                "@mac_geckodriver//:geckodriver-js",
+    #            ],
+    #            "@platforms//os:linux": [
+    #                "@linux_firefox//:firefox-js",
+    #                "@linux_geckodriverdriver//:geckodriver-js",
+    #            ],
+    #        }),
+    #        "env": {
+    #            "SELENIUM_BROWSER": "firefox",
+    #        } | select({
+    #            "@platforms//os:macos": {
+    #                "DRIVER_BINARY": "mac_geckodriver/geckodriver",
+    #                "BROWSER_BINARY": "mac_firefox/Firefox.app/Contents/MacOS/firefox",
+    #            },
+    #            "@platforms//os:linux": {
+    #                "DRIVER_BINARY": "linux_geckodriver/geckodriver",
+    #                "BROWSER_BINARY": "linux_firefox/firefox/firefox",
+    #            },
+    #        }),
+    #    },
 }

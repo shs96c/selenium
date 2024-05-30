@@ -20,21 +20,22 @@
 const assert = require('node:assert')
 const fileServer = require('./lib/test/fileserver')
 const { ignore, Pages, suite } = require('./lib/test')
-const { Key, Origin } = require('../lib/input')
-const { Browser, By, until } = require('..')
+const { Key, Origin } = require('selenium-webdriver/lib/input')
+const { Browser, By, until } = require('selenium-webdriver')
+const driverFactory = require('./driver_factory')
 
 suite(function (env) {
+  let driver
+
+  before(async function () {
+    driver = driverFactory.GetBrowserForTests()
+  })
+
+  after(function () {
+    return driver.quit()
+  })
+
   describe('WebDriver.actions()', function () {
-    let driver
-
-    beforeEach(async function () {
-      driver = await env.builder().build()
-    })
-
-    afterEach(function () {
-      return driver.quit()
-    })
-
     it('click(element)', async function () {
       await driver.get(fileServer.whereIs('/data/actions/click.html'))
 

@@ -59,7 +59,6 @@ function GetBrowserForTests() {
       if (resolvedDriver) {
         let sb = new chrome.ServiceBuilder(resolvedDriver)
         sb.enableVerboseLogging()
-        // sb.setStdio('inherit')
         builder.setChromeService(sb)
       }
       if (resolvedBinary) {
@@ -71,10 +70,6 @@ function GetBrowserForTests() {
       }
       break
 
-    // case 'edge':
-    //   builder = builder.forBrowser(webdriver.Browser.EDGE)
-    //   break
-    //
     case 'firefox':
       builder.forBrowser(Browser.FIREFOX)
       if (resolvedDriver) {
@@ -88,6 +83,7 @@ function GetBrowserForTests() {
         options.setBinary(resolvedBinary)
         options.enableDebugger()
         options.enableBidi()
+        options.setAcceptInsecureCerts(true)
         builder.setFirefoxOptions(options)
       }
       break
