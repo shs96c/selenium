@@ -66,16 +66,16 @@ function startSeleniumServer(jar) {
 }
 
 function tracePrototypeChainOf(object) {
-  let proto = object.constructor.prototype;
-  let result = '';
+  let proto = object.constructor.prototype
+  let result = ''
 
   while (proto) {
-    result += ' -> ' + proto.constructor.name + '.prototype';
+    result += ' -> ' + proto.constructor.name + '.prototype'
     proto = Object.getPrototypeOf(proto)
   }
 
-  result += ' -> null';
-  return result;
+  result += ' -> null'
+  return result
 }
 
 /**
@@ -643,7 +643,7 @@ class Builder {
       capabilities.merge(this.edgeOptions_)
     }
 
-    console.log("merged capabilities", capabilities)
+    console.log('merged capabilities', capabilities)
 
     checkOptions(capabilities, 'chromeOptions', chrome.Options, 'setChromeOptions')
     checkOptions(capabilities, 'moz:firefoxOptions', firefox.Options, 'setFirefoxOptions')

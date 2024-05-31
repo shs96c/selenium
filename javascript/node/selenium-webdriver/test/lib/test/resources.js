@@ -56,7 +56,7 @@ exports.locate = function (filePath) {
   } catch {
     throw new Error('Unable to locate ' + filePath)
   }
-  const lines = fs.readFileSync(repoMappingFile, {encoding: 'utf8'}).split('\n')
+  const lines = fs.readFileSync(repoMappingFile, { encoding: 'utf8' }).split('\n')
 
   // Build a map of "repo we declared we need" to "path"
   const mapping = {}
