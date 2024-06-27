@@ -34,10 +34,10 @@ BROWSERS = {
                 "@linux_geckodriver//:geckodriver-js",
                 "@linux_firefox//:firefox-js",
             ],
-            #            "@selenium//common:use_pinned_macos_firefox": [
-            #                "@mac_geckodriver//:geckodriver-js",
-            #                "@mac_firefox//:firefox-js",
-            #            ],
+            "@selenium//common:use_pinned_macos_firefox": [
+                "@mac_geckodriver//:geckodriver-js",
+                "@mac_firefox//:firefox-js",
+            ],
             "//conditions:default": [],
         }),
         "env": select({
@@ -45,10 +45,10 @@ BROWSERS = {
                 "SE_GECKODRIVER": "linux_geckodriver/geckodriver",
                 "SE_FIREFOX": "linux_firefox/firefox/firefox",
             },
-            #            "@selenium//common:use_pinned_macos_firefox": {
-            #                "SE_GECKODRIVER": "mac_geckodriver/geckodriver",
-            #                "SE_FIREFOX": "mac_firefox/Firefox.app/Contents/MacOS/firefox",
-            #            },
+            "@selenium//common:use_pinned_macos_firefox": {
+                "SE_GECKODRIVER": "mac_geckodriver/geckodriver",
+                "SE_FIREFOX": "mac_firefox/Firefox.app/Contents/MacOS/firefox",
+            },
             "//conditions:default": {},
         }),
     },
