@@ -1,0 +1,10 @@
+java_library(
+    name = "playwright",
+    srcs = glob(["*.java"]),
+    visibility = [
+        "//java/src/org/openqa/selenium/grid:__subpackages__",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium/remote/http",
+    ],
+)

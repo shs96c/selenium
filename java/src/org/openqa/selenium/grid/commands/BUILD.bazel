@@ -30,6 +30,7 @@ java_library(
         "//java/src/org/openqa/selenium/grid/node",
         "//java/src/org/openqa/selenium/grid/node/config",
         "//java/src/org/openqa/selenium/grid/node/local",
+        "//java/src/org/openqa/selenium/grid/playwright",
         "//java/src/org/openqa/selenium/grid/router",
         "//java/src/org/openqa/selenium/grid/router/httpd",
         "//java/src/org/openqa/selenium/grid/security",

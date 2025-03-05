@@ -52,6 +52,7 @@ import org.openqa.selenium.grid.log.LoggingOptions;
 import org.openqa.selenium.grid.node.Node;
 import org.openqa.selenium.grid.node.ProxyNodeWebsockets;
 import org.openqa.selenium.grid.node.config.NodeOptions;
+import org.openqa.selenium.grid.playwright.PlaywrightRoute;
 import org.openqa.selenium.grid.router.Router;
 import org.openqa.selenium.grid.router.httpd.RouterOptions;
 import org.openqa.selenium.grid.security.BasicAuthenticationFilter;
@@ -206,6 +207,8 @@ public class Standalone extends TemplateGridServerCommand {
       Routable ui = new GridUiRoute(subPath);
       httpHandler = combine(ui, appendRoute);
     }
+
+    httpHandler = combine(new PlaywrightRoute("/playwright"), httpHandler);
 
     UsernameAndPassword uap = secretOptions.getServerAuthentication();
     if (uap != null) {
