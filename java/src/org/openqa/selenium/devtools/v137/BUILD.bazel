@@ -2,10 +2,23 @@ load("//common:defs.bzl", "copy_file")
 load("//java:defs.bzl", "java_export", "java_library")
 load("//java:version.bzl", "SE_VERSION")
 
+# gazelle:resolve java org.openqa.selenium.devtools.v137.fetch //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.fetch.model //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.log //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.log.model //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.network //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.network.model //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.page //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.page.model //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.runtime //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.runtime.model //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.target //java/src/org/openqa/selenium/devtools/v137
+# gazelle:resolve java org.openqa.selenium.devtools.v137.target.model //java/src/org/openqa/selenium/devtools/v137
+
 cdp_version = "v137"
 
 java_export(
-    name = cdp_version,
+    name = "v137",
     srcs = glob(["*.java"]),
     maven_coordinates = "org.seleniumhq.selenium:selenium-devtools-%s:%s" % (cdp_version, SE_VERSION),
     opens_to = [

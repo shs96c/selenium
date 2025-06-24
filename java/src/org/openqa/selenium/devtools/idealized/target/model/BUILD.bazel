@@ -1,0 +1,18 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "model",
+    srcs = [
+        "SessionID.java",
+        "TargetID.java",
+        "TargetInfo.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/devtools/idealized/browser/model"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/devtools/idealized/browser/model",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/json",
+    ],
+)

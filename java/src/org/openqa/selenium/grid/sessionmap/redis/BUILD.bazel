@@ -1,28 +1,29 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_export")
-load("//java:version.bzl", "SE_VERSION")
+load("@rules_java//java:defs.bzl", "java_library")
 
-java_export(
+java_library(
     name = "redis",
-    srcs = glob(["*.java"]),
-    maven_coordinates = "org.seleniumhq.selenium:selenium-session-map-redis:%s" % SE_VERSION,
-    pom_template = "//java/src/org/openqa/selenium:template-pom",
-    tags = [
-        "release-artifact",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
+    srcs = ["RedisBackedSessionMap.java"],
+    visibility = ["//:__subpackages__"],
     exports = [
-        # SessionMap is in the public api
-        "//java/src/org/openqa/selenium/grid",
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/grid/sessionmap",
+        "//java/src/org/openqa/selenium/redis",
     ],
     deps = [
-        "//java/src/org/openqa/selenium/grid",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/events",
+        "//java/src/org/openqa/selenium/grid/config",
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/grid/log",
+        "//java/src/org/openqa/selenium/grid/server",
+        "//java/src/org/openqa/selenium/grid/sessionmap",
+        "//java/src/org/openqa/selenium/grid/sessionmap/config",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
         "//java/src/org/openqa/selenium/redis",
         "//java/src/org/openqa/selenium/remote",
-        artifact("com.google.guava:guava"),
-        artifact("io.lettuce:lettuce-core"),
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:com_google_guava_guava",
+        "@maven//:io_lettuce_lettuce_core",
     ],
 )

@@ -1,0 +1,12 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "internal",
+    srcs = [
+        "Debug.java",
+        "Either.java",
+        "Require.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = ["@maven//:org_jspecify_jspecify"],
+)

@@ -1,0 +1,30 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "v1_41",
+    srcs = [
+        "CreateContainer.java",
+        "DockerMessages.java",
+        "GetContainerLogs.java",
+        "InspectContainer.java",
+        "IsContainerPresent.java",
+        "ListImages.java",
+        "PullImage.java",
+        "StartContainer.java",
+        "StopContainer.java",
+        "V141Docker.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium/docker",
+        "//java/src/org/openqa/selenium/remote/http",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium/docker",
+        "//java/src/org/openqa/selenium/docker/internal",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/remote/http",
+        "@maven//:com_google_guava_guava",
+    ],
+)

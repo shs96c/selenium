@@ -1,20 +1,51 @@
-load("//java:defs.bzl", "java_export")
-load("//java:version.bzl", "SE_VERSION")
+load("@rules_java//java:defs.bzl", "java_library")
 
-java_export(
+java_library(
     name = "firefox",
-    srcs = glob(["*.java"]),
-    maven_coordinates = "org.seleniumhq.selenium:selenium-firefox-driver:%s" % SE_VERSION,
-    pom_template = "//java/src/org/openqa/selenium:template-pom",
-    tags = [
-        "release-artifact",
+    srcs = [
+        "AddHasContext.java",
+        "AddHasExtensions.java",
+        "AddHasFullPageScreenshot.java",
+        "ClasspathExtension.java",
+        "Executable.java",
+        "Extension.java",
+        "FileExtension.java",
+        "FirefoxBinary.java",
+        "FirefoxCommandContext.java",
+        "FirefoxDriver.java",
+        "FirefoxDriverLogLevel.java",
+        "FirefoxDriverService.java",
+        "FirefoxOptions.java",
+        "FirefoxProfile.java",
+        "GeckoDriverInfo.java",
+        "GeckoDriverService.java",
+        "HasContext.java",
+        "HasExtensions.java",
+        "HasFullPageScreenshot.java",
+        "Preferences.java",
+        "ProfilesIni.java",
+        "UnableToCreateProfileException.java",
     ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//java:auto-service",
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/bidi",
-        "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/manager",
+        "//java/src/org/openqa/selenium/html5",
         "//java/src/org/openqa/selenium/remote",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/bidi",
+        "//java/src/org/openqa/selenium/html5",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/io",
+        "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/net",
+        "//java/src/org/openqa/selenium/os",
+        "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/html5",
+        "//java/src/org/openqa/selenium/remote/http",
+        "//java/src/org/openqa/selenium/remote/service",
+        "@maven//:com_google_auto_service_auto_service_annotations",
     ],
 )

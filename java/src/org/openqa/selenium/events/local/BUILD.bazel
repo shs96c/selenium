@@ -1,19 +1,13 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "local",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/grid:__pkg__",
-        "//java/src/org/openqa/selenium/grid/commands:__pkg__",
-        "//java/test/org/openqa/selenium/events:__subpackages__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
-    ],
+    srcs = ["GuavaEventBus.java"],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
         "//java/src/org/openqa/selenium/events",
         "//java/src/org/openqa/selenium/grid/config",
-        artifact("com.google.guava:guava"),
+        "//java/src/org/openqa/selenium/internal",
+        "@maven//:com_google_guava_guava",
     ],
 )

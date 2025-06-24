@@ -1,42 +1,29 @@
-load("//java:defs.bzl", "java_library")
-
-AUGMENTER_SRCS = [
-    "BiDiProvider.java",
-]
-
-java_library(
-    name = "augmenter",
-    srcs = AUGMENTER_SRCS,
-    visibility = [
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-    ],
-    deps = [
-        ":bidi",
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium:core",
-        "//java/src/org/openqa/selenium/remote:api",
-        "//java/src/org/openqa/selenium/remote/http",
-    ],
-)
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "bidi",
-    srcs = glob(
-        [
-            "*.java",
-        ],
-        exclude = AUGMENTER_SRCS,
-    ),
-    visibility = [
-        "//java/src/org/openqa/selenium/bidi:__subpackages__",
-        "//java/src/org/openqa/selenium/firefox:__subpackages__",
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/test/org/openqa/selenium/bidi:__subpackages__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
+    srcs = [
+        "BiDi.java",
+        "BiDiException.java",
+        "BiDiProvider.java",
+        "BiDiSessionStatus.java",
+        "Command.java",
+        "Connection.java",
+        "ConverterFunctions.java",
+        "Event.java",
+        "HasBiDi.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/json",
     ],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/remote",
         "//java/src/org/openqa/selenium/remote/http",
+        "@maven//:com_google_auto_service_auto_service_annotations",
     ],
 )

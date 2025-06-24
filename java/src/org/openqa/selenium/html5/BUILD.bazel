@@ -1,0 +1,16 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "html5",
+    srcs = [
+        "AppCacheStatus.java",
+        "LocalStorage.java",
+        "Location.java",
+        "LocationContext.java",
+        "SessionStorage.java",
+        "Storage.java",
+        "WebStorage.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = ["@maven//:org_jspecify_jspecify"],
+)

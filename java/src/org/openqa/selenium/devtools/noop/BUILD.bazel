@@ -1,0 +1,21 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "noop",
+    srcs = [
+        "NoOpCdpInfo.java",
+        "NoOpDomains.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium/devtools/idealized/log",
+        "//java/src/org/openqa/selenium/devtools/idealized/target",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/devtools",
+        "//java/src/org/openqa/selenium/devtools/idealized",
+        "//java/src/org/openqa/selenium/devtools/idealized/log",
+        "//java/src/org/openqa/selenium/devtools/idealized/target",
+    ],
+)

@@ -1,26 +1,33 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "browsingcontext",
-    srcs = glob(
-        [
-            "*.java",
-        ],
-    ),
-    visibility = [
-        "//java/src/org/openqa/selenium/bidi:__subpackages__",
-        "//java/src/org/openqa/selenium/firefox:__subpackages__",
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/test/org/openqa/selenium/bidi:__subpackages__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
+    srcs = [
+        "BoxClipRectangle.java",
+        "BrowsingContext.java",
+        "BrowsingContextInfo.java",
+        "CaptureScreenshotParameters.java",
+        "ClipRectangle.java",
+        "CreateContextParameters.java",
+        "ElementClipRectangle.java",
+        "HistoryUpdated.java",
+        "LocateNodeParameters.java",
+        "Locator.java",
+        "NavigationInfo.java",
+        "NavigationResult.java",
+        "ReadinessState.java",
+        "UserPromptClosed.java",
+        "UserPromptOpened.java",
+        "UserPromptType.java",
     ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/bidi/script"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/bidi",
         "//java/src/org/openqa/selenium/bidi/script",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/remote/http",
-        artifact("com.google.auto.service:auto-service-annotations"),
+        "//java/src/org/openqa/selenium/print",
     ],
 )

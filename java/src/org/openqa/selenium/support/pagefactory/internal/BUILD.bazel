@@ -1,0 +1,14 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "internal",
+    srcs = [
+        "LocatingElementHandler.java",
+        "LocatingElementListHandler.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/support/pagefactory",
+    ],
+)

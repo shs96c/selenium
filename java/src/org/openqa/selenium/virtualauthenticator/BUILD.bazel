@@ -1,0 +1,16 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "virtualauthenticator",
+    srcs = [
+        "Credential.java",
+        "HasVirtualAuthenticator.java",
+        "VirtualAuthenticator.java",
+        "VirtualAuthenticatorOptions.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//java/src/org/openqa/selenium/internal",
+        "@maven//:org_jspecify_jspecify",
+    ],
+)

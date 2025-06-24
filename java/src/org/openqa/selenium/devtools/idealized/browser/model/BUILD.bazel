@@ -1,0 +1,8 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "model",
+    srcs = ["BrowserContextID.java"],
+    visibility = ["//:__subpackages__"],
+    deps = ["//java/src/org/openqa/selenium/internal"],
+)

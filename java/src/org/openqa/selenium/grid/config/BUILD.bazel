@@ -1,26 +1,34 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "config",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/cli:__pkg__",
-        "//java/src/org/openqa/selenium/events:__subpackages__",
-        "//java/src/org/openqa/selenium/grid:__subpackages__",
-        "//java/src/org/openqa/selenium/netty/server:__pkg__",
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/src/org/openqa/selenium/remote/tracing:__subpackages__",
-        "//java/test/org/openqa/selenium:__pkg__",
-        "//java/test/org/openqa/selenium:__subpackages__",
-        "//java/test/org/openqa/selenium/environment:__pkg__",
+    srcs = [
+        "AnnotatedConfig.java",
+        "ClassCreation.java",
+        "CompoundConfig.java",
+        "ConcatenatingConfig.java",
+        "Config.java",
+        "ConfigException.java",
+        "ConfigFlags.java",
+        "ConfigValue.java",
+        "Configs.java",
+        "DescribedOption.java",
+        "EnvConfig.java",
+        "HasRoles.java",
+        "JsonConfig.java",
+        "MapConfig.java",
+        "MemoizedConfig.java",
+        "NonSplittingSplitter.java",
+        "Role.java",
+        "StandardGridRoles.java",
+        "TomlConfig.java",
     ],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        artifact("com.beust:jcommander"),
-        artifact("com.google.guava:guava"),
-        artifact("org.tomlj:tomlj"),
+        "@maven//:com_beust_jcommander",
+        "@maven//:com_google_guava_guava",
+        "@maven//:org_tomlj_tomlj",
     ],
 )

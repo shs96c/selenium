@@ -1,23 +1,24 @@
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "log",
-    srcs = glob(
-        [
-            "*.java",
-        ],
-    ),
-    visibility = [
-        "//java/src/org/openqa/selenium/bidi:__subpackages__",
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/test/org/openqa/selenium/bidi:__subpackages__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
+    srcs = [
+        "BaseLogEntry.java",
+        "ConsoleLogEntry.java",
+        "FilterBy.java",
+        "GenericLogEntry.java",
+        "JavascriptLogEntry.java",
+        "Log.java",
+        "LogEntry.java",
+        "LogLevel.java",
+        "StackFrame.java",
+        "StackTrace.java",
     ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/bidi/script"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
         "//java/src/org/openqa/selenium/bidi",
         "//java/src/org/openqa/selenium/bidi/script",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/remote/http",
     ],
 )

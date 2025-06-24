@@ -1,0 +1,18 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "w3c",
+    srcs = [
+        "W3CHttpCommandCodec.java",
+        "W3CHttpResponseCodec.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/remote"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/codec",
+        "//java/src/org/openqa/selenium/remote/http",
+    ],
+)

@@ -1,25 +1,36 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "graphql",
-    srcs = glob(["*.java"]),
-    resources = [
-        "selenium-grid-schema.graphqls",
+    srcs = [
+        "GraphqlHandler.java",
+        "Grid.java",
+        "GridData.java",
+        "Node.java",
+        "OsInfo.java",
+        "Session.java",
+        "SessionData.java",
+        "SessionNotFoundException.java",
+        "Slot.java",
+        "Types.java",
     ],
-    visibility = [
-        "//java/src/org/openqa/selenium/grid:__subpackages__",
-        "//java/test/org/openqa/selenium/grid/graphql:__pkg__",
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/remote/http",
+        "@maven//:com_graphql_java_graphql_java",
     ],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/grid/data",
         "//java/src/org/openqa/selenium/grid/distributor",
         "//java/src/org/openqa/selenium/grid/sessionqueue",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
         "//java/src/org/openqa/selenium/remote",
         "//java/src/org/openqa/selenium/remote/http",
-        artifact("com.google.guava:guava"),
-        artifact("com.graphql-java:graphql-java"),
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:com_google_guava_guava",
+        "@maven//:com_graphql_java_graphql_java",
     ],
 )

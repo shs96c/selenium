@@ -1,23 +1,39 @@
-load("//java:defs.bzl", "java_export")
-load("//java:version.bzl", "SE_VERSION")
+load("@rules_java//java:defs.bzl", "java_library")
 
-java_export(
+java_library(
     name = "http",
-    srcs = glob(["**/*.java"]),
-    maven_coordinates = "org.seleniumhq.selenium:selenium-http:%s" % SE_VERSION,
-    pom_template = "//java/src/org/openqa/selenium:template-pom",
-    tags = [
-        "release-artifact",
+    srcs = [
+        "AddSeleniumUserAgent.java",
+        "BinaryMessage.java",
+        "ClientConfig.java",
+        "CloseMessage.java",
+        "ConnectionFailedException.java",
+        "Contents.java",
+        "DumpHttpExchangeFilter.java",
+        "Filter.java",
+        "HttpClient.java",
+        "HttpClientName.java",
+        "HttpHandler.java",
+        "HttpHeader.java",
+        "HttpMessage.java",
+        "HttpMethod.java",
+        "HttpRequest.java",
+        "HttpResponse.java",
+        "Message.java",
+        "RemoteCall.java",
+        "RetryRequest.java",
+        "Routable.java",
+        "Route.java",
+        "TextMessage.java",
+        "UrlPath.java",
+        "UrlTemplate.java",
+        "WebSocket.java",
     ],
-    uses = [
-        "org.openqa.selenium.remote.http.HttpClient$Factory",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium"],
     deps = [
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
     ],
 )

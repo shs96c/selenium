@@ -1,0 +1,22 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "html5",
+    srcs = [
+        "AddWebStorage.java",
+        "RemoteLocalStorage.java",
+        "RemoteLocationContext.java",
+        "RemoteSessionStorage.java",
+        "RemoteWebStorage.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/html5",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/html5",
+        "//java/src/org/openqa/selenium/remote",
+    ],
+)

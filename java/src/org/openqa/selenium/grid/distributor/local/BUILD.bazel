@@ -1,15 +1,17 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "local",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/grid/commands:__pkg__",
-        "//java/src/org/openqa/selenium/grid/distributor/httpd:__pkg__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
+    srcs = ["LocalDistributor.java"],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/grid/distributor",
+        "//java/src/org/openqa/selenium/grid/node",
     ],
     deps = [
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/concurrent",
         "//java/src/org/openqa/selenium/events",
         "//java/src/org/openqa/selenium/grid/config",
@@ -27,9 +29,11 @@ java_library(
         "//java/src/org/openqa/selenium/grid/sessionmap/config",
         "//java/src/org/openqa/selenium/grid/sessionqueue",
         "//java/src/org/openqa/selenium/grid/sessionqueue/config",
-        "//java/src/org/openqa/selenium/grid/sessionqueue/remote",
-        "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/remote",
-        artifact("com.google.guava:guava"),
+        "//java/src/org/openqa/selenium/remote/http",
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "//java/src/org/openqa/selenium/status",
+        "@maven//:com_google_guava_guava",
     ],
 )

@@ -1,23 +1,35 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "config",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/grid:__subpackages__",
-        "//java/test/org/openqa/selenium/grid/node/config:__subpackages__",
-        "//java/test/org/openqa/selenium/grid/node/relay:__subpackages__",
+    srcs = [
+        "DriverServiceSessionFactory.java",
+        "NodeFlags.java",
+        "NodeOptions.java",
+        "SessionCapabilitiesMutator.java",
     ],
-    deps = [
-        "//java:auto-service",
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/grid/config",
         "//java/src/org/openqa/selenium/grid/data",
         "//java/src/org/openqa/selenium/grid/node",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/devtools",
+        "//java/src/org/openqa/selenium/grid/config",
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/grid/node",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/manager",
+        "//java/src/org/openqa/selenium/net",
         "//java/src/org/openqa/selenium/remote",
-        artifact("com.beust:jcommander"),
-        artifact("com.google.guava:guava"),
+        "//java/src/org/openqa/selenium/remote/http",
+        "//java/src/org/openqa/selenium/remote/service",
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:com_beust_jcommander",
+        "@maven//:com_google_auto_service_auto_service_annotations",
+        "@maven//:com_google_guava_guava",
     ],
 )

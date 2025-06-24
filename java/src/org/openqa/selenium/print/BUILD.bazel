@@ -1,0 +1,15 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "print",
+    srcs = [
+        "PageMargin.java",
+        "PageSize.java",
+        "PrintOptions.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//java/src/org/openqa/selenium/internal",
+        "@maven//:org_jspecify_jspecify",
+    ],
+)

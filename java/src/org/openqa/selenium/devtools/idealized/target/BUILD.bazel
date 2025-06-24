@@ -1,0 +1,12 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "target",
+    srcs = ["Target.java"],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/devtools/idealized/target/model"],
+    deps = [
+        "//java/src/org/openqa/selenium/devtools",
+        "//java/src/org/openqa/selenium/devtools/idealized/target/model",
+    ],
+)

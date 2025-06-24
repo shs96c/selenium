@@ -1,25 +1,32 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "opentelemetry",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/test/org/openqa/selenium/remote/tracing:__subpackages__",
+    srcs = [
+        "OpenTelemetryAttributeMap.java",
+        "OpenTelemetryContext.java",
+        "OpenTelemetryPropagator.java",
+        "OpenTelemetrySpan.java",
+        "OpenTelemetryTracer.java",
+        "SeleniumSpanExporter.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:io_opentelemetry_opentelemetry_api",
+        "@maven//:io_opentelemetry_opentelemetry_context",
+        "@maven//:io_opentelemetry_opentelemetry_sdk_common",
+        "@maven//:io_opentelemetry_opentelemetry_sdk_trace",
     ],
     deps = [
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
         "//java/src/org/openqa/selenium/remote/tracing",
-        artifact("io.opentelemetry:opentelemetry-api"),
-        artifact("io.opentelemetry:opentelemetry-context"),
-        artifact("io.opentelemetry:opentelemetry-exporter-logging"),
-        artifact("io.opentelemetry:opentelemetry-sdk"),
-        artifact("io.opentelemetry:opentelemetry-sdk-common"),
-        artifact("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi"),
-        artifact("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure"),
-        artifact("io.opentelemetry:opentelemetry-sdk-trace"),
+        "@maven//:io_opentelemetry_opentelemetry_api",
+        "@maven//:io_opentelemetry_opentelemetry_context",
+        "@maven//:io_opentelemetry_opentelemetry_sdk",
+        "@maven//:io_opentelemetry_opentelemetry_sdk_common",
+        "@maven//:io_opentelemetry_opentelemetry_sdk_extension_autoconfigure",
+        "@maven//:io_opentelemetry_opentelemetry_sdk_trace",
     ],
 )

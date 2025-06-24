@@ -1,0 +1,28 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "pagefactory",
+    srcs = [
+        "AbstractAnnotations.java",
+        "AjaxElementLocator.java",
+        "AjaxElementLocatorFactory.java",
+        "Annotations.java",
+        "ByAll.java",
+        "ByChained.java",
+        "DefaultElementLocator.java",
+        "DefaultElementLocatorFactory.java",
+        "DefaultFieldDecorator.java",
+        "ElementLocator.java",
+        "ElementLocatorFactory.java",
+        "FieldDecorator.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/interactions",
+        "//java/src/org/openqa/selenium/support",
+        "//java/src/org/openqa/selenium/support/pagefactory/internal",
+        "//java/src/org/openqa/selenium/support/ui",
+    ],
+)

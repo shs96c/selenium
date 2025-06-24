@@ -1,0 +1,16 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "jdk",
+    srcs = [
+        "JdkHttpClient.java",
+        "JdkHttpMessages.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/remote/http"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/remote/http",
+        "@maven//:com_google_auto_service_auto_service_annotations",
+    ],
+)

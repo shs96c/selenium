@@ -1,13 +1,18 @@
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "empty",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/remote/tracing:__pkg__",
+    srcs = [
+        "NullAttributeMap.java",
+        "NullContext.java",
+        "NullPropagator.java",
+        "NullSpan.java",
+        "NullTracer.java",
     ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/remote/tracing"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
-        "//java/src/org/openqa/selenium/remote/tracing:tracing-lib",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/remote/tracing",
     ],
 )

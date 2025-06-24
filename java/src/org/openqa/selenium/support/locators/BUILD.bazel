@@ -1,25 +1,20 @@
-load("//common:defs.bzl", "copy_file")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "locators",
-    srcs = glob(["*.java"]),
-    resources = [
-        ":find-elements",
+    srcs = [
+        "RelativeLocator.java",
+        "RelativeLocatorScript.java",
+        "RelativeLocatorServerSide.java",
     ],
-    visibility = [
-        "//java/src/org/openqa/selenium/support:__pkg__",
-        "//java/test/org/openqa/selenium/support/locators:__pkg__",
-    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium"],
     deps = [
-        "//java:auto-service",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
         "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/locators",
+        "@maven//:com_google_auto_service_auto_service_annotations",
     ],
-)
-
-copy_file(
-    name = "find-elements",
-    src = "//javascript/atoms/fragments:find-elements.js",
-    out = "findElements.js",
 )

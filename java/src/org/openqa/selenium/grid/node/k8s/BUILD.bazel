@@ -1,18 +1,37 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "k8s",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//deploys/docker:__pkg__",
+    srcs = [
+        "OneShotFlags.java",
+        "OneShotNode.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/grid/config",
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/grid/node",
+        "//java/src/org/openqa/selenium/remote/http",
     ],
     deps = [
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium/grid",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/events",
+        "//java/src/org/openqa/selenium/grid/config",
+        "//java/src/org/openqa/selenium/grid/data",
+        "//java/src/org/openqa/selenium/grid/jmx",
+        "//java/src/org/openqa/selenium/grid/log",
+        "//java/src/org/openqa/selenium/grid/node",
+        "//java/src/org/openqa/selenium/grid/node/config",
+        "//java/src/org/openqa/selenium/grid/security",
+        "//java/src/org/openqa/selenium/grid/server",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
         "//java/src/org/openqa/selenium/remote",
-        artifact("com.beust:jcommander"),
-        artifact("com.google.guava:guava"),
+        "//java/src/org/openqa/selenium/remote/http",
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:com_beust_jcommander",
+        "@maven//:com_google_auto_service_auto_service_annotations",
+        "@maven//:com_google_guava_guava",
     ],
 )

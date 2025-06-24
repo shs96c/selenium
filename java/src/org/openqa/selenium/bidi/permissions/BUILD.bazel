@@ -1,17 +1,7 @@
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "permissions",
-    srcs = glob(
-        [
-            "*.java",
-        ],
-    ),
-    visibility = [
-        "//java/src/org/openqa/selenium/bidi:__subpackages__",
-        "//java/src/org/openqa/selenium/firefox:__subpackages__",
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/test/org/openqa/selenium/bidi:__subpackages__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
-    ],
+    srcs = ["PermissionState.java"],
+    visibility = ["//:__subpackages__"],
 )

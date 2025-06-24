@@ -1,19 +1,15 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_export")
-load("//java:version.bzl", "SE_VERSION")
+load("@rules_java//java:defs.bzl", "java_library")
 
-java_export(
+java_library(
     name = "os",
-    srcs = glob(["*.java"]),
-    maven_coordinates = "org.seleniumhq.selenium:selenium-os:%s" % SE_VERSION,
-    pom_template = "//java/src/org/openqa/selenium:template-pom",
-    tags = [
-        "release-artifact",
+    srcs = [
+        "ExecutableFinder.java",
+        "ExternalProcess.java",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/io",
-        artifact("org.apache.commons:commons-exec"),
     ],
 )

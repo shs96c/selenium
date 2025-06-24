@@ -1,0 +1,22 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "codec",
+    srcs = [
+        "AbstractHttpCommandCodec.java",
+        "AbstractHttpResponseCodec.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/http",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/net",
+        "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/http",
+    ],
+)

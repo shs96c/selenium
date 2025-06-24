@@ -10,6 +10,7 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "buildifier_prebuilt", version = "6.4.0")
 bazel_dep(name = "contrib_rules_jvm", version = "0.27.0")
 bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "gazelle", version = "0.44.0")
 
 # Required for the closure rules
 bazel_dep(name = "protobuf", version = "29.2", dev_dependency = True, repo_name = "com_google_protobuf")
@@ -55,45 +56,45 @@ linter.register(name = "rust-rustfmt")
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(node_version = "20.9.0")
 
-pnpm = use_extension(
-    "@aspect_rules_js//npm:extensions.bzl",
-    "pnpm",
-    dev_dependency = True,
-)
-use_repo(pnpm, "pnpm")
-
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
-npm.npm_translate_lock(
-    name = "npm",
-    data = [
-        "@//:package.json",
-        "@//:pnpm-workspace.yaml",
-        "@//javascript/grid-ui:package.json",
-        "@//javascript/selenium-webdriver:package.json",
-    ],
-    generate_bzl_library_targets = True,
-    npmrc = "//:.npmrc",
-    pnpm_lock = "//:pnpm-lock.yaml",
-    update_pnpm_lock = True,
-    verify_node_modules_ignored = "//:.bazelignore",
-)
-use_repo(npm, "npm")
-
-rules_ts_ext = use_extension(
-    "@aspect_rules_ts//ts:extensions.bzl",
-    "ext",
-    dev_dependency = True,
-)
-rules_ts_ext.deps(
-    ts_version = "4.9.5",
-)
-use_repo(rules_ts_ext, "npm_typescript")
-
-esbuild = use_extension("@aspect_rules_esbuild//esbuild:extensions.bzl", "esbuild")
-esbuild.toolchain(esbuild_version = "0.23.0")
-use_repo(esbuild, "esbuild_toolchains")
-
-register_toolchains("@esbuild_toolchains//:all")
+#pnpm = use_extension(
+#    "@aspect_rules_js//npm:extensions.bzl",
+#    "pnpm",
+#    dev_dependency = True,
+#)
+#use_repo(pnpm, "pnpm")
+#
+#npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+#npm.npm_translate_lock(
+#    name = "npm",
+#    data = [
+#        "@//:package.json",
+#        "@//:pnpm-workspace.yaml",
+#        "@//javascript/grid-ui:package.json",
+#        "@//javascript/selenium-webdriver:package.json",
+#    ],
+#    generate_bzl_library_targets = True,
+#    npmrc = "//:.npmrc",
+#    pnpm_lock = "//:pnpm-lock.yaml",
+#    update_pnpm_lock = True,
+#    verify_node_modules_ignored = "//:.bazelignore",
+#)
+#use_repo(npm, "npm")
+#
+#rules_ts_ext = use_extension(
+#    "@aspect_rules_ts//ts:extensions.bzl",
+#    "ext",
+#    dev_dependency = True,
+#)
+#rules_ts_ext.deps(
+#    ts_version = "4.9.5",
+#)
+#use_repo(rules_ts_ext, "npm_typescript")
+#
+#esbuild = use_extension("@aspect_rules_esbuild//esbuild:extensions.bzl", "esbuild")
+#esbuild.toolchain(esbuild_version = "0.23.0")
+#use_repo(esbuild, "esbuild_toolchains")
+#
+#register_toolchains("@esbuild_toolchains//:all")
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
 dotnet.toolchain(dotnet_version = "8.0.203")

@@ -1,11 +1,13 @@
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "io",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/dev/selenium/tools/modules:__pkg__",
-        "//java/src/org/openqa/selenium/os:__pkg__",
-        "//java/test/org/openqa/selenium/io:__pkg__",
+    srcs = [
+        "CircularOutputStream.java",
+        "FileHandler.java",
+        "MultiOutputStream.java",
+        "TemporaryFilesystem.java",
+        "Zip.java",
     ],
+    visibility = ["//:__subpackages__"],
 )

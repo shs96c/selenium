@@ -1,0 +1,30 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "interactions",
+    srcs = [
+        "Action.java",
+        "Actions.java",
+        "CompositeAction.java",
+        "Coordinates.java",
+        "Encodable.java",
+        "InputSource.java",
+        "Interaction.java",
+        "Interactive.java",
+        "KeyInput.java",
+        "Locatable.java",
+        "MoveTargetOutOfBoundsException.java",
+        "Pause.java",
+        "PointerInput.java",
+        "Sequence.java",
+        "SourceType.java",
+        "WheelInput.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
+        "@maven//:org_jspecify_jspecify",
+    ],
+)

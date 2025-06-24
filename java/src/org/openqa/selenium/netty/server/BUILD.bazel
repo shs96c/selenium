@@ -1,31 +1,32 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "server",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/grid:__subpackages__",
-        "//java/src/org/openqa/selenium/netty/server:__pkg__",
-        "//java/src/org/openqa/selenium/remote/server:__pkg__",
-        "//java/test/org/openqa/selenium:__subpackages__",
+    srcs = [
+        "MessageInboundConverter.java",
+        "MessageOutboundConverter.java",
+        "NettyServer.java",
+        "RequestConverter.java",
+        "ResponseConverter.java",
+        "SeleniumHandler.java",
+        "SeleniumHttpInitializer.java",
+        "ServerBindException.java",
+        "WebSocketHandshakeComplete.java",
+        "WebSocketMessageHandler.java",
+        "WebSocketUpgradeHandler.java",
     ],
-    exports = [
-        "//java/src/org/openqa/selenium/grid/server",
-        "//java/src/org/openqa/selenium/remote/http",
-    ],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
         "//java/src/org/openqa/selenium/grid/server",
-        "//java/src/org/openqa/selenium/grid/web",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/remote",
         "//java/src/org/openqa/selenium/remote/http",
-        artifact("com.google.guava:guava"),
-        artifact("io.netty:netty-buffer"),
-        artifact("io.netty:netty-codec-http"),
-        artifact("io.netty:netty-common"),
-        artifact("io.netty:netty-handler"),
-        artifact("io.netty:netty-transport"),
-        artifact("org.bouncycastle:bcpkix-jdk18on"),
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:com_google_guava_guava",
+        "@maven//:io_netty_netty_buffer",
+        "@maven//:io_netty_netty_codec_http",
+        "@maven//:io_netty_netty_common",
+        "@maven//:io_netty_netty_handler",
+        "@maven//:io_netty_netty_transport",
     ],
 )

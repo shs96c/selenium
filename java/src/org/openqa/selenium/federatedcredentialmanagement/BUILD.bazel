@@ -1,0 +1,12 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "federatedcredentialmanagement",
+    srcs = [
+        "FederatedCredentialManagementAccount.java",
+        "FederatedCredentialManagementDialog.java",
+        "HasFederatedCredentialManagement.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = ["//java/src/org/openqa/selenium"],
+)

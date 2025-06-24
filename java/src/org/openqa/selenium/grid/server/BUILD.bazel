@@ -1,27 +1,35 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "server",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium:__subpackages__",
-        "//java/test/org/openqa/selenium:__subpackages__",
-        "//java/test/org/openqa/selenium/environment:__pkg__",
+    srcs = [
+        "BaseServerFlags.java",
+        "BaseServerOptions.java",
+        "EventBusFlags.java",
+        "EventBusOptions.java",
+        "HelpFlags.java",
+        "NetworkOptions.java",
+        "Server.java",
     ],
-    runtime_deps = [
-        "//java/src/org/openqa/selenium/events/zeromq",
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium/events",
+        "//java/src/org/openqa/selenium/grid/config",
+        "//java/src/org/openqa/selenium/remote/http",
     ],
     deps = [
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/events",
         "//java/src/org/openqa/selenium/grid/component",
         "//java/src/org/openqa/selenium/grid/config",
         "//java/src/org/openqa/selenium/grid/jmx",
         "//java/src/org/openqa/selenium/grid/web",
-        "//java/src/org/openqa/selenium/remote",
-        artifact("com.beust:jcommander"),
-        artifact("com.google.guava:guava"),
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/net",
+        "//java/src/org/openqa/selenium/remote/http",
+        "//java/src/org/openqa/selenium/remote/tracing",
+        "@maven//:com_beust_jcommander",
+        "@maven//:com_google_auto_service_auto_service_annotations",
+        "@maven//:com_google_guava_guava",
     ],
 )

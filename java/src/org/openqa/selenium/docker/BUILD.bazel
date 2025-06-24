@@ -1,18 +1,31 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "docker",
-    srcs = glob(["**/*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/grid/node/docker:__pkg__",
-        "//java/test/org/openqa/selenium/docker:__subpackages__",
-        "//java/test/org/openqa/selenium/grid/node/docker:__pkg__",
+    srcs = [
+        "Container.java",
+        "ContainerConfig.java",
+        "ContainerId.java",
+        "ContainerInfo.java",
+        "ContainerLogs.java",
+        "Device.java",
+        "Docker.java",
+        "DockerException.java",
+        "DockerProtocol.java",
+        "Image.java",
+        "ImageId.java",
+        "Port.java",
+        "Version.java",
+        "VersionCommand.java",
     ],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/docker/internal",
+        "//java/src/org/openqa/selenium/docker/v1_41",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
         "//java/src/org/openqa/selenium/remote/http",
-        artifact("com.google.guava:guava"),
+        "@maven//:com_google_guava_guava",
     ],
 )

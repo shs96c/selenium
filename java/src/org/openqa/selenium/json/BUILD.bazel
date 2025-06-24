@@ -1,18 +1,39 @@
-load("//java:defs.bzl", "java_export")
-load("//java:version.bzl", "SE_VERSION")
+load("@rules_java//java:defs.bzl", "java_library")
 
-java_export(
+java_library(
     name = "json",
-    srcs = glob(["*.java"]),
-    maven_coordinates = "org.seleniumhq.selenium:selenium-json:%s" % SE_VERSION,
-    pom_template = "//java/src/org/openqa/selenium:template-pom",
-    tags = [
-        "release-artifact",
+    srcs = [
+        "BooleanCoercer.java",
+        "CollectionCoercer.java",
+        "EnumCoercer.java",
+        "Input.java",
+        "InstanceCoercer.java",
+        "InstantCoercer.java",
+        "Json.java",
+        "JsonException.java",
+        "JsonInput.java",
+        "JsonInputIterator.java",
+        "JsonOutput.java",
+        "JsonType.java",
+        "JsonTypeCoercer.java",
+        "MapCoercer.java",
+        "NumberCoercer.java",
+        "ObjectCoercer.java",
+        "PropertySetting.java",
+        "SimplePropertyDescriptor.java",
+        "StaticInitializerCoercer.java",
+        "StringCoercer.java",
+        "TypeCoercer.java",
+        "TypeToken.java",
+        "Types.java",
+        "UriCoercer.java",
+        "UrlCoercer.java",
+        "UuidCoercer.java",
     ],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/logging",
     ],
 )

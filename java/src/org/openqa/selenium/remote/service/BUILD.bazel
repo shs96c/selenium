@@ -1,0 +1,26 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "service",
+    srcs = [
+        "DriverCommandExecutor.java",
+        "DriverFinder.java",
+        "DriverService.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/remote",
+    ],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/concurrent",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/manager",
+        "//java/src/org/openqa/selenium/net",
+        "//java/src/org/openqa/selenium/os",
+        "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/http",
+        "@maven//:org_jspecify_jspecify",
+    ],
+)

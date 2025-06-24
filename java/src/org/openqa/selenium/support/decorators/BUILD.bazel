@@ -1,16 +1,21 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "decorators",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/remote:__subpackages__",
-        "//java/src/org/openqa/selenium/support:__subpackages__",
-        "//java/test/org/openqa/selenium/support/decorators:__pkg__",
+    srcs = [
+        "Decorated.java",
+        "DefaultDecorated.java",
+        "WebDriverDecorator.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/virtualauthenticator",
     ],
     deps = [
-        "//java/src/org/openqa/selenium:core",
-        artifact("net.bytebuddy:byte-buddy"),
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/virtualauthenticator",
+        "@maven//:net_bytebuddy_byte_buddy",
     ],
 )

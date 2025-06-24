@@ -1,24 +1,44 @@
-load("@rules_jvm_external//:defs.bzl", "artifact")
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "script",
-    srcs = glob(
-        [
-            "*.java",
-        ],
-    ),
-    visibility = [
-        "//java/src/org/openqa/selenium/bidi:__subpackages__",
-        "//java/src/org/openqa/selenium/firefox:__subpackages__",
-        "//java/src/org/openqa/selenium/remote:__pkg__",
-        "//java/test/org/openqa/selenium/bidi:__subpackages__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
+    srcs = [
+        "ArrayLocalValue.java",
+        "CallFunctionParameters.java",
+        "ChannelValue.java",
+        "ContextTarget.java",
+        "DateLocalValue.java",
+        "EvaluateParameters.java",
+        "EvaluateResult.java",
+        "EvaluateResultExceptionValue.java",
+        "EvaluateResultSuccess.java",
+        "ExceptionDetails.java",
+        "LocalValue.java",
+        "MapLocalValue.java",
+        "Message.java",
+        "NodeProperties.java",
+        "ObjectLocalValue.java",
+        "PrimitiveProtocolValue.java",
+        "PrimitiveType.java",
+        "RealmInfo.java",
+        "RealmTarget.java",
+        "RealmType.java",
+        "RegExpValue.java",
+        "RemoteReference.java",
+        "RemoteValue.java",
+        "ResultOwnership.java",
+        "SerializationOptions.java",
+        "SetLocalValue.java",
+        "Source.java",
+        "StackFrame.java",
+        "StackTrace.java",
+        "Target.java",
+        "WindowProxyProperties.java",
+        "WindowRealmInfo.java",
     ],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/remote/http",
-        artifact("com.google.auto.service:auto-service-annotations"),
     ],
 )

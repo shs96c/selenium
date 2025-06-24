@@ -1,0 +1,12 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "model",
+    srcs = ["LogEntry.java"],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium/logging"],
+    deps = [
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/logging",
+    ],
+)

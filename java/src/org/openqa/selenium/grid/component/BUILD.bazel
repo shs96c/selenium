@@ -1,14 +1,7 @@
-load("//java:defs.bzl", "java_library")
+load("@rules_java//java:defs.bzl", "java_library")
 
 java_library(
     name = "component",
-    srcs = glob(["*.java"]),
-    visibility = [
-        "//java/src/org/openqa/selenium/grid:__subpackages__",
-        "//java/src/org/openqa/selenium/netty/server:__pkg__",
-        "//java/test/org/openqa/selenium/grid:__subpackages__",
-    ],
-    deps = [
-        "//java/src/org/openqa/selenium:core",
-    ],
+    srcs = ["HasLifecycle.java"],
+    visibility = ["//:__subpackages__"],
 )

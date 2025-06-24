@@ -1,0 +1,20 @@
+load("@rules_java//java:defs.bzl", "java_library")
+
+java_library(
+    name = "events",
+    srcs = [
+        "CdpEventTypes.java",
+        "ConsoleEvent.java",
+        "DomMutationEvent.java",
+    ],
+    visibility = ["//:__subpackages__"],
+    exports = ["//java/src/org/openqa/selenium"],
+    deps = [
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/devtools",
+        "//java/src/org/openqa/selenium/devtools/idealized/runtime/model",
+        "//java/src/org/openqa/selenium/internal",
+        "//java/src/org/openqa/selenium/json",
+        "//java/src/org/openqa/selenium/logging",
+    ],
+)

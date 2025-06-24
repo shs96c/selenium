@@ -1,25 +1,27 @@
-load("//java:defs.bzl", "java_export")
-load("//java:version.bzl", "SE_VERSION")
+load("@rules_java//java:defs.bzl", "java_library")
 
-java_export(
+java_library(
     name = "edge",
-    srcs = glob(["*.java"]),
-    maven_coordinates = "org.seleniumhq.selenium:selenium-edge-driver:%s" % SE_VERSION,
-    pom_template = "//java/src/org/openqa/selenium:template-pom",
-    tags = [
-        "release-artifact",
+    srcs = [
+        "AddHasCasting.java",
+        "AddHasCdp.java",
+        "EdgeDriver.java",
+        "EdgeDriverInfo.java",
+        "EdgeDriverService.java",
+        "EdgeOptions.java",
     ],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//:__subpackages__"],
     exports = [
-        "//java/src/org/openqa/selenium/chromium",
+        "//java/src/org/openqa/selenium",
+        "//java/src/org/openqa/selenium/remote",
     ],
     deps = [
-        "//java:auto-service",
-        "//java/src/org/openqa/selenium:core",
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/chromium",
-        "//java/src/org/openqa/selenium/manager",
+        "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/remote",
+        "//java/src/org/openqa/selenium/remote/http",
+        "//java/src/org/openqa/selenium/remote/service",
+        "@maven//:com_google_auto_service_auto_service_annotations",
     ],
 )
