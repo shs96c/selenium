@@ -11,8 +11,8 @@ load("//java:defs.bzl", "artifact")
 # gazelle:prefix github.com/your/project
 # gazelle:java_maven_install_file java/maven_install.json
 # gazelle:exclude java/test
-# gazelle:exclude java/src/dev/selenium
 # gazelle:resolve java com.google.common.primitives @maven//:com_google_guava_guava
+# gazelle:resolve java com.github.bazelbuild.rules_jvm_external.zip @rules_jvm_external//private/tools/java/com/github/bazelbuild/rules_jvm_external/zip
 gazelle(
     name = "gazelle",
     gazelle = ":gazelle_bin",

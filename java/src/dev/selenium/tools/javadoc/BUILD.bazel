@@ -1,0 +1,18 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+java_library(
+    name = "javadoc",
+    srcs = ["JavadocJarMaker.java"],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//java/src/org/openqa/selenium/io",
+        "@rules_jvm_external//private/tools/java/com/github/bazelbuild/rules_jvm_external/zip",
+    ],
+)
+
+java_binary(
+    name = "JavadocJarMaker",
+    main_class = "dev.selenium.tools.javadoc.JavadocJarMaker",
+    visibility = ["//visibility:public"],
+    runtime_deps = [":javadoc"],
+)

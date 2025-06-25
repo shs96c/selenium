@@ -1,0 +1,21 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+
+java_library(
+    name = "modules",
+    srcs = ["ModuleGenerator.java"],
+    visibility = ["//:__subpackages__"],
+    exports = ["@maven//:net_bytebuddy_byte_buddy"],
+    deps = [
+        "//java/src/org/openqa/selenium/io",
+        "@maven//:com_github_javaparser_javaparser_core",
+        "@maven//:net_bytebuddy_byte_buddy",
+        "@rules_jvm_external//private/tools/java/com/github/bazelbuild/rules_jvm_external/zip",
+    ],
+)
+
+java_binary(
+    name = "ModuleGenerator",
+    main_class = "dev.selenium.tools.modules.ModuleGenerator",
+    visibility = ["//visibility:public"],
+    runtime_deps = [":modules"],
+)
