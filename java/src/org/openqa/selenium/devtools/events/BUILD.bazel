@@ -15,6 +15,5 @@ java_library(
         "//java/src/org/openqa/selenium/devtools/idealized/runtime/model",
         "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/logging",
     ],
 )

@@ -34,6 +34,5 @@ java_library(
     deps = [
         "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/internal",
-        "//java/src/org/openqa/selenium/logging",
     ],
 )

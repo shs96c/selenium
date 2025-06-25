@@ -4,9 +4,9 @@ java_library(
     name = "model",
     srcs = ["LogEntry.java"],
     visibility = ["//:__subpackages__"],
-    exports = ["//java/src/org/openqa/selenium/logging"],
+    exports = ["//java/src/org/openqa/selenium"],
     deps = [
+        "//java/src/org/openqa/selenium",
         "//java/src/org/openqa/selenium/internal",
-        "//java/src/org/openqa/selenium/logging",
     ],
 )

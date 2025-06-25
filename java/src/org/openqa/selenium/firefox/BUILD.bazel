@@ -40,7 +40,6 @@ java_library(
         "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/io",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/net",
         "//java/src/org/openqa/selenium/os",
         "//java/src/org/openqa/selenium/remote",
         "//java/src/org/openqa/selenium/remote/html5",

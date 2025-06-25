@@ -2,6 +2,13 @@ load("@rules_java//java:defs.bzl", "java_library")
 load("//java:defs.bzl", "java_export")
 load("//java:version.bzl", "SE_VERSION")
 
+# Included in the `selenium` target
+# gazelle:exclude logging
+# gazelle:exclude net
+# gazelle:resolve java org.openqa.selenium.logging //java/src/org/openqa/selenium:selenium
+# gazelle:resolve java org.openqa.selenium.logging.profiler //java/src/org/openqa/selenium:selenium
+# gazelle:resolve java org.openqa.selenium.net //java/src/org/openqa/selenium:selenium
+
 java_export(
     name = "core",
     hides = [
@@ -16,7 +23,7 @@ java_export(
         "release-artifact",
     ],
     visibility = ["//visibility:public"],
-    runtime_deps = [
+    exports = [
         ":selenium",
     ],
 )
@@ -92,13 +99,14 @@ java_library(
         "WindowType.java",
         "WrapsDriver.java",
         "WrapsElement.java",
-    ],
+    ] + glob([
+        "logging/*.java",  # keep
+        "logging/profiler/*.java",  # keep
+        "net/*.java",  # keep
+    ]),
     visibility = ["//:__subpackages__"],
-    exports = ["//java/src/org/openqa/selenium/logging"],
     deps = [
         "//java/src/org/openqa/selenium/internal",
-        "//java/src/org/openqa/selenium/logging",
-        "//java/src/org/openqa/selenium/net",
         "//java/src/org/openqa/selenium/print",
         "@maven//:org_jspecify_jspecify",
     ],

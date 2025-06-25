@@ -23,7 +23,6 @@ java_library(
         "//java/src/org/openqa/selenium/grid/node",
         "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/net",
         "//java/src/org/openqa/selenium/remote",
         "//java/src/org/openqa/selenium/remote/http",
         "//java/src/org/openqa/selenium/remote/service",

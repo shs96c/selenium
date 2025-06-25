@@ -36,7 +36,6 @@ java_library(
         "//java/src/org/openqa/selenium/html5",
         "//java/src/org/openqa/selenium/internal",
         "//java/src/org/openqa/selenium/json",
-        "//java/src/org/openqa/selenium/logging",
         "//java/src/org/openqa/selenium/remote",
         "//java/src/org/openqa/selenium/remote/html5",
         "//java/src/org/openqa/selenium/remote/http",
