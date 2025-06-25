@@ -103,7 +103,7 @@ java_library(
         "logging/*.java",  # keep
         "logging/profiler/*.java",  # keep
         "net/*.java",  # keep
-    ]),
+    ]),  # keep
     visibility = ["//:__subpackages__"],
     deps = [
         "//java/src/org/openqa/selenium/internal",
