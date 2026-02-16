@@ -121,21 +121,6 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
 
-  javascript/private:
-    dependencies:
-      balanced-match:
-        specifier: ^1.0.2
-        version: 1.0.2
-      brace-expansion:
-        specifier: ^2.0.1
-        version: 2.0.2
-      google-closure-deps:
-        specifier: ^20230802.0.0
-        version: 20230802.0.0
-      minimatch:
-        specifier: ^3.1.2
-        version: 3.1.2
-
   javascript/selenium-webdriver:
     dependencies:
       '@bazel/runfiles':
@@ -4226,6 +4211,7 @@ packages:
     dependencies:
       minimatch: 3.1.2
       yargs: 16.2.0
+    dev: true
 
   /gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
