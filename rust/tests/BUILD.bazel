@@ -1,6 +1,18 @@
 load("@crates//:defs.bzl", "all_crate_deps")
 load("//rust:defs.bzl", "rust_test_suite", "rustfmt_config")
 
+_CARGO_TOML = "rust/Cargo.toml"
+_DEPS = all_crate_deps(
+    package_name = _CARGO_TOML,
+    normal = True,
+    normal_dev = True,
+)
+_PROC_MACRO_DEPS = all_crate_deps(
+    package_name = _CARGO_TOML,
+    proc_macro = True,
+    proc_macro_dev = True,
+)
+
 rustfmt_config(
     name = "enable-rustfmt",
 )
@@ -27,9 +39,6 @@ rust_test_suite(
     deps = [
         "//rust:selenium_manager",
         "@rules_rust//tools/runfiles",
-    ] + all_crate_deps(
-        package_name = "rust",
-        normal = True,
-        normal_dev = True,
-    ),
+    ] + _DEPS,
+    proc_macro_deps = _PROC_MACRO_DEPS,
 )

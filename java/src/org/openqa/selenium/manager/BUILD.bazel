@@ -1,4 +1,4 @@
-load("//common:defs.bzl", "copy_file")
+load("//common:defs.bzl", "copy_binary")
 load("//java:defs.bzl", "java_export")
 load("//java:version.bzl", "SE_VERSION")
 
@@ -12,8 +12,10 @@ java_export(
     pom_template = "//java/src/org/openqa/selenium:template-pom",
     resources = [
         ":manager-linux",
+        ":manager-linux-arm64",
         ":manager-macos",
         ":manager-windows",
+        ":manager-windows-arm64",
     ],
     tags = [
         "release-artifact",
@@ -28,20 +30,32 @@ java_export(
     ],
 )
 
-copy_file(
+copy_binary(
     name = "manager-linux",
     src = "//common/manager:selenium-manager-linux",
     out = "linux/selenium-manager",
 )
 
-copy_file(
+copy_binary(
+    name = "manager-linux-arm64",
+    src = "//common/manager:selenium-manager-linux-arm64",
+    out = "linux-arm64/selenium-manager",
+)
+
+copy_binary(
     name = "manager-macos",
     src = "//common/manager:selenium-manager-macos",
     out = "macos/selenium-manager",
 )
 
-copy_file(
+copy_binary(
     name = "manager-windows",
     src = "//common/manager:selenium-manager-windows",
     out = "windows/selenium-manager.exe",
+)
+
+copy_binary(
+    name = "manager-windows-arm64",
+    src = "//common/manager:selenium-manager-windows-arm64",
+    out = "windows-arm64/selenium-manager.exe",
 )
