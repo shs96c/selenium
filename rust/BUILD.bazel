@@ -3,8 +3,16 @@ load("@rules_platform//platform_data:defs.bzl", "platform_data")
 load("//rust:defs.bzl", "rust_binary", "rust_library", "rust_test", "rustfmt_config")
 
 _CARGO_TOML = "rust/Cargo.toml"
-_DEPS = all_crate_deps(normal = True, package_name = _CARGO_TOML)
-_PROC_MACRO_DEPS = all_crate_deps(proc_macro = True, package_name = _CARGO_TOML)
+
+_DEPS = all_crate_deps(
+    package_name = _CARGO_TOML,
+    normal = True,
+)
+
+_PROC_MACRO_DEPS = all_crate_deps(
+    package_name = _CARGO_TOML,
+    proc_macro = True,
+)
 
 rustfmt_config(
     name = "enable-rustfmt",
@@ -13,40 +21,40 @@ rustfmt_config(
 platform_data(
     name = "selenium-manager-linux",
     platform = "//:linux_x86_64",
-    target = ":selenium-manager",
     tags = ["manual"],
+    target = ":selenium-manager",
     visibility = ["//common/manager:__pkg__"],
 )
 
 platform_data(
     name = "selenium-manager-linux-arm64",
     platform = "//:linux_arm64",
-    target = ":selenium-manager",
     tags = ["manual"],
+    target = ":selenium-manager",
     visibility = ["//common/manager:__pkg__"],
 )
 
 platform_data(
     name = "selenium-manager-macos",
     platform = "//:macos_arm64",
-    target = ":selenium-manager",
     tags = ["manual"],
+    target = ":selenium-manager",
     visibility = ["//common/manager:__pkg__"],
 )
 
 platform_data(
     name = "selenium-manager-windows",
     platform = "//:windows_x86_64",
-    target = ":selenium-manager",
     tags = ["manual"],
+    target = ":selenium-manager",
     visibility = ["//common/manager:__pkg__"],
 )
 
 platform_data(
     name = "selenium-manager-windows-arm64",
     platform = "//:windows_arm64",
-    target = ":selenium-manager",
     tags = ["manual"],
+    target = ":selenium-manager",
     visibility = ["//common/manager:__pkg__"],
 )
 
@@ -72,12 +80,12 @@ rust_binary(
     name = "selenium-manager",
     srcs = ["src/main.rs"],
     edition = "2024",
+    proc_macro_deps = _PROC_MACRO_DEPS,
     version = "0.4.41-nightly",
     visibility = ["//visibility:public"],
     deps = [
         ":selenium_manager",
     ] + _DEPS,
-    proc_macro_deps = _PROC_MACRO_DEPS,
 )
 
 rust_library(
@@ -92,9 +100,9 @@ rust_library(
         "//conditions:default": ["avoid_stats"],
     }),
     edition = "2024",
+    proc_macro_deps = _PROC_MACRO_DEPS,
     visibility = ["//rust:__subpackages__"],
     deps = _DEPS,
-    proc_macro_deps = _PROC_MACRO_DEPS,
 )
 
 filegroup(
