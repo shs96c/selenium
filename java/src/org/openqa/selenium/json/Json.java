@@ -17,12 +17,9 @@
 
 package org.openqa.selenium.json;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.UncheckedIOException;
-import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -130,13 +127,11 @@ public class Json {
    * @throws JsonException if an I/O exception is encountered
    */
   public String toJson(@Nullable Object toConvert, int maxDepth) {
-    try (Writer writer = new StringWriter();
-        JsonOutput jsonOutput = newOutput(writer)) {
+    StringBuilder builder = new StringBuilder();
+    try (JsonOutput jsonOutput = newOutput(builder)) {
       jsonOutput.write(toConvert, maxDepth);
-      return writer.toString();
-    } catch (IOException e) {
-      throw new JsonException("Cannot convert " + toConvert + " to json", e);
     }
+    return builder.toString();
   }
 
   /**
