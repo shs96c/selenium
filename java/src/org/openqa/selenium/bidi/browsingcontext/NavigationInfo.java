@@ -35,7 +35,7 @@ public class NavigationInfo {
       String browsingContextId, @Nullable String navigationId, long timestamp, String url) {
     this.browsingContextId = Require.nonNull("browsingContext", browsingContextId);
     this.navigationId = navigationId;
-    this.timestamp = timestamp;
+    this.timestamp = Require.positive("Timestamp", timestamp);
     this.url = Require.nonNull("URL", url);
   }
 
