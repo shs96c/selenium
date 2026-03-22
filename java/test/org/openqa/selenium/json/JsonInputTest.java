@@ -315,6 +315,50 @@ class JsonInputTest {
     }
   }
 
+  @Test
+  void skipValueShouldThrowOnDeeplyNestedInput() {
+    int depth = 1500;
+    StringBuilder json = new StringBuilder();
+    json.append("{\"key\":");
+    for (int i = 0; i < depth; i++) {
+      json.append('[');
+    }
+    for (int i = 0; i < depth; i++) {
+      json.append(']');
+    }
+    json.append('}');
+
+    try (JsonInput input = newInput(json.toString())) {
+      input.beginObject();
+      input.nextName();
+      assertThatExceptionOfType(JsonException.class)
+          .isThrownBy(input::skipValue)
+          .withMessageContaining("Maximum nesting depth");
+    }
+  }
+
+  @Test
+  void skipValueShouldWorkForModeratelyNestedInput() {
+    int depth = 50;
+    StringBuilder json = new StringBuilder();
+    json.append("{\"key\":");
+    for (int i = 0; i < depth; i++) {
+      json.append('[');
+    }
+    json.append("1");
+    for (int i = 0; i < depth; i++) {
+      json.append(']');
+    }
+    json.append('}');
+
+    try (JsonInput input = newInput(json.toString())) {
+      input.beginObject();
+      input.nextName();
+      input.skipValue();
+      input.endObject();
+    }
+  }
+
   private JsonInput newInput(String raw) {
     StringReader reader = new StringReader(raw);
     return new JsonInput(reader, new JsonTypeCoercer(), BY_NAME);

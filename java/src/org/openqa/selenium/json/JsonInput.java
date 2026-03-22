@@ -381,14 +381,29 @@ public class JsonInput implements Closeable {
   }
 
   /**
+   * Maximum nesting depth allowed when skipping values. This limits the depth of recursion to
+   * prevent stack overflow from maliciously crafted deeply nested JSON.
+   */
+  private static final int MAX_SKIP_DEPTH = 1000;
+
+  /**
    * Discard the pending JSON property value.
    *
-   * @throws JsonException if the pending element isn't a value type
+   * @throws JsonException if the pending element isn't a value type or nesting exceeds the maximum
+   *     allowed depth
    * @throws UncheckedIOException if an I/O exception is encountered
    */
-  // FIXME: This method doesn't verify that the prior element was a property name.
-  // FIXME: This method doesn't enforce a depth limit when processing container types.
   public void skipValue() {
+    skipValue(0);
+  }
+
+  private void skipValue(int depth) {
+    if (depth >= MAX_SKIP_DEPTH) {
+      throw new JsonException(
+          "Maximum nesting depth of " + MAX_SKIP_DEPTH + " exceeded while skipping value. "
+              + input);
+    }
+
     switch (peek()) {
       case BOOLEAN:
         nextBoolean();
@@ -409,7 +424,7 @@ public class JsonInput implements Closeable {
       case START_COLLECTION:
         beginArray();
         while (hasNext()) {
-          skipValue();
+          skipValue(depth + 1);
         }
         endArray();
         break;
@@ -418,7 +433,7 @@ public class JsonInput implements Closeable {
         beginObject();
         while (hasNext()) {
           nextName();
-          skipValue();
+          skipValue(depth + 1);
         }
         endObject();
         break;
