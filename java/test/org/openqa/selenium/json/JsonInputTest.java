@@ -72,6 +72,23 @@ class JsonInputTest {
   }
 
   @Test
+  void shouldParseNumbersExceedingLongRangeAsBigDecimal() {
+    try (JsonInput input = newInput("99999999999999999999")) {
+      Number number = input.nextNumber();
+      assertThat(number).isInstanceOf(java.math.BigDecimal.class);
+      assertThat(number.toString()).isEqualTo("99999999999999999999");
+    }
+  }
+
+  @Test
+  void shouldParseNegativeNumbersExceedingLongRangeAsBigDecimal() {
+    try (JsonInput input = newInput("-99999999999999999999")) {
+      Number number = input.nextNumber();
+      assertThat(number).isInstanceOf(java.math.BigDecimal.class);
+    }
+  }
+
+  @Test
   void shouldParseDecimalNumbersAsDoubles() {
     try (JsonInput input = newInput("42.0")) {
       assertThat(input.peek()).isEqualTo(NUMBER);

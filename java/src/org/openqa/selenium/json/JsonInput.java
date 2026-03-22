@@ -260,7 +260,13 @@ public class JsonInput implements Closeable {
       // Therefore, using a Long is only a fast path here, but we should not rely on the `double`
       // value below is a real floating point.
       if (!mightBeDecimal) {
-        return Long.valueOf(builder.toString());
+        String str = builder.toString();
+        try {
+          return Long.valueOf(str);
+        } catch (NumberFormatException e) {
+          // Number exceeds Long range; fall back to BigDecimal
+          return new BigDecimal(str);
+        }
       }
 
       return new BigDecimal(builder.toString()).doubleValue();
