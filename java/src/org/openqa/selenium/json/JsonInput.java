@@ -508,6 +508,39 @@ public class JsonInput implements Closeable {
   }
 
   /**
+   * Read a JSON object, coercing each field to its declared type. Unknown fields are skipped. This
+   * eliminates the typical switch/case boilerplate in {@code fromJson} methods.
+   *
+   * <p>Example usage:
+   *
+   * <pre>{@code
+   * Map<String, Object> v = input.readObject(Map.of(
+   *     "name", String.class,
+   *     "age", Integer.class));
+   * return new Person((String) v.get("name"), (Integer) v.get("age"));
+   * }</pre>
+   *
+   * @param fields mapping of JSON key names to their expected types
+   * @return map of JSON key names to their coerced values (only keys present in the JSON)
+   */
+  public Map<String, Object> readObject(Map<String, Type> fields) {
+    markReadPerformed();
+    Map<String, Object> result = new java.util.LinkedHashMap<>();
+    beginObject();
+    while (hasNext()) {
+      String key = nextName();
+      Type type = fields.get(key);
+      if (type != null) {
+        result.put(key, coercer.coerce(this, type, setter));
+      } else {
+        skipValue();
+      }
+    }
+    endObject();
+    return result;
+  }
+
+  /**
    * Read an array of elements from the JSON input stream with elements as the specified type.
    *
    * @param type data type for deserialization (class or {@link TypeToken})

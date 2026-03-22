@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -403,6 +404,33 @@ class JsonInputTest {
       Object value = input.read(String.class);
 
       assertThat(value).isNull();
+    }
+  }
+
+  @Test
+  void readObjectShouldCoerceFieldsByType() {
+    String raw = "{\"name\": \"cheddar\", \"age\": 42, \"extra\": true}";
+
+    try (JsonInput input = newInput(raw)) {
+      Map<String, Object> result = input.readObject(Map.of(
+          "name", (Type) String.class,
+          "age", (Type) Integer.class));
+
+      assertThat(result.get("name")).isEqualTo("cheddar");
+      assertThat(result.get("age")).isEqualTo(42);
+      assertThat(result).doesNotContainKey("extra");
+    }
+  }
+
+  @Test
+  void readObjectShouldHandleEmptyObject() {
+    String raw = "{}";
+
+    try (JsonInput input = newInput(raw)) {
+      Map<String, Object> result = input.readObject(Map.of(
+          "name", (Type) String.class));
+
+      assertThat(result).isEmpty();
     }
   }
 
