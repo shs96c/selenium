@@ -28,6 +28,7 @@ build --tool_java_runtime_version=remotejdk_21
 
 # We target java 11 by default
 build --javacopt="--release 11"
+build --javacopt="-parameters"
 
 # Require java dependencies to be used and first-order
 build --experimental_strict_java_deps=strict
