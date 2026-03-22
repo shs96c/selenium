@@ -49,6 +49,8 @@ public class JsonInput implements Closeable {
   // Used when reading maps and collections so that we handle de-nesting and
   // figuring out whether we're expecting a NAME properly.
   private final Deque<Container> stack = new ArrayDeque<>();
+  // Reusable buffer for string reading to reduce allocation pressure
+  private final StringBuilder stringBuffer = new StringBuilder(256);
 
   JsonInput(Reader source, JsonTypeCoercer coercer, PropertySetting setter) {
 
@@ -607,20 +609,20 @@ public class JsonInput implements Closeable {
   private String readString() {
     input.read(); // Skip leading quote
 
-    StringBuilder builder = new StringBuilder();
+    stringBuffer.setLength(0);
     char c;
     while (true) {
       c = input.read();
       switch (c) {
         case Input.EOF:
-          throw new JsonException("Unterminated string: " + builder + ". " + input);
+          throw new JsonException("Unterminated string: " + stringBuffer + ". " + input);
         case '"': // terminate string
-          return builder.toString();
+          return stringBuffer.toString();
         case '\\': // quoted char
-          readEscape(builder);
+          readEscape(stringBuffer);
           break;
         default:
-          builder.append(c);
+          stringBuffer.append(c);
       }
     }
   }
