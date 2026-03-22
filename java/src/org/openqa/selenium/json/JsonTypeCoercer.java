@@ -116,6 +116,7 @@ class JsonTypeCoercer {
     builder.add(new CollectionCoercer<>(Set.class, this, HashSet::new, (set) -> set::add));
 
     builder.add(new StaticInitializerCoercer());
+    builder.add(new ConstructorCoercer(this));
 
     builder.add(new MapCoercer<>(Map.class, this, LinkedHashMap::new, (map) -> map::put));
 

@@ -193,16 +193,11 @@ class JsonTest {
   }
 
   @Test
-  void canNotPopulateAnObjectOfAClassWithNoDefaultConstructor() {
+  void canPopulateAnObjectOfAClassWithNoDefaultConstructorViaConstructorCoercer() {
     String raw = "{\"value\": \"time\"}";
 
-    assertThatExceptionOfType(JsonException.class)
-        .isThrownBy(() -> new Json().toType(raw, NoDefaultConstructor.class))
-        .withMessage("Unable to parse: {\"value\": \"time\"}")
-        .havingCause()
-        .isInstanceOf(JsonException.class)
-        .withMessageStartingWith(
-            "Unable to find type coercer for class %s", NoDefaultConstructor.class.getTypeName());
+    NoDefaultConstructor result = new Json().toType(raw, NoDefaultConstructor.class);
+    assertThat(result.getValue()).isEqualTo("time");
   }
 
   @Test
@@ -605,6 +600,67 @@ class JsonTest {
     assertThat(roundTripped.get("float")).isEqualTo("3.14");
   }
 
+  @Test
+  void canDeserializeImmutableClassViaConstructorParameters() {
+    String raw = "{\"name\": \"cheese\", \"age\": 42}";
+
+    ImmutablePerson person = new Json().toType(raw, ImmutablePerson.class);
+
+    assertThat(person.name).isEqualTo("cheese");
+    assertThat(person.age).isEqualTo(42);
+  }
+
+  @Test
+  void canDeserializeImmutableClassWithJsonAliases() {
+    String raw = "{\"ctx\": \"abc123\", \"nav\": \"def456\"}";
+
+    AliasedImmutable result = new Json().toType(raw, AliasedImmutable.class);
+
+    assertThat(result.context).isEqualTo("abc123");
+    assertThat(result.navigation).isEqualTo("def456");
+  }
+
+  @Test
+  void constructorCoercerSkipsUnknownFields() {
+    String raw = "{\"name\": \"brie\", \"age\": 5, \"unknown\": true}";
+
+    ImmutablePerson person = new Json().toType(raw, ImmutablePerson.class);
+
+    assertThat(person.name).isEqualTo("brie");
+    assertThat(person.age).isEqualTo(5);
+  }
+
+  @Test
+  void constructorCoercerHandlesMissingNullableFields() {
+    // Only "name" provided, "age" (primitive int) should get default 0
+    String raw = "{\"name\": \"cheddar\"}";
+
+    ImmutablePerson person = new Json().toType(raw, ImmutablePerson.class);
+
+    assertThat(person.name).isEqualTo("cheddar");
+    assertThat(person.age).isEqualTo(0);
+  }
+
+  @Test
+  void constructorCoercerWorksWithNestedTypes() {
+    String raw = "{\"label\": \"home\", \"person\": {\"name\": \"gouda\", \"age\": 10}}";
+
+    ImmutableWrapper wrapper = new Json().toType(raw, ImmutableWrapper.class);
+
+    assertThat(wrapper.label).isEqualTo("home");
+    assertThat(wrapper.person.name).isEqualTo("gouda");
+    assertThat(wrapper.person.age).isEqualTo(10);
+  }
+
+  @Test
+  void classWithFromJsonStillUsesStaticInitializer() {
+    // Classes that have fromJson should still use StaticInitializerCoercer, not ConstructorCoercer
+    String raw = "{\"cheese\": \"brie\"}";
+
+    MapTakingFromJsonMethod obj = new Json().toType(raw, MapTakingFromJsonMethod.class);
+    assertThat(obj.cheese).isEqualTo("brie");
+  }
+
   public static class BeanWithSetter {
 
     String theName;
@@ -735,5 +791,43 @@ class JsonTest {
     Instant birth;
     Date wedding;
     Instant death;
+  }
+
+  // No fromJson, no no-arg constructor. Should be handled by ConstructorCoercer.
+  public static class ImmutablePerson {
+    final String name;
+    final int age;
+
+    public ImmutablePerson(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+
+  // Has jsonAliases to map JSON keys to constructor param names.
+  public static class AliasedImmutable {
+    final String context;
+    final String navigation;
+
+    public AliasedImmutable(String context, String navigation) {
+      this.context = context;
+      this.navigation = navigation;
+    }
+
+    @SuppressWarnings("unused")
+    private static java.util.Map<String, String> jsonAliases() {
+      return java.util.Map.of("ctx", "context", "nav", "navigation");
+    }
+  }
+
+  // Nested immutable types
+  public static class ImmutableWrapper {
+    final String label;
+    final ImmutablePerson person;
+
+    public ImmutableWrapper(String label, ImmutablePerson person) {
+      this.label = label;
+      this.person = person;
+    }
   }
 }
