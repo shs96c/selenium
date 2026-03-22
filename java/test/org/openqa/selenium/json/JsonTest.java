@@ -251,18 +251,14 @@ class JsonTest {
   }
 
   @Test
-  void reportsTooLargeNumericValue() {
+  void parsesLargeNumericValueWithoutThrowing() {
+    // Numbers exceeding Long range are now parsed as BigDecimal and coerced via longValue()
     String raw = "{\"id\": 123456789012345678901234567890}";
 
-    assertThatThrownBy(() -> new Json().toType(raw, NumericValues.class, BY_FIELD))
-        .isInstanceOf(JsonException.class)
-        .hasMessageStartingWith("Unable to parse: " + raw)
-        .cause()
-        .isInstanceOf(JsonException.class)
-        .hasMessageStartingWith("Unable to parse to a number: 123456789012345678901234567890")
-        .cause()
-        .isInstanceOf(NumberFormatException.class)
-        .hasMessage("For input string: \"123456789012345678901234567890\"");
+    NumericValues bean = new Json().toType(raw, NumericValues.class, BY_FIELD);
+    // The value is truncated when coerced to long, same as BigDecimal.longValue()
+    assertThat(bean.id)
+        .isEqualTo(new java.math.BigDecimal("123456789012345678901234567890").longValue());
   }
 
   @Test

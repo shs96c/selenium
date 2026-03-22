@@ -254,6 +254,19 @@ public class JsonInput implements Closeable {
       }
     } while (read);
 
+    // Validate: no leading zeros in the integer part (RFC 8259 §6).
+    // After optional sign, if the first digit is '0', it must be alone or followed by '.' / 'e'.
+    String raw = builder.toString();
+    int intStart = 0;
+    if (raw.length() > 0 && (raw.charAt(0) == '-' || raw.charAt(0) == '+')) {
+      intStart = 1;
+    }
+    if (raw.length() > intStart + 1
+        && raw.charAt(intStart) == '0'
+        && Character.isDigit(raw.charAt(intStart + 1))) {
+      throw new JsonException("Leading zeros are not allowed in JSON numbers: " + raw + ". " + input);
+    }
+
     try {
       // The JSON Schema does state the decimal point should not be used distinguish between
       // integers and floating point values.

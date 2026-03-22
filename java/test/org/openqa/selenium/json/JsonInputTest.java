@@ -89,6 +89,41 @@ class JsonInputTest {
   }
 
   @Test
+  void shouldRejectLeadingZerosInIntegers() {
+    try (JsonInput input = newInput("0123")) {
+      assertThatExceptionOfType(JsonException.class).isThrownBy(input::nextNumber);
+    }
+  }
+
+  @Test
+  void shouldRejectMultipleLeadingZeros() {
+    try (JsonInput input = newInput("00")) {
+      assertThatExceptionOfType(JsonException.class).isThrownBy(input::nextNumber);
+    }
+  }
+
+  @Test
+  void shouldAcceptZeroAlone() {
+    try (JsonInput input = newInput("0")) {
+      assertThat(input.nextNumber()).isEqualTo(0L);
+    }
+  }
+
+  @Test
+  void shouldAcceptNegativeZero() {
+    try (JsonInput input = newInput("-0")) {
+      assertThat(input.nextNumber()).isEqualTo(0L);
+    }
+  }
+
+  @Test
+  void shouldAcceptZeroPointSomething() {
+    try (JsonInput input = newInput("0.5")) {
+      assertThat((Double) input.nextNumber()).isEqualTo(0.5d);
+    }
+  }
+
+  @Test
   void shouldParseDecimalNumbersAsDoubles() {
     try (JsonInput input = newInput("42.0")) {
       assertThat(input.peek()).isEqualTo(NUMBER);
