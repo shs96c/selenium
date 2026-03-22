@@ -33,10 +33,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -106,6 +108,7 @@ public class JsonOutput implements Closeable {
   }
 
   private final Map<Predicate<Class<?>>, DepthAwareConsumer> converters;
+  private final Map<Class<?>, DepthAwareConsumer> converterCache = new HashMap<>();
   private final Appendable appendable;
   private final Consumer<String> appender;
   private final Deque<Node> stack;
@@ -407,12 +410,18 @@ public class JsonOutput implements Closeable {
       append("null");
       return this;
     }
-    converters.entrySet().stream()
-        .filter(entry -> entry.getKey().test(input.getClass()))
-        .findFirst()
-        .map(Map.Entry::getValue)
-        .orElseThrow(() -> new JsonException("Unable to write " + input))
-        .consume(input, maxDepth, depthRemaining);
+    Class<?> clazz = input.getClass();
+    DepthAwareConsumer consumer = converterCache.get(clazz);
+    if (consumer == null) {
+      consumer =
+          converters.entrySet().stream()
+              .filter(entry -> entry.getKey().test(clazz))
+              .findFirst()
+              .map(Map.Entry::getValue)
+              .orElseThrow(() -> new JsonException("Unable to write " + input));
+      converterCache.put(clazz, consumer);
+    }
+    consumer.consume(input, maxDepth, depthRemaining);
 
     return this;
   }
@@ -469,6 +478,9 @@ public class JsonOutput implements Closeable {
     return toReturn.toString();
   }
 
+  private static final Object NO_METHOD = new Object();
+  private static final Map<String, Object> METHOD_PRESENCE_CACHE = new ConcurrentHashMap<>();
+
   /**
    * Get a reference to a method of the specified name with no argument in the indicated class or
    * one of its ancestors.
@@ -479,6 +491,21 @@ public class JsonOutput implements Closeable {
    * @throws JsonException if a security violation is encountered
    */
   private @Nullable Method getMethod(Class<?> clazz, String methodName) {
+    String cacheKey = clazz.getName() + "#" + methodName;
+    Object cached = METHOD_PRESENCE_CACHE.get(cacheKey);
+    if (cached == NO_METHOD) {
+      return null;
+    }
+    if (cached instanceof Method) {
+      return (Method) cached;
+    }
+
+    Method result = findMethod(clazz, methodName);
+    METHOD_PRESENCE_CACHE.put(cacheKey, result != null ? result : NO_METHOD);
+    return result;
+  }
+
+  private @Nullable Method findMethod(Class<?> clazz, String methodName) {
     if (Object.class.equals(clazz)) {
       return null;
     }
@@ -488,7 +515,7 @@ public class JsonOutput implements Closeable {
       method.setAccessible(true);
       return method;
     } catch (NoSuchMethodException e) {
-      return getMethod(clazz.getSuperclass(), methodName);
+      return findMethod(clazz.getSuperclass(), methodName);
     } catch (SecurityException e) {
       throw new JsonException(
           "Unable to find the method because of a security constraint: " + methodName, e);
