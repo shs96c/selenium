@@ -38,6 +38,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -775,6 +776,33 @@ class JsonOutputTest {
 
     assertThatExceptionOfType(JsonException.class)
         .isThrownBy(() -> jsonOutput.write(finalValue, maxDepth));
+  }
+
+  @Test
+  void shouldQuoteFilePathsAsJsonStrings() {
+    File file = new File("/tmp/test-file");
+    String json = convert(file);
+
+    assertThat(json).startsWith("\"");
+    assertThat(json).endsWith("\"");
+
+    // Round-trip: should deserialize back to a valid string
+    String parsed = new Json().toType(json, String.class);
+    assertThat(parsed).isEqualTo(file.getAbsolutePath());
+  }
+
+  @Test
+  void shouldSerializePrimitiveIntArray() {
+    int[] array = {1, 2, 3};
+    String json = convert(array);
+
+    assertThat(json).contains("1");
+    assertThat(json).contains("2");
+    assertThat(json).contains("3");
+
+    // Should be valid JSON array
+    List<?> parsed = new Json().toType(json, List.class);
+    assertThat(parsed).hasSize(3);
   }
 
   private String convert(Object toConvert) {

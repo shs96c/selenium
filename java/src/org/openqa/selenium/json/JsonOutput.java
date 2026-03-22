@@ -22,6 +22,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
@@ -149,7 +150,7 @@ public class JsonOutput implements Closeable {
         Enum.class::isAssignableFrom, (obj, maxDepth, depthRemaining) -> append(asString(obj)));
     builder.put(
         File.class::isAssignableFrom,
-        (obj, maxDepth, depthRemaining) -> append(((File) obj).getAbsolutePath()));
+        (obj, maxDepth, depthRemaining) -> append(asString(((File) obj).getAbsolutePath())));
     builder.put(
         URI.class::isAssignableFrom,
         (obj, maxDepth, depthRemaining) -> append(asString((obj).toString())));
@@ -228,9 +229,13 @@ public class JsonOutput implements Closeable {
                 "Reached the maximum depth of " + maxDepth + " while writing JSON");
           }
           beginArray();
-          Stream.of((Object[]) obj)
-              .filter(o -> (!(o instanceof Optional) || ((Optional<?>) o).isPresent()))
-              .forEach(o -> write0(o, maxDepth, depthRemaining - 1));
+          int length = Array.getLength(obj);
+          for (int i = 0; i < length; i++) {
+            Object element = Array.get(obj, i);
+            if (!(element instanceof Optional) || ((Optional<?>) element).isPresent()) {
+              write0(element, maxDepth, depthRemaining - 1);
+            }
+          }
           endArray();
         });
 
