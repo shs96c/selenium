@@ -77,34 +77,23 @@ public class JsonOutput implements Closeable {
   // https://github.com/google/gson/issues/341 so we escape those as well.
   // It's legal to escape any character, so to be nice to HTML parsers,
   // we'll also escape "<" and "&"
-  private static final Map<Integer, String> ESCAPES;
+  private static final String[] ASCII_ESCAPES = new String[128];
 
   static {
-    // increased initial capacity to avoid hash collisions, especially for the following ranges:
-    // '0' to '9', 'a' to 'z', 'A' to 'Z'
-    Map<Integer, String> builder = new LinkedHashMap<>(128);
-
     for (int i = 0; i <= 0x1f; i++) {
-      // We want nice looking escapes for these, which are called out
-      // by json.org
-      if (!(i == '\b' || i == '\f' || i == '\n' || i == '\r' || i == '\t')) {
-        builder.put(i, String.format("\\u%04x", i));
-      }
+      ASCII_ESCAPES[i] = String.format("\\u%04x", i);
     }
-
-    builder.put((int) '"', "\\\"");
-    builder.put((int) '\\', "\\\\");
-    builder.put((int) '/', "\\u002f");
-    builder.put((int) '\b', "\\b");
-    builder.put((int) '\f', "\\f");
-    builder.put((int) '\n', "\\n");
-    builder.put((int) '\r', "\\r");
-    builder.put((int) '\t', "\\t");
-
-    builder.put((int) '\u2028', "\\u2028");
-    builder.put((int) '<', String.format("\\u%04x", (int) '<'));
-    builder.put((int) '&', String.format("\\u%04x", (int) '&'));
-    ESCAPES = Collections.unmodifiableMap(builder);
+    // Override common control characters with readable escapes
+    ASCII_ESCAPES['\b'] = "\\b";
+    ASCII_ESCAPES['\f'] = "\\f";
+    ASCII_ESCAPES['\n'] = "\\n";
+    ASCII_ESCAPES['\r'] = "\\r";
+    ASCII_ESCAPES['\t'] = "\\t";
+    ASCII_ESCAPES['"'] = "\\\"";
+    ASCII_ESCAPES['\\'] = "\\\\";
+    ASCII_ESCAPES['/'] = "\\u002f";
+    ASCII_ESCAPES['<'] = String.format("\\u%04x", (int) '<');
+    ASCII_ESCAPES['&'] = String.format("\\u%04x", (int) '&');
   }
 
   private final Map<Predicate<Class<?>>, DepthAwareConsumer> converters;
@@ -459,22 +448,27 @@ public class JsonOutput implements Closeable {
    * @return quoted JSON string
    */
   private String asString(Object obj) {
-    StringBuilder toReturn = new StringBuilder("\"");
-
-    String.valueOf(obj)
-        .chars()
-        .forEach(
-            i -> {
-              String escaped = ESCAPES.get(i);
-              if (escaped != null) {
-                toReturn.append(escaped);
-              } else {
-                toReturn.append((char) i);
-              }
-            });
-
+    String str = String.valueOf(obj);
+    StringBuilder toReturn = new StringBuilder(str.length() + 2);
     toReturn.append('"');
 
+    for (int i = 0; i < str.length(); i++) {
+      char c = str.charAt(i);
+      if (c < 128) {
+        String escaped = ASCII_ESCAPES[c];
+        if (escaped != null) {
+          toReturn.append(escaped);
+        } else {
+          toReturn.append(c);
+        }
+      } else if (c == '\u2028') {
+        toReturn.append("\\u2028");
+      } else {
+        toReturn.append(c);
+      }
+    }
+
+    toReturn.append('"');
     return toReturn.toString();
   }
 
