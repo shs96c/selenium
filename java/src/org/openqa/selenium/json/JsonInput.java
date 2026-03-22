@@ -691,7 +691,8 @@ public class JsonInput implements Closeable {
    * @throws UncheckedIOException if an I/O exception is encountered
    */
   private void skipWhitespace(Input input) {
-    while (input.peek() != Input.EOF && Character.isWhitespace(input.peek())) {
+    char c;
+    while ((c = input.peek()) != Input.EOF && (c == ' ' || c == '\t' || c == '\n' || c == '\r')) {
       input.read();
     }
   }

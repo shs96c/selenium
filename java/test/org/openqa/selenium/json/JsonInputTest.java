@@ -407,6 +407,26 @@ class JsonInputTest {
   }
 
   @Test
+  void shouldRejectVerticalTabAsWhitespace() {
+    // Vertical tab (0x0B) is treated as whitespace by Character.isWhitespace()
+    // but is not valid JSON whitespace per RFC 8259 §2 (only SP, HT, LF, CR)
+    String raw = "{\u000B\"key\": 1}";
+    try (JsonInput input = newInput(raw)) {
+      assertThatExceptionOfType(JsonException.class).isThrownBy(() -> input.read(MAP_TYPE));
+    }
+  }
+
+  @Test
+  void shouldAcceptStandardJsonWhitespace() {
+    // Space, tab, CR, LF are the four valid JSON whitespace characters
+    String raw = "{ \t\r\n\"key\" \t:\r\n 1 \t\r\n}";
+    try (JsonInput input = newInput(raw)) {
+      Map<String, Object> map = input.read(MAP_TYPE);
+      assertThat(map.get("key")).isEqualTo(1L);
+    }
+  }
+
+  @Test
   void skipValueShouldThrowOnDeeplyNestedInput() {
     int depth = 1500;
     StringBuilder json = new StringBuilder();
