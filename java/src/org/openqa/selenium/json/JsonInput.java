@@ -614,7 +614,6 @@ public class JsonInput implements Closeable {
    * @throws JsonException if an unsupported escape sequence is found
    * @throws UncheckedIOException if an I/O exception is encountered
    */
-  // FIXME: This function doesn't appear to support UTF-8 or UTF-32.
   private void readEscape(StringBuilder builder) {
     char read = input.read();
 

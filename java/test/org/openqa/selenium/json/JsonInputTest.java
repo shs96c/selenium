@@ -241,6 +241,45 @@ class JsonInputTest {
   }
 
   @Test
+  void shouldDecodeSurrogatePairEscapes() {
+    // U+1F600 (grinning face) is encoded as surrogate pair \uD83D\uDE00
+    String raw = "\"\\uD83D\\uDE00\"";
+
+    try (JsonInput input = newInput(raw)) {
+      String result = input.nextString();
+      // Java strings are UTF-16, so surrogate pairs are stored as two chars
+      assertThat(result).hasSize(2);
+      assertThat(result.codePointAt(0)).isEqualTo(0x1F600);
+      assertThat(result).isEqualTo("\uD83D\uDE00");
+    }
+  }
+
+  @Test
+  void shouldDecodeSupplementaryCharacterInObjectValue() {
+    // U+1D11E (musical symbol G clef) as surrogate pair
+    String raw = "{\"symbol\": \"\\uD834\\uDD1E\"}";
+
+    try (JsonInput in = new JsonInput(new StringReader(raw), new JsonTypeCoercer(), BY_NAME)) {
+      Map<String, Object> map = in.read(MAP_TYPE);
+      String symbol = (String) map.get("symbol");
+      assertThat(symbol.codePointAt(0)).isEqualTo(0x1D11E);
+    }
+  }
+
+  @Test
+  void shouldHandleMixedSurrogatePairsAndBmpCharacters() {
+    // Mix of BMP (\u0041 = 'A') and supplementary (\uD83D\uDE00 = grinning face)
+    String raw = "\"\\u0041\\uD83D\\uDE00\\u0042\"";
+
+    try (JsonInput input = newInput(raw)) {
+      String result = input.nextString();
+      assertThat(result).startsWith("A");
+      assertThat(result).endsWith("B");
+      assertThat(result.codePointAt(1)).isEqualTo(0x1F600);
+    }
+  }
+
+  @Test
   void shouldCallFromJsonWithJsonInputParameter() {
     String raw = "{\"message\": \"Cheese!\"}";
 
