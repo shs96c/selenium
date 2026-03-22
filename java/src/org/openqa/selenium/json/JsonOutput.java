@@ -33,12 +33,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -96,8 +94,16 @@ public class JsonOutput implements Closeable {
     ASCII_ESCAPES['&'] = String.format("\\u%04x", (int) '&');
   }
 
+  private static final int CONVERTER_CACHE_SIZE = 128;
+
   private final Map<Predicate<Class<?>>, DepthAwareConsumer> converters;
-  private final Map<Class<?>, DepthAwareConsumer> converterCache = new HashMap<>();
+  private final Map<Class<?>, DepthAwareConsumer> converterCache =
+      new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Class<?>, DepthAwareConsumer> eldest) {
+          return size() > CONVERTER_CACHE_SIZE;
+        }
+      };
   private final Appendable appendable;
   private final Consumer<String> appender;
   private final Deque<Node> stack;
@@ -472,8 +478,16 @@ public class JsonOutput implements Closeable {
     return toReturn.toString();
   }
 
+  private static final int METHOD_CACHE_SIZE = 256;
   private static final Object NO_METHOD = new Object();
-  private static final Map<String, Object> METHOD_PRESENCE_CACHE = new ConcurrentHashMap<>();
+  private static final Map<String, Object> METHOD_PRESENCE_CACHE =
+      Collections.synchronizedMap(
+          new LinkedHashMap<>(16, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<String, Object> eldest) {
+              return size() > METHOD_CACHE_SIZE;
+            }
+          });
 
   /**
    * Get a reference to a method of the specified name with no argument in the indicated class or
