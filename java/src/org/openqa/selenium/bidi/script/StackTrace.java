@@ -17,14 +17,11 @@
 
 package org.openqa.selenium.bidi.script;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.openqa.selenium.json.JsonInput;
-import org.openqa.selenium.json.TypeToken;
 
 public class StackTrace {
 
@@ -36,24 +33,6 @@ public class StackTrace {
 
   public List<StackFrame> getCallFrames() {
     return callFrames;
-  }
-
-  public static StackTrace fromJson(JsonInput input) {
-
-    List<StackFrame> callFrames = emptyList();
-
-    input.beginObject();
-    while (input.hasNext()) {
-      if ("callFrames".equals(input.nextName())) {
-        callFrames = input.readNonNull(new TypeToken<List<StackFrame>>() {}.getType());
-      } else {
-        input.skipValue();
-      }
-    }
-
-    input.endObject();
-
-    return new StackTrace(callFrames);
   }
 
   private Map<String, Object> toJson() {

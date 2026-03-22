@@ -17,9 +17,9 @@
 
 package org.openqa.selenium.bidi.browsingcontext;
 
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.internal.Require;
-import org.openqa.selenium.json.JsonInput;
 
 public class NavigationInfo {
 
@@ -33,50 +33,15 @@ public class NavigationInfo {
 
   protected NavigationInfo(
       String browsingContextId, @Nullable String navigationId, long timestamp, String url) {
-    this.browsingContextId = browsingContextId;
+    this.browsingContextId = Require.nonNull("browsingContext", browsingContextId);
     this.navigationId = navigationId;
     this.timestamp = timestamp;
-    this.url = url;
+    this.url = Require.nonNull("URL", url);
   }
 
-  static NavigationInfo fromJson(JsonInput input) {
-    String browsingContextId = null;
-    String navigationId = null;
-    Long timestamp = null;
-    String url = null;
-
-    input.beginObject();
-    while (input.hasNext()) {
-      switch (input.nextName()) {
-        case "context":
-          browsingContextId = input.read(String.class);
-          break;
-
-        case "navigation":
-          navigationId = input.read(String.class);
-          break;
-
-        case "timestamp":
-          timestamp = input.read(Long.class);
-          break;
-
-        case "url":
-          url = input.read(String.class);
-          break;
-
-        default:
-          input.skipValue();
-          break;
-      }
-    }
-
-    input.endObject();
-
-    return new NavigationInfo(
-        Require.nonNull("browsingContext", browsingContextId),
-        navigationId,
-        Require.positive("Timestamp", timestamp),
-        Require.nonNull("URL", url));
+  @SuppressWarnings("unused")
+  private static Map<String, String> jsonAliases() {
+    return Map.of("context", "browsingContextId", "navigation", "navigationId");
   }
 
   public String getBrowsingContextId() {
