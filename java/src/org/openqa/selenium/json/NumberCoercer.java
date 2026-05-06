@@ -19,6 +19,7 @@ package org.openqa.selenium.json;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -80,7 +81,55 @@ class NumberCoercer<T extends Number> extends TypeCoercer<T> {
         default:
           throw new JsonException("Unable to coerce to a number: " + jsonInput.peek());
       }
+      validateIntegerRange(number);
       return mapper.apply(number);
     };
+  }
+
+  private void validateIntegerRange(Number number) {
+    if (!isIntegerType()) {
+      return;
+    }
+
+    try {
+      BigDecimal decimal = toBigDecimal(number);
+      if (Byte.class.equals(stereotype)) {
+        decimal.byteValueExact();
+      } else if (Short.class.equals(stereotype)) {
+        decimal.shortValueExact();
+      } else if (Integer.class.equals(stereotype)) {
+        decimal.intValueExact();
+      } else if (Long.class.equals(stereotype)) {
+        decimal.longValueExact();
+      }
+    } catch (ArithmeticException e) {
+      throw new JsonException(
+          "Numeric value cannot be represented as " + stereotype.getSimpleName() + ": " + number,
+          e);
+    }
+  }
+
+  private boolean isIntegerType() {
+    return Byte.class.equals(stereotype)
+        || Short.class.equals(stereotype)
+        || Integer.class.equals(stereotype)
+        || Long.class.equals(stereotype);
+  }
+
+  private BigDecimal toBigDecimal(Number number) {
+    if (number instanceof BigDecimal) {
+      return (BigDecimal) number;
+    }
+    if (number instanceof Byte
+        || number instanceof Short
+        || number instanceof Integer
+        || number instanceof Long) {
+      return BigDecimal.valueOf(number.longValue());
+    }
+    double value = number.doubleValue();
+    if (!Double.isFinite(value)) {
+      throw new ArithmeticException("Non-finite numeric value: " + number);
+    }
+    return BigDecimal.valueOf(value);
   }
 }

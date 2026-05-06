@@ -17,7 +17,7 @@
 
 package org.openqa.selenium.bidi.browsingcontext;
 
-import java.util.Map;
+import java.beans.ConstructorProperties;
 import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.internal.Require;
 
@@ -31,17 +31,13 @@ public class NavigationInfo {
 
   private final String url;
 
+  @ConstructorProperties({"context", "navigation", "timestamp", "url"})
   protected NavigationInfo(
       String browsingContextId, @Nullable String navigationId, long timestamp, String url) {
     this.browsingContextId = Require.nonNull("browsingContext", browsingContextId);
     this.navigationId = navigationId;
     this.timestamp = Require.positive("Timestamp", timestamp);
     this.url = Require.nonNull("URL", url);
-  }
-
-  @SuppressWarnings("unused")
-  private static Map<String, String> jsonAliases() {
-    return Map.of("context", "browsingContextId", "navigation", "navigationId");
   }
 
   public String getBrowsingContextId() {

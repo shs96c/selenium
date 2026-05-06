@@ -125,6 +125,15 @@ class JsonInputTest {
   }
 
   @Test
+  void shouldRejectInvalidJsonNumberSyntax() {
+    for (String raw : List.of("+1", "-", "-.1", "1.", "1e", "1e+", "1e-", "1+2", "1a")) {
+      try (JsonInput input = newInput(raw)) {
+        assertThatExceptionOfType(JsonException.class).isThrownBy(input::nextNumber);
+      }
+    }
+  }
+
+  @Test
   void shouldParseDecimalNumbersAsDoubles() {
     try (JsonInput input = newInput("42.0")) {
       assertThat(input.peek()).isEqualTo(NUMBER);
@@ -167,6 +176,13 @@ class JsonInputTest {
   }
 
   @Test
+  void shouldRejectUnescapedControlCharactersInStrings() {
+    try (JsonInput input = newInput("\"cheese\ncake\"")) {
+      assertThatExceptionOfType(JsonException.class).isThrownBy(input::nextString);
+    }
+  }
+
+  @Test
   void anEmptyArrayHasNoContents() {
     try (JsonInput input = newInput("[]")) {
       assertThat(input.peek()).isEqualTo(START_COLLECTION);
@@ -174,6 +190,24 @@ class JsonInputTest {
       assertThat(input.hasNext()).isFalse();
       assertThat(input.peek()).isEqualTo(END_COLLECTION);
       input.endArray();
+    }
+  }
+
+  @Test
+  void shouldAllowTrailingCommaInArrayForCompatibility() {
+    try (JsonInput input = newInput("[1, 2,]")) {
+      List<Object> values = input.readArray(Object.class);
+
+      assertThat(values).containsExactly(1L, 2L);
+    }
+  }
+
+  @Test
+  void shouldAllowTrailingCommaInObjectForCompatibility() {
+    try (JsonInput input = newInput("{\"cheese\": \"brie\",}")) {
+      Map<String, Object> values = input.read(MAP_TYPE);
+
+      assertThat(values).containsEntry("cheese", "brie");
     }
   }
 
@@ -412,9 +446,11 @@ class JsonInputTest {
     String raw = "{\"name\": \"cheddar\", \"age\": 42, \"extra\": true}";
 
     try (JsonInput input = newInput(raw)) {
-      Map<String, Object> result = input.readObject(Map.of(
-          "name", (Type) String.class,
-          "age", (Type) Integer.class));
+      Map<String, Object> result =
+          input.readObject(
+              Map.of(
+                  "name", (Type) String.class,
+                  "age", (Type) Integer.class));
 
       assertThat(result.get("name")).isEqualTo("cheddar");
       assertThat(result.get("age")).isEqualTo(42);
@@ -427,8 +463,7 @@ class JsonInputTest {
     String raw = "{}";
 
     try (JsonInput input = newInput(raw)) {
-      Map<String, Object> result = input.readObject(Map.of(
-          "name", (Type) String.class));
+      Map<String, Object> result = input.readObject(Map.of("name", (Type) String.class));
 
       assertThat(result).isEmpty();
     }

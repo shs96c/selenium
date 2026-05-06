@@ -116,15 +116,15 @@ class JsonTypeCoercer {
     builder.add(new CollectionCoercer<>(Set.class, this, HashSet::new, (set) -> set::add));
 
     builder.add(new StaticInitializerCoercer());
-    builder.add(new ConstructorCoercer(this));
 
     builder.add(new MapCoercer<>(Map.class, this, LinkedHashMap::new, (map) -> map::put));
 
     // If the requested type is exactly "Object", do some guess work
     builder.add(new ObjectCoercer(this));
 
-    // Order matters here: we want this to be the last called coercer
+    // Prefer no-arg constructors with bean/field population before constructor parameter binding.
     builder.add(new InstanceCoercer(this));
+    builder.add(new ConstructorCoercer(this));
 
     this.coercers = Collections.unmodifiableSet(builder);
   }

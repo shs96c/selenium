@@ -23,7 +23,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -42,7 +46,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.internal.Require;
 import org.openqa.selenium.logging.LogLevelMapping;
@@ -247,6 +250,16 @@ public class JsonOutput implements Closeable {
           }
 
           write0(optional.get(), maxDepth, depthRemaining);
+        });
+
+    builder.put(
+        this::canSerializeWithConstructorProperties,
+        (obj, maxDepth, depthRemaining) -> {
+          if (depthRemaining < 1) {
+            throw new JsonException(
+                "Reached the maximum depth of " + maxDepth + " while writing JSON");
+          }
+          mapConstructorPropertiesObject(obj, maxDepth, depthRemaining - 1);
         });
 
     // Finally, attempt to convert as an object
@@ -560,6 +573,69 @@ public class JsonOutput implements Closeable {
     } catch (ReflectiveOperationException e) {
       throw new JsonException(e);
     }
+  }
+
+  private boolean canSerializeWithConstructorProperties(Class<?> clazz) {
+    Constructor<?> constructor = ConstructorCoercer.findConstructorWithProperties(clazz);
+    if (constructor == null) {
+      return false;
+    }
+
+    Parameter[] params = constructor.getParameters();
+    String[] jsonNames = ConstructorCoercer.getJsonNames(constructor);
+    for (int i = 0; i < jsonNames.length; i++) {
+      if (findField(clazz, fieldNameFor(params[i], jsonNames[i])) == null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void mapConstructorPropertiesObject(Object toConvert, int maxDepth, int depthRemaining) {
+    Constructor<?> constructor =
+        Require.nonNull(
+            "Constructor with ConstructorProperties",
+            ConstructorCoercer.findConstructorWithProperties(toConvert.getClass()));
+    Parameter[] params = constructor.getParameters();
+    String[] jsonNames = ConstructorCoercer.getJsonNames(constructor);
+
+    beginObject();
+    for (int i = 0; i < jsonNames.length; i++) {
+      Field field =
+          Require.nonNull(
+              "Field " + params[i].getName(),
+              findField(toConvert.getClass(), fieldNameFor(params[i], jsonNames[i])));
+      try {
+        field.setAccessible(true);
+        Object value = field.get(toConvert);
+        if (!Optional.empty().equals(value)) {
+          name(jsonNames[i]);
+          write0(value, maxDepth, depthRemaining);
+        }
+      } catch (IllegalAccessException e) {
+        throw new JsonException("Unable to read field " + field.getName(), e);
+      }
+    }
+    endObject();
+  }
+
+  private String fieldNameFor(Parameter parameter, String jsonName) {
+    return parameter.isNamePresent() ? parameter.getName() : jsonName;
+  }
+
+  private @Nullable Field findField(Class<?> clazz, String name) {
+    for (Class<?> current = clazz; current != Object.class; current = current.getSuperclass()) {
+      try {
+        Field field = current.getDeclaredField(name);
+        if (!Modifier.isStatic(field.getModifiers())) {
+          return field;
+        }
+        return null;
+      } catch (NoSuchFieldException e) {
+        // Try the superclass.
+      }
+    }
+    return null;
   }
 
   /**

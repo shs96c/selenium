@@ -225,7 +225,6 @@ public class JsonInput implements Closeable {
    */
   public Number nextNumber() {
     expect(JsonType.NUMBER);
-    boolean mightBeDecimal = false;
     StringBuilder builder = new StringBuilder();
     // We know it's safe to use a do/while loop since the first character was a number
     boolean read = true;
@@ -248,7 +247,6 @@ public class JsonInput implements Closeable {
         case '.':
         case 'e':
         case 'E':
-          mightBeDecimal = true;
           builder.append(input.read());
           break;
         default:
@@ -256,35 +254,25 @@ public class JsonInput implements Closeable {
       }
     } while (read);
 
-    // Validate: no leading zeros in the integer part (RFC 8259 §6).
-    // After optional sign, if the first digit is '0', it must be alone or followed by '.' / 'e'.
     String raw = builder.toString();
-    int intStart = 0;
-    if (raw.length() > 0 && (raw.charAt(0) == '-' || raw.charAt(0) == '+')) {
-      intStart = 1;
-    }
-    if (raw.length() > intStart + 1
-        && raw.charAt(intStart) == '0'
-        && Character.isDigit(raw.charAt(intStart + 1))) {
-      throw new JsonException("Leading zeros are not allowed in JSON numbers: " + raw + ". " + input);
-    }
+    validateNumber(raw);
+    validateNumberTerminator(raw);
 
     try {
       // The JSON Schema does state the decimal point should not be used distinguish between
       // integers and floating point values.
       // Therefore, using a Long is only a fast path here, but we should not rely on the `double`
       // value below is a real floating point.
-      if (!mightBeDecimal) {
-        String str = builder.toString();
+      if (!mightBeDecimal(raw)) {
         try {
-          return Long.valueOf(str);
+          return Long.valueOf(raw);
         } catch (NumberFormatException e) {
           // Number exceeds Long range; fall back to BigDecimal
-          return new BigDecimal(str);
+          return new BigDecimal(raw);
         }
       }
 
-      return new BigDecimal(builder.toString()).doubleValue();
+      return new BigDecimal(raw).doubleValue();
     } catch (NumberFormatException e) {
       throw new JsonException("Unable to parse to a number: " + builder + ". " + input, e);
     }
@@ -341,7 +329,9 @@ public class JsonInput implements Closeable {
     skipWhitespace(input);
     if (input.peek() == ',') {
       input.read();
-      return true;
+      skipWhitespace(input);
+      JsonType type = peek();
+      return type != JsonType.END_COLLECTION && type != JsonType.END_MAP;
     }
 
     JsonType type = peek();
@@ -421,7 +411,9 @@ public class JsonInput implements Closeable {
   private void skipValue(int depth) {
     if (depth >= MAX_SKIP_DEPTH) {
       throw new JsonException(
-          "Maximum nesting depth of " + MAX_SKIP_DEPTH + " exceeded while skipping value. "
+          "Maximum nesting depth of "
+              + MAX_SKIP_DEPTH
+              + " exceeded while skipping value. "
               + input);
     }
 
@@ -655,9 +647,97 @@ public class JsonInput implements Closeable {
           readEscape(stringBuffer);
           break;
         default:
+          if (c <= 0x1f) {
+            throw new JsonException("Unescaped control character in string: " + input);
+          }
           stringBuffer.append(c);
       }
     }
+  }
+
+  private void validateNumber(String raw) {
+    int pos = 0;
+    int length = raw.length();
+
+    if (length == 0) {
+      throw new JsonException("Empty JSON number. " + input);
+    }
+
+    if (raw.charAt(pos) == '+') {
+      throw new JsonException("Leading plus signs are not allowed in JSON numbers: " + raw);
+    }
+
+    if (raw.charAt(pos) == '-') {
+      pos++;
+      if (pos == length) {
+        throw new JsonException("JSON numbers require a digit after '-': " + raw);
+      }
+    }
+
+    if (raw.charAt(pos) == '0') {
+      pos++;
+      if (pos < length && Character.isDigit(raw.charAt(pos))) {
+        throw new JsonException("Leading zeros are not allowed in JSON numbers: " + raw);
+      }
+    } else if (isDigitOneToNine(raw.charAt(pos))) {
+      pos++;
+      while (pos < length && Character.isDigit(raw.charAt(pos))) {
+        pos++;
+      }
+    } else {
+      throw new JsonException("JSON numbers require an integer digit: " + raw);
+    }
+
+    if (pos < length && raw.charAt(pos) == '.') {
+      pos++;
+      if (pos == length || !Character.isDigit(raw.charAt(pos))) {
+        throw new JsonException("JSON numbers require a digit after '.': " + raw);
+      }
+      while (pos < length && Character.isDigit(raw.charAt(pos))) {
+        pos++;
+      }
+    }
+
+    if (pos < length && (raw.charAt(pos) == 'e' || raw.charAt(pos) == 'E')) {
+      pos++;
+      if (pos < length && (raw.charAt(pos) == '+' || raw.charAt(pos) == '-')) {
+        pos++;
+      }
+      if (pos == length || !Character.isDigit(raw.charAt(pos))) {
+        throw new JsonException("JSON number exponents require at least one digit: " + raw);
+      }
+      while (pos < length && Character.isDigit(raw.charAt(pos))) {
+        pos++;
+      }
+    }
+
+    if (pos != length) {
+      throw new JsonException("Invalid JSON number: " + raw);
+    }
+  }
+
+  private boolean mightBeDecimal(String raw) {
+    return raw.indexOf('.') != -1 || raw.indexOf('e') != -1 || raw.indexOf('E') != -1;
+  }
+
+  private void validateNumberTerminator(String raw) {
+    char next = input.peek();
+    if (next == Input.EOF
+        || next == ','
+        || next == ']'
+        || next == '}'
+        || next == ' '
+        || next == '\t'
+        || next == '\n'
+        || next == '\r') {
+      return;
+    }
+
+    throw new JsonException("Invalid character after JSON number " + raw + ": " + next);
+  }
+
+  private boolean isDigitOneToNine(char c) {
+    return c >= '1' && c <= '9';
   }
 
   /**

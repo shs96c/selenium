@@ -18,7 +18,6 @@
 package org.openqa.selenium.json;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.byLessThan;
 import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
@@ -27,12 +26,14 @@ import static org.openqa.selenium.json.Json.MAP_TYPE;
 import static org.openqa.selenium.json.PropertySetting.BY_FIELD;
 
 import com.google.common.reflect.TypeToken;
+import java.beans.ConstructorProperties;
 import java.io.StringReader;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Tag;
@@ -201,6 +202,16 @@ class JsonTest {
   }
 
   @Test
+  void prefersDefaultConstructorPopulationOverConstructorCoercer() {
+    String raw = "{\"value\": \"time\"}";
+
+    DefaultAndConstructor result = new Json().toType(raw, DefaultAndConstructor.class);
+
+    assertThat(result.getValue()).isEqualTo("time");
+    assertThat(result.getSource()).isEqualTo("default");
+  }
+
+  @Test
   void willSilentlyDiscardUnusedFieldsWhenPopulatingABean() {
     String raw = "{\"value\": \"time\", \"frob\": \"telephone\"}";
 
@@ -246,14 +257,15 @@ class JsonTest {
   }
 
   @Test
-  void parsesLargeNumericValueWithoutThrowing() {
-    // Numbers exceeding Long range are now parsed as BigDecimal and coerced via longValue()
+  void reportsTooLargeNumericValue() {
     String raw = "{\"id\": 123456789012345678901234567890}";
 
-    NumericValues bean = new Json().toType(raw, NumericValues.class, BY_FIELD);
-    // The value is truncated when coerced to long, same as BigDecimal.longValue()
-    assertThat(bean.id)
-        .isEqualTo(new java.math.BigDecimal("123456789012345678901234567890").longValue());
+    assertThatThrownBy(() -> new Json().toType(raw, NumericValues.class, BY_FIELD))
+        .isInstanceOf(JsonException.class)
+        .hasMessageStartingWith("Unable to parse: " + raw)
+        .cause()
+        .isInstanceOf(JsonException.class)
+        .hasMessageStartingWith("Numeric value cannot be represented as Long");
   }
 
   @Test
@@ -611,13 +623,24 @@ class JsonTest {
   }
 
   @Test
-  void canDeserializeImmutableClassWithJsonAliases() {
+  void canDeserializeImmutableClassWithConstructorProperties() {
     String raw = "{\"ctx\": \"abc123\", \"nav\": \"def456\"}";
 
-    AliasedImmutable result = new Json().toType(raw, AliasedImmutable.class);
+    ConstructorPropertiesImmutable result =
+        new Json().toType(raw, ConstructorPropertiesImmutable.class);
 
     assertThat(result.context).isEqualTo("abc123");
     assertThat(result.navigation).isEqualTo("def456");
+  }
+
+  @Test
+  void canSerializeImmutableClassWithConstructorProperties() {
+    ConstructorPropertiesImmutable value = new ConstructorPropertiesImmutable("abc123", "def456");
+
+    Map<String, Object> result = new Json().toType(new Json().toJson(value), MAP_TYPE);
+
+    assertThat(result).containsEntry("ctx", "abc123").containsEntry("nav", "def456");
+    assertThat(result).doesNotContainKeys("context", "navigation");
   }
 
   @Test
@@ -631,7 +654,7 @@ class JsonTest {
   }
 
   @Test
-  void constructorCoercerHandlesMissingNullableFields() {
+  void constructorCoercerHandlesMissingPrimitiveFieldsAsDefaults() {
     // Only "name" provided, "age" (primitive int) should get default 0
     String raw = "{\"name\": \"cheddar\"}";
 
@@ -639,6 +662,30 @@ class JsonTest {
 
     assertThat(person.name).isEqualTo("cheddar");
     assertThat(person.age).isEqualTo(0);
+  }
+
+  @Test
+  void constructorCoercerRequiresMandatoryFields() {
+    String raw = "{\"age\": 5}";
+
+    assertThatThrownBy(() -> new Json().toType(raw, ImmutablePerson.class))
+        .isInstanceOf(JsonException.class)
+        .hasMessageStartingWith("Unable to parse: " + raw)
+        .cause()
+        .isInstanceOf(JsonException.class)
+        .hasMessageContaining("Missing required JSON field 'name'");
+  }
+
+  @Test
+  void constructorCoercerAllowsMissingOptionalFields() {
+    String raw = "{\"name\": \"cheddar\"}";
+
+    ImmutableWithOptionalFields value = new Json().toType(raw, ImmutableWithOptionalFields.class);
+
+    assertThat(value.name).isEqualTo("cheddar");
+    assertThat(value.nickname).isNull();
+    assertThat(value.label).isEmpty();
+    assertThat(value.age).isEqualTo(0);
   }
 
   @Test
@@ -702,6 +749,33 @@ class JsonTest {
 
     public String getValue() {
       return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+  }
+
+  public static class DefaultAndConstructor {
+
+    private String value;
+    private final String source;
+
+    public DefaultAndConstructor() {
+      this.source = "default";
+    }
+
+    public DefaultAndConstructor(String value) {
+      this.value = value;
+      this.source = "constructor";
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public String getSource() {
+      return source;
     }
 
     public void setValue(String value) {
@@ -804,19 +878,30 @@ class JsonTest {
     }
   }
 
-  // Has jsonAliases to map JSON keys to constructor param names.
-  public static class AliasedImmutable {
+  public static class ImmutableWithOptionalFields {
+    final String name;
+    @Nullable final String nickname;
+    final Optional<String> label;
+    final int age;
+
+    public ImmutableWithOptionalFields(
+        String name, @Nullable String nickname, Optional<String> label, int age) {
+      this.name = name;
+      this.nickname = nickname;
+      this.label = label;
+      this.age = age;
+    }
+  }
+
+  // Uses ConstructorProperties to map JSON keys to constructor param names and fields.
+  public static class ConstructorPropertiesImmutable {
     final String context;
     final String navigation;
 
-    public AliasedImmutable(String context, String navigation) {
+    @ConstructorProperties({"ctx", "nav"})
+    public ConstructorPropertiesImmutable(String context, String navigation) {
       this.context = context;
       this.navigation = navigation;
-    }
-
-    @SuppressWarnings("unused")
-    private static java.util.Map<String, String> jsonAliases() {
-      return java.util.Map.of("ctx", "context", "nav", "navigation");
     }
   }
 

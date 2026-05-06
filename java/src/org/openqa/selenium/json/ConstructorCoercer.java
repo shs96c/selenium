@@ -19,17 +19,18 @@ package org.openqa.selenium.json;
 
 import static org.openqa.selenium.json.Types.narrow;
 
+import java.beans.ConstructorProperties;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
+import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.internal.Require;
 
 /**
@@ -37,14 +38,12 @@ import org.openqa.selenium.internal.Require;
  * keys to constructor parameter names.
  *
  * <p>Requires compilation with {@code -parameters} so that constructor parameter names are
- * available via reflection.
+ * available via reflection. Classes may also declare {@link ConstructorProperties} to specify JSON
+ * field names when they differ from constructor parameter names.
  *
- * <p>For classes where JSON keys differ from parameter names, a static {@code jsonAliases()} method
- * returning {@code Map<String, String>} (JSON key → parameter name) provides the mapping.
+ * <p>For classes where JSON keys differ from parameter names, prefer {@link ConstructorProperties}.
  */
 class ConstructorCoercer extends TypeCoercer<Object> {
-
-  private static final String ALIASES_METHOD_NAME = "jsonAliases";
 
   private final JsonTypeCoercer coercer;
 
@@ -74,28 +73,14 @@ class ConstructorCoercer extends TypeCoercer<Object> {
     constructor.setAccessible(true);
 
     Parameter[] params = constructor.getParameters();
-    Map<String, String> aliases = getAliases(aClass);
+    String[] jsonNames = getJsonNames(constructor);
 
-    // Build mapping: JSON key → parameter index
-    // Also build reverse: parameter name → index for alias lookups
-    Map<String, Integer> paramNameToIndex = new HashMap<>();
-    for (int i = 0; i < params.length; i++) {
-      paramNameToIndex.put(params[i].getName(), i);
-    }
-
-    // JSON key → (parameter index, parameter generic type)
     Map<String, ParamTarget> jsonKeyToParam = new HashMap<>();
-    // Direct matches: JSON key == parameter name
     for (int i = 0; i < params.length; i++) {
-      jsonKeyToParam.put(params[i].getName(), new ParamTarget(i, params[i].getParameterizedType()));
-    }
-    // Alias overrides: JSON key → parameter name (via jsonAliases())
-    for (Map.Entry<String, String> alias : aliases.entrySet()) {
-      String jsonKey = alias.getKey();
-      String paramName = alias.getValue();
-      Integer idx = paramNameToIndex.get(paramName);
-      if (idx != null) {
-        jsonKeyToParam.put(jsonKey, new ParamTarget(idx, params[idx].getParameterizedType()));
+      ParamTarget target = new ParamTarget(i, params[i].getParameterizedType());
+      jsonKeyToParam.put(jsonNames[i], target);
+      if (!params[i].getName().equals(jsonNames[i])) {
+        jsonKeyToParam.put(params[i].getName(), target);
       }
     }
 
@@ -105,8 +90,11 @@ class ConstructorCoercer extends TypeCoercer<Object> {
       for (int i = 0; i < params.length; i++) {
         if (params[i].getType().isPrimitive()) {
           args[i] = defaultForPrimitive(params[i].getType());
+        } else if (Optional.class.equals(params[i].getType())) {
+          args[i] = Optional.empty();
         }
       }
+      boolean[] seen = new boolean[params.length];
 
       jsonInput.beginObject();
       while (jsonInput.hasNext()) {
@@ -114,11 +102,18 @@ class ConstructorCoercer extends TypeCoercer<Object> {
         ParamTarget target = jsonKeyToParam.get(key);
         if (target != null) {
           args[target.index] = coercer.coerce(jsonInput, target.type, setter);
+          seen[target.index] = true;
         } else {
           jsonInput.skipValue();
         }
       }
       jsonInput.endObject();
+
+      for (int i = 0; i < params.length; i++) {
+        if (!seen[i] && isMandatory(params[i])) {
+          throw new JsonException("Missing required JSON field '" + jsonNames[i] + "' for " + type);
+        }
+      }
 
       try {
         return constructor.newInstance(args);
@@ -128,15 +123,23 @@ class ConstructorCoercer extends TypeCoercer<Object> {
     };
   }
 
-  /**
-   * Find the best constructor: the one with the most parameters where all parameter names are
-   * present (compiled with -parameters).
-   */
+  /** Find the best constructor for immutable JSON binding. */
   private static Constructor<?> findConstructor(Class<?> aClass) {
+    return findConstructorWithProperties(aClass) != null
+        ? findConstructorWithProperties(aClass)
+        : Arrays.stream(aClass.getDeclaredConstructors())
+            .filter(c -> c.getParameterCount() > 0)
+            .filter(c -> !c.isSynthetic())
+            .filter(ConstructorCoercer::allParamsNamed)
+            .max(Comparator.comparingInt(Constructor::getParameterCount))
+            .orElse(null);
+  }
+
+  static @Nullable Constructor<?> findConstructorWithProperties(Class<?> aClass) {
     return Arrays.stream(aClass.getDeclaredConstructors())
         .filter(c -> c.getParameterCount() > 0)
         .filter(c -> !c.isSynthetic())
-        .filter(ConstructorCoercer::allParamsNamed)
+        .filter(ConstructorCoercer::hasValidConstructorProperties)
         .max(Comparator.comparingInt(Constructor::getParameterCount))
         .orElse(null);
   }
@@ -150,21 +153,32 @@ class ConstructorCoercer extends TypeCoercer<Object> {
     return true;
   }
 
-  @SuppressWarnings("unchecked")
-  private static Map<String, String> getAliases(Class<?> aClass) {
-    try {
-      Method method = aClass.getDeclaredMethod(ALIASES_METHOD_NAME);
-      if (Modifier.isStatic(method.getModifiers())
-          && Map.class.isAssignableFrom(method.getReturnType())) {
-        method.setAccessible(true);
-        return (Map<String, String>) method.invoke(null);
+  private static boolean hasValidConstructorProperties(Constructor<?> constructor) {
+    ConstructorProperties properties = constructor.getAnnotation(ConstructorProperties.class);
+    return properties != null && properties.value().length == constructor.getParameterCount();
+  }
+
+  static String[] getJsonNames(Constructor<?> constructor) {
+    ConstructorProperties properties = constructor.getAnnotation(ConstructorProperties.class);
+    if (properties != null) {
+      if (properties.value().length != constructor.getParameterCount()) {
+        throw new JsonException(
+            "ConstructorProperties length does not match parameter count for " + constructor);
       }
-    } catch (NoSuchMethodException e) {
-      // No aliases declared — that's fine
-    } catch (ReflectiveOperationException e) {
-      throw new JsonException("Unable to read jsonAliases() from " + aClass.getName(), e);
+      return properties.value();
     }
-    return Collections.emptyMap();
+
+    return Arrays.stream(constructor.getParameters())
+        .map(Parameter::getName)
+        .toArray(String[]::new);
+  }
+
+  private static boolean isMandatory(Parameter param) {
+    if (param.getType().isPrimitive() || Optional.class.equals(param.getType())) {
+      return false;
+    }
+    return param.getAnnotation(Nullable.class) == null
+        && param.getAnnotatedType().getAnnotation(Nullable.class) == null;
   }
 
   private static Object defaultForPrimitive(Class<?> type) {
